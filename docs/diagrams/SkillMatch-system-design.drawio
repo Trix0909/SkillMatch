@@ -1,0 +1,437 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="system-architecture" name="System architecture">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1200" pageHeight="850">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="System architecture" style="text;html=0;fontSize=26;fontStyle=1;align=left;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="30" y="15" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Job seeker / Employer / Administrator&#10;Web browser" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="430" y="90" width="340" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Presentation tier&#10;Django templates + Bootstrap 5&#10;CSS + JavaScript skill tags" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="390" y="225" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Application tier&#10;Django routing, authentication, forms&#10;Views, role and ownership checks" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="390" y="410" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="MatchingAlgorithm&#10;Count terms → cap at 2 → TF-IDF&#10;Cosine × certification × experience" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="850" y="410" width="310" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Data tier&#10;SQLite via Django ORM&#10;Users, profiles, skills, evidence, jobs" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="390" y="610" width="420" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="HTML response / form input" edge="1" parent="1" source="3" target="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Django request / response" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="ORM query / save" edge="1" parent="1" source="5" target="7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Eligible query and corpus" edge="1" parent="1" source="5" target="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="Ranked score breakdown" edge="1" parent="1" source="6" target="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="database-schema" name="Database schema">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="1000">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Database schema" style="text;html=0;fontSize=26;fontStyle=1;align=left;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="30" y="15" width="1340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="auth_user&#10;PK id · username · email&#10;first_name · last_name&#10;password hash · active · staff" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="90" width="300" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Account&#10;PK id · FK user (unique)&#10;role: seeker | employer" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="290" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="JobSeekerProfile&#10;PK id · FK user (unique)&#10;certification_level · experience_level&#10;bio · portfolio · updated_at" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="170" y="330" width="350" height="145" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="EmployerProfile&#10;PK id · FK user (unique)&#10;company_name · description" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="870" y="340" width="340" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Skill&#10;PK id · FK profile&#10;name · normalized_name&#10;FK category (optional)&#10;UNIQUE(profile, normalized_name)" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="650" width="330" height="155" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="EvidenceLink&#10;PK id · FK profile&#10;url (HTTP/S)" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="450" y="650" width="300" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="JobPost&#10;PK id · FK employer&#10;title · description · required_skills&#10;certification_level · experience_level&#10;is_active · timestamps" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="900" y="630" width="350" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="SkillCategory&#10;PK id · name (unique)" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="870" width="330" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="1 → 1" edge="1" parent="1" source="3" target="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="1 → 0..1" edge="1" parent="1" source="3" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="1 → 0..1" edge="1" parent="1" source="3" target="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="1 → many" edge="1" parent="1" source="5" target="7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="1 → 0..many" edge="1" parent="1" source="5" target="8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="1 → many" edge="1" parent="1" source="6" target="9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="0..1 → many" edge="1" parent="1" source="10" target="7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="use-cases" name="Use cases">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1400" pageHeight="1050">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Use cases" style="text;html=0;fontSize=26;fontStyle=1;align=left;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="30" y="15" width="1340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Job seeker" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=0;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="50" y="210" width="75" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Employer" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=0;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="210" width="75" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Administrator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=0;fontSize=15;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="805" width="75" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Register / Log in / Sign out" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="520" y="100" width="340" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Create and edit professional profile&#10;Unique skill tags, levels, bio, portfolio&#10;Optional evidence links" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="210" y="280" width="410" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="View ranked job recommendations&#10;and job details" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="210" y="490" width="410" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Browse open job posts" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="210" y="680" width="410" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Manage company profile" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="790" y="280" width="360" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Create and manage job posts" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="790" y="460" width="360" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="Search / rank candidates&#10;Inspect profile and score details" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="790" y="640" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Manage users, profiles and jobs" style="ellipse;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="690" y="850" width="410" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="" edge="1" parent="1" source="3" target="6" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="" edge="1" parent="1" source="4" target="6" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="" edge="1" parent="1" source="3" target="7" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="" edge="1" parent="1" source="3" target="8" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="" edge="1" parent="1" source="3" target="9" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="" edge="1" parent="1" source="4" target="10" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="" edge="1" parent="1" source="4" target="11" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="" edge="1" parent="1" source="4" target="12" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="" edge="1" parent="1" source="5" target="13" style="endArrow=none;html=0;strokeColor=#7c90aa;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="matching-activity" name="Matching activity">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1150" pageHeight="1450">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Matching activity" style="text;html=0;fontSize=26;fontStyle=1;align=left;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="30" y="15" width="1090" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Employer submits job or search text" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="90" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Authorize employer and job ownership" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="225" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Load active candidate profiles&#10;Keep only profiles with skills, bio and portfolio" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="360" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Concatenate skills + bio + portfolio&#10;Prepare employer text" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="515" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Tokenize and remove stop words&#10;Cap raw term frequencies at 2" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="670" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Fit shared TF-IDF representation&#10;Compute cosine similarity" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="825" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Apply profile certification multiplier&#10;Apply profile experience multiplier" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="980" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Sort descending, break ties by ID&#10;Paginate ranked candidate profiles" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1135" width="430" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="" edge="1" parent="1" source="3" target="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="" edge="1" parent="1" source="4" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="" edge="1" parent="1" source="5" target="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="" edge="1" parent="1" source="6" target="7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="" edge="1" parent="1" source="7" target="8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="" edge="1" parent="1" source="8" target="9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="" edge="1" parent="1" source="9" target="10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="Reverse workflow&#10;A complete seeker profile is the query.&#10;Documents are open jobs from active employers.&#10;Use the same pipeline and profile multipliers." style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="800" width="300" height="165" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="Empty corpus or empty vocabulary&#10;Show an empty list or zero scores.&#10;No fabricated matches." style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="30" y="1060" width="300" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="implementation-class-diagram" name="Implementation class diagram">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1300" pageHeight="900">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Implementation class diagram" style="text;html=0;fontSize=26;fontStyle=1;align=left;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="30" y="15" width="1240" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Django User&#10;username, password, active&#10;check_password(), get_full_name()" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="480" y="90" width="330" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="JobSeekerProfile&#10;certification_level, experience_level&#10;bio, portfolio&#10;is_complete, matching_text" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="50" y="325" width="390" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="EmployerProfile&#10;company_name, description&#10;jobs (related manager)" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="850" y="325" width="360" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="JobPost&#10;title, description, required_skills&#10;levels, is_active&#10;matching_text" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="850" y="610" width="360" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="MatchingAlgorithm&#10;vectorize(texts)&#10;compute_similarity(query, documents)&#10;apply_multipliers(base, profile)&#10;rank_candidates(query, profiles)&#10;rank_jobs(profile, jobs)" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="390" y="570" width="420" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Skill / EvidenceLink&#10;Unique skill name / URL&#10;FK profile" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="620" width="285" height="105" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="one-to-one composition" edge="1" parent="1" source="3" target="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="one-to-one composition" edge="1" parent="1" source="3" target="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="owns many" edge="1" parent="1" source="4" target="8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="owns many" edge="1" parent="1" source="5" target="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="reads" edge="1" parent="1" source="7" target="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="reads" edge="1" parent="1" source="7" target="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;strokeColor=#7c90aa;fontColor=#425974;fontSize=12;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Django implements role profiles through composition&#10;rather than subclassing its concrete User model." style="text;html=0;fontSize=13;fontColor=#60748e;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="410" y="810" width="480" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="matching-sequence" name="Matching sequence">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1300" pageHeight="950">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Matching sequence" style="text;html=0;fontSize=26;fontStyle=1;align=left;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="30" y="15" width="1240" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Employer browser" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Django view / form" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="370" y="100" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Django ORM / SQLite" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="690" y="100" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="MatchingAlgorithm" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="100" width="220" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="159" y="830" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="" edge="1" parent="1" source="3" target="7" style="dashed=1;endArrow=none;strokeColor=#b6c3d4;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="479" y="830" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" edge="1" parent="1" source="4" target="9" style="dashed=1;endArrow=none;strokeColor=#b6c3d4;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="799" y="830" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="" edge="1" parent="1" source="5" target="11" style="dashed=1;endArrow=none;strokeColor=#b6c3d4;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1119" y="830" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="" edge="1" parent="1" source="6" target="13" style="dashed=1;endArrow=none;strokeColor=#b6c3d4;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="159" y="230" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="479" y="230" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="1. Submit job description" edge="1" parent="1" source="15" target="16" style="endArrow=block;html=0;fontSize=12;strokeColor=#637d9d;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="479" y="310" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="799" y="310" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="2. Check ownership and retrieve active profiles" edge="1" parent="1" source="18" target="19" style="endArrow=block;html=0;fontSize=12;strokeColor=#637d9d;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="799" y="390" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="479" y="390" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="3. Profiles, unique skills and portfolio text" edge="1" parent="1" source="21" target="22" style="endArrow=block;html=0;fontSize=12;strokeColor=#637d9d;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="479" y="470" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1119" y="470" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="4. Rank query against profile corpus" edge="1" parent="1" source="24" target="25" style="endArrow=block;html=0;fontSize=12;strokeColor=#637d9d;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="5. Cap TF, vectorize, cosine, multipliers" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="910" y="515" width="340" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1119" y="620" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="479" y="620" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="6. Ranked Match objects" edge="1" parent="1" source="28" target="29" style="endArrow=block;html=0;fontSize=12;strokeColor=#637d9d;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="479" y="735" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="" style="fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="159" y="735" width="2" height="2" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="7. Render candidates, skills and score breakdown" edge="1" parent="1" source="31" target="32" style="endArrow=block;html=0;fontSize=12;strokeColor=#637d9d;labelBackgroundColor=#ffffff;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="interface-wireframes" name="Interface wireframes">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1500" pageHeight="1300">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Interface wireframes" style="text;html=0;fontSize=26;fontStyle=1;align=left;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="30" y="15" width="1440" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Registration and login" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#b6c3d4;fontColor=#29425f;fontSize=18;verticalAlign=top;spacingTop=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="660" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Professional profile" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#b6c3d4;fontColor=#29425f;fontSize=18;verticalAlign=top;spacingTop=20;" vertex="1" parent="1">
+          <mxGeometry x="780" y="100" width="660" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Employer job posting" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#b6c3d4;fontColor=#29425f;fontSize=18;verticalAlign=top;spacingTop=20;" vertex="1" parent="1">
+          <mxGeometry x="40" y="710" width="660" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Ranked match results" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#ffffff;strokeColor=#b6c3d4;fontColor=#29425f;fontSize=18;verticalAlign=top;spacingTop=20;" vertex="1" parent="1">
+          <mxGeometry x="780" y="710" width="660" height="520" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Name · Email · Username&#10;Role selector&#10;Company name (employers only)&#10;Password · Confirm password" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="90" y="190" width="560" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Create account / Sign in" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="90" y="465" width="560" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Names&#10;Single skill input + Add skill&#10;Skill tags with removal and duplicate feedback&#10;Certification and experience dropdowns&#10;Bio · Portfolio description&#10;Optional evidence links" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="830" y="190" width="560" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="Save profile" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="830" y="525" width="560" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Job title and description&#10;Unique required skill tags&#10;Minimum certification and experience" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="90" y="800" width="560" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="Post job and find matches" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="90" y="1050" width="560" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Candidate / Job title and summary&#10;Matching skill tags&#10;Certification and experience levels&#10;View profile / opportunity" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="830" y="800" width="350" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="Weighted score&#10;Why this match?&#10;Base similarity&#10;× Certification&#10;× Experience" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="800" width="190" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Pagination · query retained" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#eef3fc;strokeColor=#9ab2d9;fontColor=#233a56;fontSize=14;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="830" y="1090" width="560" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
