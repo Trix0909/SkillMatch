@@ -1,1 +1,62 @@
-{% extends 'base.html' %}{% block title %}Browse jobs · SkillMatch{% endblock %}{% block content %}<div class="page-heading"><div><span class="eyebrow">EXPLORE WHAT’S NEXT</span><h1>Browse opportunities<span class="blue">.</span></h1><p>Explore the open roles posted by employers on SkillMatch.</p></div></div><form class="search-bar" method="get"><label class="visually-hidden" for="job-search">Search jobs</label><input id="job-search" class="form-control" name="q" maxlength="150" value="{{ query }}" placeholder="Search by job title or skill"><button class="btn btn-primary">Search jobs</button>{% if query %}<a class="btn btn-outline-secondary" href="{% url 'jobs' %}">Clear</a>{% endif %}</form><div class="results-heading"><h2>Open jobs <span class="count">{{ page_obj.paginator.count }}</span></h2><span>Newest first</span></div>{% for job in page_obj %}<article class="panel job-card"><div class="result-meta"><span class="company-monogram">{{ job.employer.company_name|first|upper }}</span><span>{{ job.employer.company_name }}</span><span class="ms-auto small">{{ job.created_at|date:'d M Y' }}</span></div><h3><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3><p class="result-description">{{ job.description|truncatechars:200 }}</p><div class="skill-tags">{% for skill in job.required_skills %}<span class="skill-tag">{{ skill }}</span>{% endfor %}</div><div class="card-bottom"><span>{{ job.get_certification_level_display }} · {{ job.get_experience_level_display }}</span><a href="{% url 'job_detail' job.pk %}">View opportunity ↗</a></div></article>{% empty %}<div class="panel empty-state"><h2>{% if query %}No jobs found for “{{ query }}”.{% else %}No open jobs yet.{% endif %}</h2><p>{% if query %}Try another job title or skill.{% else %}New opportunities will appear here when employers post them.{% endif %}</p></div>{% endfor %}{% include 'partials/pagination.html' %}{% endblock %}
+{% extends "base.html" %}
+{% block title %}Browse jobs · SkillMatch{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">EXPLORE WHAT’S NEXT</span>
+      <h1>
+        Browse opportunities<span class="blue">.</span>
+      </h1>
+      <p>Explore the open roles posted by employers on SkillMatch.</p>
+    </div>
+  </div>
+  <form class="search-bar" method="get">
+    <label class="visually-hidden" for="job-search">Search jobs</label>
+    <input id="job-search"
+           class="form-control"
+           name="q"
+           maxlength="150"
+           value="{{ query }}"
+           placeholder="Search by job title or skill">
+    <button class="btn btn-primary">Search jobs</button>
+    {% if query %}
+      <a class="btn btn-outline-secondary" href="{% url 'jobs' %}">Clear</a>
+    {% endif %}
+  </form>
+  <div class="results-heading">
+    <h2>
+      Open jobs <span class="count">{{ page_obj.paginator.count }}</span>
+    </h2>
+    <span>Newest first</span>
+  </div>
+  {% for job in page_obj %}
+    <article class="panel job-card">
+      <div class="result-meta">
+        <span class="company-monogram">{{ job.employer.company_name|first|upper }}</span>
+        <span>{{ job.employer.company_name }}</span>
+        <span class="ms-auto small">{{ job.created_at|date:'d M Y' }}</span>
+      </div>
+      <h3>
+        <a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a>
+      </h3>
+      <p class="result-description">{{ job.description|truncatechars:200 }}</p>
+      <div class="skill-tags">
+        {% for skill in job.required_skills %}
+          <span class="skill-tag">{{ skill }}</span>
+        {% endfor %}
+      </div>
+      <div class="card-bottom">
+        <span>{{ job.get_certification_level_display }} · {{ job.get_experience_level_display }}</span>
+        <a href="{% url 'job_detail' job.pk %}">View opportunity ↗</a>
+      </div>
+    </article>
+  {% empty %}
+    <div class="panel empty-state">
+      <h2>{% if query %}No jobs found for “{{ query }}”.{% else %}No open jobs yet.{% endif %}</h2>
+      <p>
+        {% if query %}Try another job title or skill.{% else %}New opportunities will appear here when employers post them.{% endif %}
+      </p>
+    </div>
+  {% endfor %}
+  {% include "partials/pagination.html" %}
+{% endblock %}

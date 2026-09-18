@@ -1,0 +1,25 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": false,
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "files.exclude": {
+    "**/__pycache__": true,
+    ".ruff_cache": true
+  },
+  "search.exclude": {
+    ".venv": true,
+    "staticfiles": true,
+    "tmp": true
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "[html][css][javascript][json][yaml]": {
+    "editor.tabSize": 2
+  }
+}

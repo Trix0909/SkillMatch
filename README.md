@@ -6,18 +6,18 @@ The working proposal is the implementation authority where the files differ. Thi
 
 ## Run on Windows
 
-From this directory, using Python 3.12 or later:
+From this directory, using Python 3.12:
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe manage.py migrate
-.\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
+.\setup.ps1
+.\start.ps1
 ```
 
 Open **http://127.0.0.1:8000**. After setup, `start.ps1` starts the development server. Python in this project’s `.venv` is already configured on the build machine.
 
-On macOS/Linux, use `python3`, `.venv/bin/python`, and the same management commands.
+On macOS/Linux, run `python3.12 tools/dev.py setup`, then `.venv/bin/python tools/dev.py run`.
+
+Setup installs pinned application and development dependencies, applies migrations and checks the configuration. It can be rerun without resetting existing data. See [development environment and workflow](docs/DEVELOPMENT.md) for the complete requirement checklist, editor configuration and Git workflow.
 
 ### Try the synthetic demonstration
 
@@ -69,10 +69,10 @@ The same algorithm works in reverse. A single seeker’s multipliers are constan
 ## Validate
 
 ```powershell
-.\.venv\Scripts\python.exe manage.py check
-.\.venv\Scripts\python.exe manage.py test skillmatch.tests --verbosity 2
-.\.venv\Scripts\python.exe manage.py makemigrations --check --dry-run
+.\.venv\Scripts\python.exe tools/dev.py check
 ```
+
+The command runs Python linting, formatting checks, dependency and Django checks, migration drift detection, all tests, production-setting checks, static collection and a Git-index privacy check. `tools/dev.py format` formats first-party code, and `tools/dev.py doctor` inspects the environment and prepared database. GitHub Actions is configured to run validation on Windows and Linux when the repository is pushed to GitHub.
 
 Tests cover the real ranking pipeline, repetition capping, qualification multipliers, bidirectional matching, duplicate prevention, evidence safety, registration, role permissions, ownership, CSRF, escaped content, job lifecycle and research metric calculations.
 

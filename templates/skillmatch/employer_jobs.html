@@ -1,1 +1,68 @@
-{% extends 'base.html' %}{% block title %}My job posts · SkillMatch{% endblock %}{% block content %}<div class="page-heading"><div><span class="eyebrow">{{ user.employer_profile.company_name|upper }}</span><h1>Find your next great fit<span class="blue">.</span></h1><p>Turn your job requirements into a ranked list of relevant people.</p></div><a class="btn btn-primary" href="{% url 'job_create' %}">+ Post a job</a></div><div class="match-banner employer-banner"><div><span class="eyebrow">LESS SEARCHING. MORE UNDERSTANDING.</span><h2>The skills you need, in clearer view.</h2><p>Describe the work. Discover candidates. Understand every match.</p><a href="{% url 'candidates' %}">Search candidates directly →</a></div><span class="banner-art" aria-hidden="true">⌕</span></div><div class="results-heading"><h2>Your job posts <span class="count">{{ page_obj.paginator.count }}</span></h2><span>Manage your opportunities</span></div>{% for job in page_obj %}<article class="panel job-card"><div class="d-flex justify-content-between align-items-center gap-2"><span class="status-tag {% if not job.is_active %}closed{% endif %}">{% if job.is_active %}● Open{% else %}Closed{% endif %}</span><span class="small muted">Posted {{ job.created_at|date:'d M Y' }}</span></div><h3 class="mt-3"><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3><p class="result-description">{{ job.description|truncatechars:160 }}</p><div class="skill-tags">{% for skill in job.required_skills %}<span class="skill-tag">{{ skill }}</span>{% endfor %}</div><div class="card-bottom"><div class="d-flex gap-3 align-items-center"><a href="{% url 'job_edit' job.pk %}">Edit</a><form method="post" action="{% url 'job_toggle' job.pk %}">{% csrf_token %}<button class="link-button">{% if job.is_active %}Close job{% else %}Reopen job{% endif %}</button></form><a class="muted" href="{% url 'job_delete' job.pk %}">Delete</a></div><a class="btn btn-primary btn-sm" href="{% url 'job_candidates' job.pk %}">View matches ↗</a></div></article>{% empty %}<div class="panel empty-state"><span class="empty-icon">▤</span><h2>Your first great match starts with a job.</h2><p>Tell candidates what you’re looking for. We’ll help you find the relevant profiles.</p><a href="{% url 'job_create' %}" class="btn btn-primary">Post your first job →</a></div>{% endfor %}{% include 'partials/pagination.html' %}{% endblock %}
+{% extends "base.html" %}
+{% block title %}My job posts · SkillMatch{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">{{ user.employer_profile.company_name|upper }}</span>
+      <h1>
+        Find your next great fit<span class="blue">.</span>
+      </h1>
+      <p>Turn your job requirements into a ranked list of relevant people.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'job_create' %}">+ Post a job</a>
+  </div>
+  <div class="match-banner employer-banner">
+    <div>
+      <span class="eyebrow">LESS SEARCHING. MORE UNDERSTANDING.</span>
+      <h2>The skills you need, in clearer view.</h2>
+      <p>Describe the work. Discover candidates. Understand every match.</p>
+      <a href="{% url 'candidates' %}">Search candidates directly →</a>
+    </div>
+    <span class="banner-art" aria-hidden="true">⌕</span>
+  </div>
+  <div class="results-heading">
+    <h2>
+      Your job posts <span class="count">{{ page_obj.paginator.count }}</span>
+    </h2>
+    <span>Manage your opportunities</span>
+  </div>
+  {% for job in page_obj %}
+    <article class="panel job-card">
+      <div class="d-flex justify-content-between align-items-center gap-2">
+        <span class="status-tag {% if not job.is_active %}closed{% endif %}">
+          {% if job.is_active %}● Open{% else %}Closed{% endif %}
+        </span>
+        <span class="small muted">Posted {{ job.created_at|date:'d M Y' }}</span>
+      </div>
+      <h3 class="mt-3">
+        <a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a>
+      </h3>
+      <p class="result-description">{{ job.description|truncatechars:160 }}</p>
+      <div class="skill-tags">
+        {% for skill in job.required_skills %}
+          <span class="skill-tag">{{ skill }}</span>
+        {% endfor %}
+      </div>
+      <div class="card-bottom">
+        <div class="d-flex gap-3 align-items-center">
+          <a href="{% url 'job_edit' job.pk %}">Edit</a>
+          <form method="post" action="{% url 'job_toggle' job.pk %}">
+            {% csrf_token %}
+            <button class="link-button">{% if job.is_active %}Close job{% else %}Reopen job{% endif %}</button>
+          </form>
+          <a class="muted" href="{% url 'job_delete' job.pk %}">Delete</a>
+        </div>
+        <a class="btn btn-primary btn-sm"
+           href="{% url 'job_candidates' job.pk %}">View matches ↗</a>
+      </div>
+    </article>
+  {% empty %}
+    <div class="panel empty-state">
+      <span class="empty-icon">▤</span>
+      <h2>Your first great match starts with a job.</h2>
+      <p>Tell candidates what you’re looking for. We’ll help you find the relevant profiles.</p>
+      <a href="{% url 'job_create' %}" class="btn btn-primary">Post your first job →</a>
+    </div>
+  {% endfor %}
+  {% include "partials/pagination.html" %}
+{% endblock %}

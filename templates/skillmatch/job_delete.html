@@ -1,1 +1,14 @@
-{% extends 'base.html' %}{% block title %}Delete job · SkillMatch{% endblock %}{% block content %}<div class="panel narrow-panel"><span class="eyebrow">REMOVE OPPORTUNITY</span><h1>Delete this job?</h1><p>“{{ job.title }}” will be permanently removed. You can close it instead to keep the job details.</p><form method="post" class="d-flex gap-3">{% csrf_token %}<a class="btn btn-outline-secondary" href="{% url 'employer_jobs' %}">Keep job</a><button class="btn btn-danger">Delete job</button></form></div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Delete job · SkillMatch{% endblock %}
+{% block content %}
+  <div class="panel narrow-panel">
+    <span class="eyebrow">REMOVE OPPORTUNITY</span>
+    <h1>Delete this job?</h1>
+    <p>“{{ job.title }}” will be permanently removed. You can close it instead to keep the job details.</p>
+    <form method="post" class="d-flex gap-3">
+      {% csrf_token %}
+      <a class="btn btn-outline-secondary" href="{% url 'employer_jobs' %}">Keep job</a>
+      <button class="btn btn-danger">Delete job</button>
+    </form>
+  </div>
+{% endblock %}

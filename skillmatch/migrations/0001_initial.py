@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,98 +16,321 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='SkillCategory',
+            name="SkillCategory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=80, unique=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(max_length=80, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='EmployerProfile',
+            name="EmployerProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('company_name', models.CharField(max_length=150)),
-                ('description', models.TextField(blank=True, validators=[django.core.validators.MaxLengthValidator(2000)])),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='employer_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("company_name", models.CharField(max_length=150)),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True, validators=[django.core.validators.MaxLengthValidator(2000)]
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="employer_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='JobSeekerProfile',
+            name="JobSeekerProfile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('certification_level', models.CharField(choices=[('basic', 'Basic'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced'), ('expert', 'Expert')], default='basic', max_length=12)),
-                ('experience_level', models.CharField(choices=[('junior', 'Junior'), ('mid', 'Mid'), ('senior', 'Senior'), ('lead', 'Lead')], default='junior', max_length=8)),
-                ('bio', models.TextField(blank=True, validators=[django.core.validators.MaxLengthValidator(2000)])),
-                ('portfolio', models.TextField(blank=True, validators=[django.core.validators.MaxLengthValidator(6000)])),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='seeker_profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "certification_level",
+                    models.CharField(
+                        choices=[
+                            ("basic", "Basic"),
+                            ("intermediate", "Intermediate"),
+                            ("advanced", "Advanced"),
+                            ("expert", "Expert"),
+                        ],
+                        default="basic",
+                        max_length=12,
+                    ),
+                ),
+                (
+                    "experience_level",
+                    models.CharField(
+                        choices=[
+                            ("junior", "Junior"),
+                            ("mid", "Mid"),
+                            ("senior", "Senior"),
+                            ("lead", "Lead"),
+                        ],
+                        default="junior",
+                        max_length=8,
+                    ),
+                ),
+                (
+                    "bio",
+                    models.TextField(
+                        blank=True, validators=[django.core.validators.MaxLengthValidator(2000)]
+                    ),
+                ),
+                (
+                    "portfolio",
+                    models.TextField(
+                        blank=True, validators=[django.core.validators.MaxLengthValidator(6000)]
+                    ),
+                ),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="seeker_profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='EvidenceLink',
+            name="EvidenceLink",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(max_length=500, validators=[django.core.validators.URLValidator(schemes=['http', 'https'])])),
-                ('profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='evidence_links', to='skillmatch.jobseekerprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "url",
+                    models.URLField(
+                        max_length=500,
+                        validators=[django.core.validators.URLValidator(schemes=["http", "https"])],
+                    ),
+                ),
+                (
+                    "profile",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="evidence_links",
+                        to="skillmatch.jobseekerprofile",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Skill',
+            name="Skill",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=80)),
-                ('normalized_name', models.CharField(editable=False, max_length=80)),
-                ('profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='skills', to='skillmatch.jobseekerprofile')),
-                ('category', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='skillmatch.skillcategory')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(max_length=80)),
+                ("normalized_name", models.CharField(editable=False, max_length=80)),
+                (
+                    "profile",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="skills",
+                        to="skillmatch.jobseekerprofile",
+                    ),
+                ),
+                (
+                    "category",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="skillmatch.skillcategory",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['id'],
+                "ordering": ["id"],
             },
         ),
         migrations.CreateModel(
-            name='Account',
+            name="Account",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(choices=[('seeker', 'Job seeker'), ('employer', 'Employer')], max_length=10)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='account', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[("seeker", "Job seeker"), ("employer", "Employer")], max_length=10
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="account",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'constraints': [models.CheckConstraint(condition=models.Q(('role__in', ['seeker', 'employer'])), name='valid_account_role')],
+                "constraints": [
+                    models.CheckConstraint(
+                        condition=models.Q(("role__in", ["seeker", "employer"])),
+                        name="valid_account_role",
+                    )
+                ],
             },
         ),
         migrations.CreateModel(
-            name='JobPost',
+            name="JobPost",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=150)),
-                ('description', models.TextField(validators=[django.core.validators.MaxLengthValidator(8000)])),
-                ('required_skills', models.JSONField(default=list)),
-                ('certification_level', models.CharField(choices=[('basic', 'Basic'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced'), ('expert', 'Expert')], default='basic', max_length=12)),
-                ('experience_level', models.CharField(choices=[('junior', 'Junior'), ('mid', 'Mid'), ('senior', 'Senior'), ('lead', 'Lead')], default='junior', max_length=8)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('employer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='jobs', to='skillmatch.employerprofile')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("title", models.CharField(max_length=150)),
+                (
+                    "description",
+                    models.TextField(validators=[django.core.validators.MaxLengthValidator(8000)]),
+                ),
+                ("required_skills", models.JSONField(default=list)),
+                (
+                    "certification_level",
+                    models.CharField(
+                        choices=[
+                            ("basic", "Basic"),
+                            ("intermediate", "Intermediate"),
+                            ("advanced", "Advanced"),
+                            ("expert", "Expert"),
+                        ],
+                        default="basic",
+                        max_length=12,
+                    ),
+                ),
+                (
+                    "experience_level",
+                    models.CharField(
+                        choices=[
+                            ("junior", "Junior"),
+                            ("mid", "Mid"),
+                            ("senior", "Senior"),
+                            ("lead", "Lead"),
+                        ],
+                        default="junior",
+                        max_length=8,
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "employer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="jobs",
+                        to="skillmatch.employerprofile",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at', '-id'],
-                'constraints': [models.CheckConstraint(condition=models.Q(('certification_level__in', {'advanced': 'Advanced', 'basic': 'Basic', 'expert': 'Expert', 'intermediate': 'Intermediate'})), name='valid_job_cert'), models.CheckConstraint(condition=models.Q(('experience_level__in', {'junior': 'Junior', 'lead': 'Lead', 'mid': 'Mid', 'senior': 'Senior'})), name='valid_job_exp')],
+                "ordering": ["-created_at", "-id"],
+                "constraints": [
+                    models.CheckConstraint(
+                        condition=models.Q(
+                            (
+                                "certification_level__in",
+                                {
+                                    "advanced": "Advanced",
+                                    "basic": "Basic",
+                                    "expert": "Expert",
+                                    "intermediate": "Intermediate",
+                                },
+                            )
+                        ),
+                        name="valid_job_cert",
+                    ),
+                    models.CheckConstraint(
+                        condition=models.Q(
+                            (
+                                "experience_level__in",
+                                {
+                                    "junior": "Junior",
+                                    "lead": "Lead",
+                                    "mid": "Mid",
+                                    "senior": "Senior",
+                                },
+                            )
+                        ),
+                        name="valid_job_exp",
+                    ),
+                ],
             },
         ),
         migrations.AddConstraint(
-            model_name='jobseekerprofile',
-            constraint=models.CheckConstraint(condition=models.Q(('certification_level__in', {'advanced': 'Advanced', 'basic': 'Basic', 'expert': 'Expert', 'intermediate': 'Intermediate'})), name='valid_profile_cert'),
+            model_name="jobseekerprofile",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    (
+                        "certification_level__in",
+                        {
+                            "advanced": "Advanced",
+                            "basic": "Basic",
+                            "expert": "Expert",
+                            "intermediate": "Intermediate",
+                        },
+                    )
+                ),
+                name="valid_profile_cert",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='jobseekerprofile',
-            constraint=models.CheckConstraint(condition=models.Q(('experience_level__in', {'junior': 'Junior', 'lead': 'Lead', 'mid': 'Mid', 'senior': 'Senior'})), name='valid_profile_exp'),
+            model_name="jobseekerprofile",
+            constraint=models.CheckConstraint(
+                condition=models.Q(
+                    (
+                        "experience_level__in",
+                        {"junior": "Junior", "lead": "Lead", "mid": "Mid", "senior": "Senior"},
+                    )
+                ),
+                name="valid_profile_exp",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='skill',
-            constraint=models.UniqueConstraint(fields=('profile', 'normalized_name'), name='unique_profile_skill'),
+            model_name="skill",
+            constraint=models.UniqueConstraint(
+                fields=("profile", "normalized_name"), name="unique_profile_skill"
+            ),
         ),
         migrations.AddConstraint(
-            model_name='skill',
-            constraint=models.UniqueConstraint(django.db.models.functions.text.Lower('name'), models.F('profile'), name='unique_skill_case_insensitive'),
+            model_name="skill",
+            constraint=models.UniqueConstraint(
+                django.db.models.functions.text.Lower("name"),
+                models.F("profile"),
+                name="unique_skill_case_insensitive",
+            ),
         ),
     ]

@@ -1,1 +1,31 @@
-{% extends 'base.html' %}{% block title %}Sign in · SkillMatch{% endblock %}{% block content %}<div class="auth-layout"><div class="auth-intro"><span class="eyebrow blue">YOUR NEXT CONNECTION STARTS HERE</span><h1>Welcome<br>back<span class="blue">.</span></h1><p>Your skills, your experience and your next opportunity. All in one place.</p><div class="auth-decoration">✧</div></div><section class="auth-card"><h2>Sign in to SkillMatch</h2><p class="muted mb-4">Continue to your workspace.</p><form method="post">{% csrf_token %}{{ form.non_field_errors }}{% for field in form %}{% include 'partials/field.html' %}{% endfor %}<input type="hidden" name="next" value="{{ next }}"><button class="btn btn-primary w-100 mt-2">Sign in <span aria-hidden="true">→</span></button></form><p class="auth-switch">New to SkillMatch? <a href="{% url 'register' %}">Create an account</a></p></section></div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Sign in · SkillMatch{% endblock %}
+{% block content %}
+  <div class="auth-layout">
+    <div class="auth-intro">
+      <span class="eyebrow blue">YOUR NEXT CONNECTION STARTS HERE</span>
+      <h1>
+        Welcome
+        <br>
+        back<span class="blue">.</span>
+      </h1>
+      <p>Your skills, your experience and your next opportunity. All in one place.</p>
+      <div class="auth-decoration">✧</div>
+    </div>
+    <section class="auth-card">
+      <h2>Sign in to SkillMatch</h2>
+      <p class="muted mb-4">Continue to your workspace.</p>
+      <form method="post">
+        {% csrf_token %}{{ form.non_field_errors }}{% for field in form %}
+        {% include "partials/field.html" %}
+{% endfor %}
+<input type="hidden" name="next" value="{{ next }}">
+<button class="btn btn-primary w-100 mt-2">
+  Sign in <span aria-hidden="true">→</span>
+</button>
+</form>
+<p class="auth-switch">New to SkillMatch? <a href="{% url 'register' %}">Create an account</a>
+</p>
+</section>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "SkillMatch: validate",
+      "type": "process",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "tools/dev.py",
+        "check"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "SkillMatch: format",
+      "type": "process",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "tools/dev.py",
+        "format"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "SkillMatch: inspect environment",
+      "type": "process",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "tools/dev.py",
+        "doctor"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "SkillMatch: run server",
+      "type": "process",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "tools/dev.py",
+        "run"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

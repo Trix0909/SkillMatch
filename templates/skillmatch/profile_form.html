@@ -1,1 +1,77 @@
-{% extends 'base.html' %}{% block title %}Edit profile · SkillMatch{% endblock %}{% block content %}<div class="page-heading"><div><span class="eyebrow">{% if seeker %}YOUR PROFESSIONAL STORY{% else %}YOUR BUSINESS{% endif %}</span><h1>{% if seeker %}Build your profile{% else %}Company profile{% endif %}<span class="blue">.</span></h1><p>{% if seeker %}Give the right opportunities a way to find you.{% else %}Introduce your company to potential candidates.{% endif %}</p></div></div><div class="row g-4"><div class="col-xl-8"><form class="panel form-panel" method="post">{% csrf_token %}{{ form.non_field_errors }}{% if seeker %}<div class="form-section"><span class="section-index">01</span><h2>The essentials</h2><div class="row"><div class="col-sm-6">{% include 'partials/field.html' with field=form.first_name %}</div><div class="col-sm-6">{% include 'partials/field.html' with field=form.last_name %}</div></div>{% include 'partials/skills.html' %}<div class="row"><div class="col-sm-6">{% include 'partials/field.html' with field=form.certification_level %}</div><div class="col-sm-6">{% include 'partials/field.html' with field=form.experience_level %}</div></div></div><div class="form-section"><span class="section-index">02</span><h2>Your experience, in your words</h2>{% include 'partials/field.html' with field=form.bio %}{% include 'partials/field.html' with field=form.portfolio %}</div><div class="form-section"><span class="section-index">03</span><h2>Let your work speak</h2>{% include 'partials/field.html' with field=form.links %}</div>{% else %}{% for field in form %}{% include 'partials/field.html' %}{% endfor %}{% endif %}<div class="form-actions"><a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a><button class="btn btn-primary">Save profile <span aria-hidden="true">✓</span></button></div></form></div><aside class="col-xl-4"><div class="tip-panel"><span class="tip-icon">✧</span><h3>{% if seeker %}A profile with a purpose{% else %}Make a clear introduction{% endif %}</h3><p>{% if seeker %}Your skill tags, summary and project descriptions all contribute to matching. Be specific about what you’ve worked on.{% else %}A clear company name and description help job seekers understand who is hiring.{% endif %}</p>{% if seeker %}<hr><strong>Quality over repetition</strong><p>Repeating keywords won’t keep increasing their influence. Describe your actual work.</p><strong>Evidence is optional</strong><p>Share project or portfolio links. Employers can inspect them; links and self-reported levels are not automatically verified.</p>{% endif %}<a href="{% url 'methodology' %}">How matching works ↗</a></div></aside></div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Edit profile · SkillMatch{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">
+        {% if seeker %}YOUR PROFESSIONAL STORY{% else %}YOUR BUSINESS{% endif %}
+      </span>
+      <h1>
+        {% if seeker %}Build your profile{% else %}Company profile{% endif %}
+        <span class="blue">.</span>
+      </h1>
+      <p>
+        {% if seeker %}Give the right opportunities a way to find you.{% else %}Introduce your company to potential candidates.{% endif %}
+      </p>
+    </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-xl-8">
+      <form class="panel form-panel" method="post">
+        {% csrf_token %}{{ form.non_field_errors }}{% if seeker %}
+        <div class="form-section">
+          <span class="section-index">01</span>
+          <h2>The essentials</h2>
+          <div class="row">
+            <div class="col-sm-6">{% include "partials/field.html" with field=form.first_name %}</div>
+            <div class="col-sm-6">{% include "partials/field.html" with field=form.last_name %}</div>
+          </div>
+          {% include "partials/skills.html" %}
+          <div class="row">
+            <div class="col-sm-6">{% include "partials/field.html" with field=form.certification_level %}</div>
+            <div class="col-sm-6">{% include "partials/field.html" with field=form.experience_level %}</div>
+          </div>
+        </div>
+        <div class="form-section">
+          <span class="section-index">02</span>
+          <h2>Your experience, in your words</h2>
+          {% include "partials/field.html" with field=form.bio %}
+          {% include "partials/field.html" with field=form.portfolio %}
+        </div>
+        <div class="form-section">
+          <span class="section-index">03</span>
+          <h2>Let your work speak</h2>
+          {% include "partials/field.html" with field=form.links %}
+        </div>
+{% else %}
+  {% for field in form %}
+    {% include "partials/field.html" %}
+  {% endfor %}
+{% endif %}
+<div class="form-actions">
+  <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
+  <button class="btn btn-primary">
+    Save profile <span aria-hidden="true">✓</span>
+  </button>
+</div>
+</form>
+</div>
+<aside class="col-xl-4">
+  <div class="tip-panel">
+    <span class="tip-icon">✧</span>
+    <h3>{% if seeker %}A profile with a purpose{% else %}Make a clear introduction{% endif %}</h3>
+    <p>
+      {% if seeker %}Your skill tags, summary and project descriptions all contribute to matching. Be specific about what you’ve worked on.{% else %}A clear company name and description help job seekers understand who is hiring.{% endif %}
+    </p>
+    {% if seeker %}
+      <hr>
+      <strong>Quality over repetition</strong>
+      <p>Repeating keywords won’t keep increasing their influence. Describe your actual work.</p>
+      <strong>Evidence is optional</strong>
+      <p>Share project or portfolio links. Employers can inspect them; links and self-reported levels are not automatically verified.</p>
+    {% endif %}
+    <a href="{% url 'methodology' %}">How matching works ↗</a>
+  </div>
+</aside>
+</div>
+{% endblock %}

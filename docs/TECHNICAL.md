@@ -51,7 +51,7 @@ Django handles password hashing/validation, CSRF, session cookies and output esc
 
 ## Deployment
 
-1. Install Python 3.12+ and `requirements.txt` in a virtual environment.
+1. Install Python 3.12 and `requirements-lock.txt` in a virtual environment.
 2. Set `DJANGO_DEBUG=0`, a unique random `DJANGO_SECRET_KEY`, and comma-separated `DJANGO_ALLOWED_HOSTS` containing only the production hostnames.
 3. Set `SKILLMATCH_DB` to a persistent writable SQLite path if outside the application directory. SQLite suits the stated prototype scale; keep it on local persistent storage and back it up consistently.
 4. Use a fresh database without demo users. Run `manage.py migrate` and `manage.py createsuperuser`.
@@ -64,4 +64,4 @@ The default debug server is bound to loopback. Its persistent development secret
 
 ## Dependencies
 
-Application requirements are pinned in `requirements.txt`; resolved packages from this build are recorded in `requirements-lock.txt`. Bootstrap is vendored with its license header in `static/vendor/bootstrap.min.css` and license in `static/vendor/BOOTSTRAP-LICENSE.txt`. No external fonts, images, CDN runtime resources or paid services are needed.
+Application requirements are pinned in `requirements.txt`; resolved packages from this build are recorded in `requirements-lock.txt`. Development tools and their resolved dependency set are maintained in `requirements-dev.txt` and `requirements-dev-lock.txt`. `setup.ps1` and `tools/dev.py` provide setup, formatting and validation; see `docs/DEVELOPMENT.md`. Bootstrap is vendored with its license header in `static/vendor/bootstrap.min.css` and license in `static/vendor/BOOTSTRAP-LICENSE.txt`. No external fonts, images, CDN runtime resources or paid services are needed.

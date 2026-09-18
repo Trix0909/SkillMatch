@@ -1,1 +1,17 @@
-{% if page_obj.has_other_pages %}<nav class="pagination-bar" aria-label="Result pages">{% if page_obj.has_previous %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">← Previous</a>{% else %}<span></span>{% endif %}<span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="btn btn-outline-secondary btn-sm" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">Next →</a>{% else %}<span></span>{% endif %}</nav>{% endif %}
+{% if page_obj.has_other_pages %}
+  <nav class="pagination-bar" aria-label="Result pages">
+    {% if page_obj.has_previous %}
+      <a class="btn btn-outline-secondary btn-sm"
+         href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">← Previous</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a class="btn btn-outline-secondary btn-sm"
+         href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}">Next →</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+  </nav>
+{% endif %}

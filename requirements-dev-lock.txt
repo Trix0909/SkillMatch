@@ -1,0 +1,14 @@
+# Resolved development tools for Python 3.12.
+-r requirements-lock.txt
+click==8.5.0
+cssbeautifier==2.0.3
+djlint==1.46.1
+EditorConfig==0.17.1
+jsbeautifier==2.0.3
+json5==0.15.0
+pathspec==1.1.1
+pypdf==6.19.0
+PyYAML==6.0.3
+regex==2026.9.10
+ruff==0.16.8
+typing_extensions==4.16.0

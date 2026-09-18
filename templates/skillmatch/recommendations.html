@@ -1,1 +1,77 @@
-{% extends 'base.html' %}{% block title %}My matches · SkillMatch{% endblock %}{% block content %}<div class="page-heading"><div><span class="eyebrow">YOUR NEXT CHAPTER</span><h1>Opportunities for you<span class="blue">.</span></h1><p>Discover work that connects with your skills and experience.</p></div><a class="btn btn-outline-secondary" href="{% url 'profile_edit' %}">Edit my profile ↗</a></div><div class="match-banner"><div><span class="eyebrow">MATCHED TO YOUR PROFILE</span><h2>Your skills are the starting point.</h2><p>Recommendations consider your skills, summary and project portfolio.</p><div class="d-flex gap-2 flex-wrap">{% for skill in profile.skills.all|slice:':6' %}<span class="banner-tag">{{ skill.name }}</span>{% endfor %}</div></div><span class="banner-art" aria-hidden="true">✧</span></div><div class="results-heading"><h2>Your job matches <span class="count">{{ page_obj.paginator.count }}</span></h2><span>Sorted by weighted relevance</span></div>{% if not profile.is_complete %}<div class="empty-state panel"><span class="empty-icon">◎</span><h2>Let’s get to know your skills.</h2><p>Add your skills, professional summary and portfolio to start receiving job matches.</p><a class="btn btn-primary" href="{% url 'profile_edit' %}">Complete my profile →</a></div>{% else %}{% for match in page_obj %}<article class="panel result-card"><div class="result-main"><div class="result-meta"><span class="company-monogram">{{ match.item.employer.company_name|first|upper }}</span><span>{{ match.item.employer.company_name }}</span><span class="result-rank">#{{ forloop.counter|add:page_obj.start_index|add:'-1' }}</span></div><h3><a href="{% url 'job_detail' match.item.pk %}">{{ match.item.title }}</a></h3><p class="result-description">{{ match.item.description|truncatechars:180 }}</p><div class="skill-tags">{% for skill in match.matched_skills %}<span class="skill-tag matched">✓ {{ skill }}</span>{% empty %}<span class="muted small">No exact skill tags overlap. Text in your summary or portfolio may still match.</span>{% endfor %}</div><div class="card-bottom"><span>{{ match.item.get_certification_level_display }} · {{ match.item.get_experience_level_display }}</span><a href="{% url 'job_detail' match.item.pk %}">View opportunity ↗</a></div></div><div class="result-score">{% include 'partials/score.html' %}</div></article>{% empty %}<div class="empty-state panel"><span class="empty-icon">✧</span><h2>Your next match is still ahead.</h2><p>There are no open jobs yet. Recommendations will appear when employers post opportunities.</p></div>{% endfor %}{% include 'partials/pagination.html' %}{% endif %}<p class="results-note">Rankings are based on text relevance and self-reported levels. A score does not guarantee suitability.</p>{% endblock %}
+{% extends "base.html" %}
+{% block title %}My matches · SkillMatch{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">YOUR NEXT CHAPTER</span>
+      <h1>
+        Opportunities for you<span class="blue">.</span>
+      </h1>
+      <p>Discover work that connects with your skills and experience.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="{% url 'profile_edit' %}">Edit my profile ↗</a>
+  </div>
+  <div class="match-banner">
+    <div>
+      <span class="eyebrow">MATCHED TO YOUR PROFILE</span>
+      <h2>Your skills are the starting point.</h2>
+      <p>Recommendations consider your skills, summary and project portfolio.</p>
+      <div class="d-flex gap-2 flex-wrap">
+        {% for skill in profile.skills.all|slice:':6' %}
+          <span class="banner-tag">{{ skill.name }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    <span class="banner-art" aria-hidden="true">✧</span>
+  </div>
+  <div class="results-heading">
+    <h2>
+      Your job matches <span class="count">{{ page_obj.paginator.count }}</span>
+    </h2>
+    <span>Sorted by weighted relevance</span>
+  </div>
+  {% if not profile.is_complete %}
+    <div class="empty-state panel">
+      <span class="empty-icon">◎</span>
+      <h2>Let’s get to know your skills.</h2>
+      <p>Add your skills, professional summary and portfolio to start receiving job matches.</p>
+      <a class="btn btn-primary" href="{% url 'profile_edit' %}">Complete my profile →</a>
+    </div>
+  {% else %}
+    {% for match in page_obj %}
+      <article class="panel result-card">
+        <div class="result-main">
+          <div class="result-meta">
+            <span class="company-monogram">{{ match.item.employer.company_name|first|upper }}</span>
+            <span>{{ match.item.employer.company_name }}</span>
+            <span class="result-rank">#{{ forloop.counter|add:page_obj.start_index|add:'-1' }}</span>
+          </div>
+          <h3>
+            <a href="{% url 'job_detail' match.item.pk %}">{{ match.item.title }}</a>
+          </h3>
+          <p class="result-description">{{ match.item.description|truncatechars:180 }}</p>
+          <div class="skill-tags">
+            {% for skill in match.matched_skills %}
+              <span class="skill-tag matched">✓ {{ skill }}</span>
+            {% empty %}
+              <span class="muted small">No exact skill tags overlap. Text in your summary or portfolio may still match.</span>
+            {% endfor %}
+          </div>
+          <div class="card-bottom">
+            <span>{{ match.item.get_certification_level_display }} · {{ match.item.get_experience_level_display }}</span>
+            <a href="{% url 'job_detail' match.item.pk %}">View opportunity ↗</a>
+          </div>
+        </div>
+        <div class="result-score">{% include "partials/score.html" %}</div>
+      </article>
+    {% empty %}
+      <div class="empty-state panel">
+        <span class="empty-icon">✧</span>
+        <h2>Your next match is still ahead.</h2>
+        <p>There are no open jobs yet. Recommendations will appear when employers post opportunities.</p>
+      </div>
+    {% endfor %}
+    {% include "partials/pagination.html" %}
+  {% endif %}
+  <p class="results-note">Rankings are based on text relevance and self-reported levels. A score does not guarantee suitability.</p>
+{% endblock %}

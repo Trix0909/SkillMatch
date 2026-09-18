@@ -1,6 +1,6 @@
 def navigation(request):
-    role = ''
+    role = ""
     if request.user.is_authenticated:
-        account = getattr(request.user, 'account', None)
-        role = account.role if account else ''
-    return {'account_role': role}
+        account = getattr(request.user, "account", None)
+        role = account.role if account else ""
+    return {"account_role": role}

@@ -1,1 +1,45 @@
-{% extends 'base.html' %}{% block title %}{% if job.pk %}Edit job{% else %}Post a job{% endif %} · SkillMatch{% endblock %}{% block content %}<div class="breadcrumb-line"><a href="{% url 'employer_jobs' %}">My job posts</a> / {% if job.pk %}Edit job{% else %}New opportunity{% endif %}</div><div class="page-heading"><div><span class="eyebrow">BUILD YOUR NEXT CONNECTION</span><h1>{% if job.pk %}Edit your opportunity{% else %}What skills do you need?{% endif %}</h1><p>A clear job description helps the right candidates rise to the top.</p></div></div><div class="row g-4"><div class="col-xl-8"><form class="panel form-panel" method="post">{% csrf_token %}{{ form.non_field_errors }}<h2>About the opportunity</h2>{% include 'partials/field.html' with field=form.title %}{% include 'partials/field.html' with field=form.description %}{% include 'partials/skills.html' %}<div class="row"><div class="col-sm-6">{% include 'partials/field.html' with field=form.certification_level %}</div><div class="col-sm-6">{% include 'partials/field.html' with field=form.experience_level %}</div></div><div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'employer_jobs' %}">Cancel</a><button class="btn btn-primary">{% if job.pk %}Save changes{% else %}Post job & find matches{% endif %} →</button></div></form></div><aside class="col-xl-4"><div class="tip-panel"><span class="tip-icon">✧</span><h3>Be specific about the work.</h3><p>Describe the responsibilities and the skills someone will use. Clear, relevant words make for clearer matches.</p><hr><strong>Requirements and ranking</strong><p>Minimum levels describe your expectations. Candidate rankings use text similarity and the candidate’s own certification and experience multipliers.</p><a href="{% url 'methodology' %}">Understand the scoring ↗</a></div></aside></div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}
+  {% if job.pk %}Edit job{% else %}Post a job{% endif %} · SkillMatch{% endblock %}
+{% block content %}
+  <div class="breadcrumb-line">
+    <a href="{% url 'employer_jobs' %}">My job posts</a> / {% if job.pk %}Edit job{% else %}New opportunity{% endif %}
+  </div>
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">BUILD YOUR NEXT CONNECTION</span>
+      <h1>{% if job.pk %}Edit your opportunity{% else %}What skills do you need?{% endif %}</h1>
+      <p>A clear job description helps the right candidates rise to the top.</p>
+    </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-xl-8">
+      <form class="panel form-panel" method="post">
+        {% csrf_token %}{{ form.non_field_errors }}<h2>About the opportunity</h2>
+        {% include "partials/field.html" with field=form.title %}
+        {% include "partials/field.html" with field=form.description %}
+        {% include "partials/skills.html" %}
+        <div class="row">
+          <div class="col-sm-6">{% include "partials/field.html" with field=form.certification_level %}</div>
+          <div class="col-sm-6">{% include "partials/field.html" with field=form.experience_level %}</div>
+        </div>
+        <div class="form-actions">
+          <a class="btn btn-outline-secondary" href="{% url 'employer_jobs' %}">Cancel</a>
+          <button class="btn btn-primary">
+          {% if job.pk %}Save changes{% else %}Post job & find matches{% endif %} →</button>
+        </div>
+      </form>
+    </div>
+    <aside class="col-xl-4">
+      <div class="tip-panel">
+        <span class="tip-icon">✧</span>
+        <h3>Be specific about the work.</h3>
+        <p>Describe the responsibilities and the skills someone will use. Clear, relevant words make for clearer matches.</p>
+        <hr>
+        <strong>Requirements and ranking</strong>
+        <p>Minimum levels describe your expectations. Candidate rankings use text similarity and the candidate’s own certification and experience multipliers.</p>
+        <a href="{% url 'methodology' %}">Understand the scoring ↗</a>
+      </div>
+    </aside>
+  </div>
+{% endblock %}

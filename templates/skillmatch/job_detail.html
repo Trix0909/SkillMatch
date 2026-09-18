@@ -1,1 +1,49 @@
-{% extends 'base.html' %}{% block title %}{{ job.title }} · SkillMatch{% endblock %}{% block content %}<div class="breadcrumb-line"><a href="{% url 'home' %}">Workspace</a> / Opportunity</div><div class="panel"><div class="result-meta"><span class="company-monogram">{{ job.employer.company_name|first|upper }}</span><span>{{ job.employer.company_name }}</span><span class="status-tag ms-auto {% if not job.is_active %}closed{% endif %}">{% if job.is_active %}Open{% else %}Closed{% endif %}</span></div><h1 class="mt-4">{{ job.title }}</h1><p class="muted">Posted {{ job.created_at|date:'d F Y' }}</p><div class="skill-tags">{% for skill in job.required_skills %}<span class="skill-tag">{{ skill }}</span>{% endfor %}</div><hr class="my-4"><div class="row g-4"><div class="col-lg-8"><h2>About the role</h2><div class="prose">{{ job.description|linebreaks }}</div>{% if job.employer.description %}<h2 class="mt-4">About {{ job.employer.company_name }}</h2><div class="prose">{{ job.employer.description|linebreaks }}</div>{% endif %}</div><div class="col-lg-4"><div class="tip-panel"><h3>Role requirements</h3><p class="mb-1 muted">Minimum certification</p><strong>{{ job.get_certification_level_display }}</strong><p class="mb-1 mt-3 muted">Minimum experience</p><strong>{{ job.get_experience_level_display }}</strong></div></div></div>{% if owner %}<div class="form-actions"><a class="btn btn-outline-secondary" href="{% url 'job_edit' job.pk %}">Edit job</a><a class="btn btn-primary" href="{% url 'job_candidates' job.pk %}">View candidate matches ↗</a></div>{% endif %}</div>{% endblock %}
+{% extends "base.html" %}
+{% block title %}{{ job.title }} · SkillMatch{% endblock %}
+{% block content %}
+  <div class="breadcrumb-line">
+    <a href="{% url 'home' %}">Workspace</a> / Opportunity</div>
+  <div class="panel">
+    <div class="result-meta">
+      <span class="company-monogram">{{ job.employer.company_name|first|upper }}</span>
+      <span>{{ job.employer.company_name }}</span>
+      <span class="status-tag ms-auto {% if not job.is_active %}closed{% endif %}">
+        {% if job.is_active %}Open{% else %}Closed{% endif %}
+      </span>
+    </div>
+    <h1 class="mt-4">{{ job.title }}</h1>
+    <p class="muted">Posted {{ job.created_at|date:'d F Y' }}</p>
+    <div class="skill-tags">
+      {% for skill in job.required_skills %}
+        <span class="skill-tag">{{ skill }}</span>
+      {% endfor %}
+    </div>
+    <hr class="my-4">
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <h2>About the role</h2>
+        <div class="prose">{{ job.description|linebreaks }}</div>
+        {% if job.employer.description %}
+          <h2 class="mt-4">About {{ job.employer.company_name }}</h2>
+          <div class="prose">{{ job.employer.description|linebreaks }}</div>
+        {% endif %}
+      </div>
+      <div class="col-lg-4">
+        <div class="tip-panel">
+          <h3>Role requirements</h3>
+          <p class="mb-1 muted">Minimum certification</p>
+          <strong>{{ job.get_certification_level_display }}</strong>
+          <p class="mb-1 mt-3 muted">Minimum experience</p>
+          <strong>{{ job.get_experience_level_display }}</strong>
+        </div>
+      </div>
+    </div>
+    {% if owner %}
+      <div class="form-actions">
+        <a class="btn btn-outline-secondary" href="{% url 'job_edit' job.pk %}">Edit job</a>
+        <a class="btn btn-primary"
+           href="{% url 'job_candidates' job.pk %}">View candidate matches ↗</a>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

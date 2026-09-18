@@ -1,1 +1,86 @@
-{% extends 'base.html' %}{% block title %}Candidate matches · SkillMatch{% endblock %}{% block content %}<div class="page-heading"><div><span class="eyebrow">SKILLS THAT CONNECT</span><h1>{% if job %}Your candidate matches{% else %}Find the skills you need{% endif %}<span class="blue">.</span></h1><p>{% if job %}Ranked profiles for <strong>{{ job.title }}</strong>.{% else %}Start with a job description or skill keywords to find relevant profiles.{% endif %}</p></div>{% if job %}<a class="btn btn-outline-secondary" href="{% url 'job_detail' job.pk %}">View job ↗</a>{% endif %}</div>{% if not job %}<form method="get" class="panel search-panel">{% include 'partials/field.html' with field=form.q %}<button class="btn btn-primary">Find candidates <span aria-hidden="true">→</span></button></form>{% else %}<div class="job-context"><span class="eyebrow">LOOKING FOR</span><div class="skill-tags">{% for skill in job.required_skills %}<span class="skill-tag">{{ skill }}</span>{% endfor %}</div><p class="small muted mb-0 mt-2">Minimum levels: {{ job.get_certification_level_display }} certification · {{ job.get_experience_level_display }} experience. Rankings show relevance rather than filtering these requirements.</p></div>{% endif %}{% if searched %}<div class="results-heading"><h2>Candidate matches <span class="count">{{ page_obj.paginator.count }}</span></h2><span>Sorted by weighted relevance</span></div>{% for match in page_obj %}<article class="panel result-card"><div class="result-main"><div class="result-meta"><span class="avatar small">{{ match.item.display_name|first|upper }}</span><span>PROFESSIONAL PROFILE</span><span class="result-rank">#{{ forloop.counter|add:page_obj.start_index|add:'-1' }}</span></div><h3><a href="{% url 'profile_detail' match.item.pk %}">{{ match.item.display_name }}</a></h3><p class="result-description">{{ match.item.bio|truncatechars:180 }}</p><div class="skill-tags">{% for skill in match.item.skills.all %}<span class="skill-tag {% if skill.name in match.matched_skills %}matched{% endif %}">{% if skill.name in match.matched_skills %}✓ {% endif %}{{ skill.name }}</span>{% endfor %}</div><div class="card-bottom"><span>{{ match.item.get_certification_level_display }} · {{ match.item.get_experience_level_display }}</span><a href="{% url 'profile_detail' match.item.pk %}">View profile ↗</a></div></div><div class="result-score">{% include 'partials/score.html' %}</div></article>{% empty %}<div class="panel empty-state"><span class="empty-icon">◎</span><h2>No complete candidate profiles yet.</h2><p>Profiles appear here after job seekers add their skills, summary and project portfolio.</p></div>{% endfor %}{% include 'partials/pagination.html' %}<p class="results-note">Levels are self-reported. Review the profile and supporting evidence when assessing a candidate.</p>{% else %}<div class="search-placeholder"><span>⌕</span><h2>A clear description makes a better starting point.</h2><p>Try the skills and responsibilities you would include in a job post.</p></div>{% endif %}{% endblock %}
+{% extends "base.html" %}
+{% block title %}Candidate matches · SkillMatch{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">SKILLS THAT CONNECT</span>
+      <h1>
+        {% if job %}Your candidate matches{% else %}Find the skills you need{% endif %}
+        <span class="blue">.</span>
+      </h1>
+      <p>
+        {% if job %}Ranked profiles for <strong>{{ job.title }}</strong>.{% else %}Start with a job description or skill keywords to find relevant profiles.{% endif %}
+      </p>
+    </div>
+    {% if job %}
+      <a class="btn btn-outline-secondary"
+         href="{% url 'job_detail' job.pk %}">View job ↗</a>
+    {% endif %}
+  </div>
+  {% if not job %}
+    <form method="get" class="panel search-panel">
+      {% include "partials/field.html" with field=form.q %}
+      <button class="btn btn-primary">
+        Find candidates <span aria-hidden="true">→</span>
+      </button>
+    </form>
+  {% else %}
+    <div class="job-context">
+      <span class="eyebrow">LOOKING FOR</span>
+      <div class="skill-tags">
+        {% for skill in job.required_skills %}
+          <span class="skill-tag">{{ skill }}</span>
+        {% endfor %}
+      </div>
+      <p class="small muted mb-0 mt-2">Minimum levels: {{ job.get_certification_level_display }} certification · {{ job.get_experience_level_display }} experience. Rankings show relevance rather than filtering these requirements.</p>
+    </div>
+  {% endif %}
+  {% if searched %}
+    <div class="results-heading">
+      <h2>
+        Candidate matches <span class="count">{{ page_obj.paginator.count }}</span>
+      </h2>
+      <span>Sorted by weighted relevance</span>
+    </div>
+    {% for match in page_obj %}
+      <article class="panel result-card">
+        <div class="result-main">
+          <div class="result-meta">
+            <span class="avatar small">{{ match.item.display_name|first|upper }}</span>
+            <span>PROFESSIONAL PROFILE</span>
+            <span class="result-rank">#{{ forloop.counter|add:page_obj.start_index|add:'-1' }}</span>
+          </div>
+          <h3>
+            <a href="{% url 'profile_detail' match.item.pk %}">{{ match.item.display_name }}</a>
+          </h3>
+          <p class="result-description">{{ match.item.bio|truncatechars:180 }}</p>
+          <div class="skill-tags">
+            {% for skill in match.item.skills.all %}
+              <span class="skill-tag {% if skill.name in match.matched_skills %}matched{% endif %}">
+              {% if skill.name in match.matched_skills %}✓ {% endif %}{{ skill.name }}</span>
+            {% endfor %}
+          </div>
+          <div class="card-bottom">
+            <span>{{ match.item.get_certification_level_display }} · {{ match.item.get_experience_level_display }}</span>
+            <a href="{% url 'profile_detail' match.item.pk %}">View profile ↗</a>
+          </div>
+        </div>
+        <div class="result-score">{% include "partials/score.html" %}</div>
+      </article>
+    {% empty %}
+      <div class="panel empty-state">
+        <span class="empty-icon">◎</span>
+        <h2>No complete candidate profiles yet.</h2>
+        <p>Profiles appear here after job seekers add their skills, summary and project portfolio.</p>
+      </div>
+    {% endfor %}
+    {% include "partials/pagination.html" %}
+    <p class="results-note">Levels are self-reported. Review the profile and supporting evidence when assessing a candidate.</p>
+  {% else %}
+    <div class="search-placeholder">
+      <span>⌕</span>
+      <h2>A clear description makes a better starting point.</h2>
+      <p>Try the skills and responsibilities you would include in a job post.</p>
+    </div>
+  {% endif %}
+{% endblock %}

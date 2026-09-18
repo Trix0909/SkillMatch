@@ -46,3 +46,11 @@ Formal Precision@k results need a frozen study corpus and completed manual relev
 
 Run the Django commands in the README. `tools/browser_check.cjs` additionally needs Playwright and Microsoft Edge, uses only the local demo application, and reads generated credentials from `demo-credentials.txt`. Playwright is a QA dependency, not a requirement for running SkillMatch. The script defaults to the bundled Codex package path; set `PLAYWRIGHT_MODULE` to your own Playwright module path when running elsewhere.
 
+## Development environment follow-up
+
+The full `tools/dev.py check` workflow passed after source formatting: Ruff lint/format, Django template formatting, CSS/JavaScript/JSON formatting, dependency compatibility, all 35 tests, migration consistency, Django checks, production-setting checks, static-file collection and Git-index checks. Browser checks also passed after formatting, and the desktop landing page was visually inspected.
+
+Setup was rerun successfully with pinned development dependencies and without resetting the database. The environment inspector confirmed Python 3.12.14, current migrations, SQLite integrity `ok`, 30 candidate profiles and 10 job posts. Unicode output is configured for child processes to support the existing Windows folder name.
+
+The GitHub Actions and VS Code configuration files parse successfully. Hosted Windows/Linux CI is configured but has not run remotely because the repository has no GitHub remote. See `docs/DEVELOPMENT.md` for the requirement checklist and `docs/BACKLOG.md` for pending research/remote tasks.
+
