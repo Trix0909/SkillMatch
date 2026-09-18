@@ -92,4 +92,4 @@ See [user guide](docs/USER_GUIDE.md), [technical documentation](docs/TECHNICAL.m
 
 ## Deployment
 
-This is a local academic prototype. For deployment, use an empty database without demo accounts, a strong environment-provided `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=0`, explicit `DJANGO_ALLOWED_HOSTS`, HTTPS, a WSGI server and a web server serving collected static files. See [deployment procedure](docs/TECHNICAL.md#deployment). No external hosting or GitHub publication has been performed.
+This is an academic prototype with source maintained at [Trix0909/SkillMatch](https://github.com/Trix0909/SkillMatch). For deployment, use an empty database without demo accounts, a strong environment-provided `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=0`, explicit `DJANGO_ALLOWED_HOSTS`, HTTPS, a WSGI server and a web server serving collected static files. See [deployment procedure](docs/TECHNICAL.md#deployment). The application itself has not been deployed to an external hosting service.

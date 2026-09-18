@@ -63,7 +63,7 @@ In VS Code, select the `.venv` interpreter. The checked-in tasks expose validati
 
 Validation runs linting, formatting checks, dependency checks, Django system checks, migration-drift detection, the test suite, production-setting checks, static collection and a Git-index privacy check. Commands stop on failure. Django tests use their own temporary database. Formatting changes source files; `check` only checks source formatting and writes generated static files to the ignored output directory.
 
-The GitHub Actions workflow runs setup and validation on **Windows and Linux**, on pushes, pull requests and manual dispatch. It uses read-only repository permissions and a 15-minute timeout. The workflow is prepared locally; it only executes on GitHub after this repository is connected and pushed. No remote CI run is claimed before that happens.
+The GitHub Actions workflow runs setup and validation on **Windows and Linux**, on pushes, pull requests and manual dispatch. It uses read-only repository permissions and a 15-minute timeout. The repository is connected to [Trix0909/SkillMatch](https://github.com/Trix0909/SkillMatch); see its [Actions page](https://github.com/Trix0909/SkillMatch/actions) for hosted results.
 
 ## Git workflow
 
@@ -84,7 +84,7 @@ git status
 
 Use focused commits and the issue/pull request templates to record source requirements, acceptance criteria and validation evidence. Avoid committing generated databases, secrets, credentials or study data. The repository checker examines staged blobs and rejects prohibited paths and known local secret values; it is a targeted guard, not a general-purpose secret scanner.
 
-No Git remote was configured in the supplied workspace. Local Git version control works immediately. A remote URL and hosting account are needed to push and run hosted CI; no repository has been published automatically.
+The `origin` remote is `https://github.com/Trix0909/SkillMatch.git`. Local `master` tracks `origin/master`. Push reviewed commits with `git push`; this triggers hosted validation. Credentials, SQLite files and local study records remain excluded from version control.
 
 ## Prepared resources
 

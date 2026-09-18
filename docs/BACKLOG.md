@@ -10,7 +10,7 @@ This records actual implementation status, not elapsed Scrum sprint dates. Creat
 | Reproducible development setup | Implemented | Python 3.12, pinned locks, setup script and environment inspector |
 | Formatting and lint automation | Implemented | Ruff, djLint and first-party asset checks |
 | Local Git history | Implemented | Application baseline and development workflow commits |
-| Hosted continuous integration | Configured, awaiting remote | Connect the chosen GitHub repository and push; verify the first Windows/Linux runs |
+| Hosted continuous integration | Verified | Source pushed to Trix0909/SkillMatch; Windows and Linux passed in [run 35301744459](https://github.com/Trix0909/SkillMatch/actions/runs/35301744459) |
 | Manual matching evaluation | Awaiting study labels | Freeze the corpus and review all candidate/job pairs before measuring Precision@k |
 | SUS and user acceptance study | Awaiting participants | Collect actual responses and task observations using the evaluation protocol |
 

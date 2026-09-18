@@ -52,5 +52,5 @@ The full `tools/dev.py check` workflow passed after source formatting: Ruff lint
 
 Setup was rerun successfully with pinned development dependencies and without resetting the database. The environment inspector confirmed Python 3.12.14, current migrations, SQLite integrity `ok`, 30 candidate profiles and 10 job posts. Unicode output is configured for child processes to support the existing Windows folder name.
 
-The GitHub Actions and VS Code configuration files parse successfully. Hosted Windows/Linux CI is configured but has not run remotely because the repository has no GitHub remote. See `docs/DEVELOPMENT.md` for the requirement checklist and `docs/BACKLOG.md` for pending research/remote tasks.
+The GitHub Actions and VS Code configuration files parse successfully. The repository is now connected to `https://github.com/Trix0909/SkillMatch.git`, with `master` tracking `origin/master`. Both hosted Windows and Linux jobs passed for commit `28f4bcf` in [GitHub Actions run 35301744459](https://github.com/Trix0909/SkillMatch/actions/runs/35301744459). These jobs install the locked dependencies and execute the full development validation workflow. See `docs/DEVELOPMENT.md` for the requirement checklist and `docs/BACKLOG.md` for pending research tasks.
 
