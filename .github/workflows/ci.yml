@@ -24,7 +24,14 @@ jobs:
           python-version: '3.12'
           cache: pip
           cache-dependency-path: requirements-dev-lock.txt
-      - name: Set up isolated development environment
+      - name: Set up isolated development environment (Linux)
+        if: runner.os != 'Windows'
         run: python tools/dev.py setup
+      - name: Set up through the Windows launcher
+        if: runner.os == 'Windows'
+        shell: cmd
+        env:
+          SKILLMATCH_NO_PAUSE: '1'
+        run: start.cmd --setup-only
       - name: Lint, formatting, tests, migrations and repository checks
         run: python tools/dev.py check

@@ -6,15 +6,15 @@ This guide maps the development setup to the requested project requirements. Pro
 
 Use **Python 3.12** and Git. The application needs no API keys, cloud account, database server or JavaScript build service. Bootstrap is stored locally. Microsoft Edge and Node.js/Playwright are optional for browser QA.
 
-From the repository root on Windows:
+From the repository root on Windows, run one command (or double-click start.cmd):
 
 ```powershell
-.\setup.ps1
-.\.venv\Scripts\python.exe tools/dev.py doctor
-.\start.ps1
+.\start.cmd
 ```
 
-If `python` does not point to Python 3.12, use `setup.ps1 -Python 'C:\path\to\python.exe'`. Setup creates `.venv`, installs exact development dependencies, runs migrations and checks Django. It is safe to rerun and does not reset the database or demo passwords.
+The launcher locates Python 3.12, prepares missing dependencies, applies migrations and starts the local server. It works under PowerShell's Restricted execution policy without changing it. Stop with Ctrl+C. Use `start.cmd --setup-only` to explicitly refresh the environment without starting the server, or `start.cmd --port 8001` to use another local port.
+
+For a specific interpreter, set `$env:SKILLMATCH_PYTHON = 'C:\path\to\python.exe'` first. Existing data and demo passwords are preserved. The older PowerShell wrappers remain available on systems that permit scripts, but are no longer needed.
 
 On Linux/macOS:
 

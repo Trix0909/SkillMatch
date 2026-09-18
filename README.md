@@ -6,18 +6,28 @@ This build uses **Django templates, Bootstrap 5, SQLite and scikit-learn**, as s
 
 ## Run on Windows
 
-From this directory, using Python 3.12:
+**Double-click `start.cmd` in the SkillMatch project folder**, or open a terminal in that folder and run this one command:
 
 ```powershell
-.\setup.ps1
-.\start.ps1
+.\start.cmd
 ```
 
-Open **http://127.0.0.1:8000**. After setup, `start.ps1` starts the development server. Python in this project’s `.venv` is already configured on the build machine.
+When the server is ready, open **http://127.0.0.1:8000** in your browser. Keep the terminal window open while using the app; press **Ctrl+C** to stop it.
+
+The launcher finds Python 3.12, creates the project environment if needed, installs missing or changed pinned dependencies, applies database migrations and starts Django. The first setup needs internet access; later starts reuse installed dependencies. Your existing database, accounts and demo passwords are preserved. You do not need to activate an environment or run a separate setup command.
+
+### First installation and troubleshooting
+
+- **Python:** Install Python **3.12** with the Python launcher if it is not already installed. The launcher first reuses a working project `.venv`, then checks `py -3.12`, `python`, and the bundled Python on the original development machine.
+- **PowerShell says scripts are disabled:** Use `.\start.cmd`, rather than the older `.ps1` commands. No execution-policy change or administrator terminal is needed.
+- **Moved the folder:** Open the new **SkillMatch** folder in VS Code (**File → Open Folder**) and open a new terminal there. Run `.\start.cmd`. On a different computer, install Python 3.12 and recreate the environment; virtual environments are machine-specific.
+- **Port 8000 is in use:** Stop your other development server with Ctrl+C, or run `.\start.cmd --port 8001` and open **http://127.0.0.1:8001**.
+- **Install or refresh dependencies without starting:** Run `.\start.cmd --setup-only`.
+- **Use a specific Python installation:** Set `$env:SKILLMATCH_PYTHON = 'C:\path\to\python.exe'` before running `.\start.cmd`. It must be Python 3.12.
 
 On macOS/Linux, run `python3.12 tools/dev.py setup`, then `.venv/bin/python tools/dev.py run`.
 
-Setup installs pinned application and development dependencies, applies migrations and checks the configuration. It can be rerun without resetting existing data. See [development environment and workflow](docs/DEVELOPMENT.md) for the complete requirement checklist, editor configuration and Git workflow.
+See [development environment and workflow](docs/DEVELOPMENT.md) for editor configuration, validation and the Git workflow.
 
 ### Try the synthetic demonstration
 

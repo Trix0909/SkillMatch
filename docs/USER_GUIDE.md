@@ -2,7 +2,7 @@
 
 ## Start
 
-Run `start.ps1` from the project folder, or use the `manage.py runserver` command in the README. Open `http://127.0.0.1:8000`.
+Double-click `start.cmd` in the project folder, or run `.\start.cmd` in its terminal. It prepares the environment and starts the app. Open `http://127.0.0.1:8000` once the server is ready. Keep the terminal open while using SkillMatch; press Ctrl+C to stop.
 
 Select **Get started** to register. Enter your name, email, username and password. Choose **I’m looking for work** or **I’m hiring**. Employers also enter a company name. Registration signs you in and opens profile editing. Your selected role cannot be switched through a web request or form; use separate accounts for the two roles.
 
