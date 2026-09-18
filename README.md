@@ -1,8 +1,8 @@
 # SkillMatch
 
-A Django web application for structured professional profiles and keyword-weighted job matching, implemented from Trina Kinyua’s three supplied project files (admission number 168111).
+A Django web application for structured professional profiles and keyword-weighted job matching.
 
-The working proposal is the implementation authority where the files differ. This build uses **Django templates, Bootstrap 5, SQLite and scikit-learn**, as specified in the proposal and defense presentation. The earlier concept note’s React frontend is superseded by those detailed specifications. See [requirements and source decisions](docs/REQUIREMENTS.md).
+This build uses **Django templates, Bootstrap 5, SQLite and scikit-learn**, as specified in the proposal and defense presentation. The React frontend is superseded by detailed specifications in the documentation. See [requirements and source decisions](docs/REQUIREMENTS.md).
 
 ## Run on Windows
 
