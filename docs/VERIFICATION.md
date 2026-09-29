@@ -1,10 +1,10 @@
 # Implementation verification
 
-Verified locally on 18 September 2026 using Python 3.12, Django 5.2.17, scikit-learn 1.7.2, SQLite and headless Microsoft Edge.
+Development validation was rerun locally on 29 September 2026 using Python 3.12.14, Django 5.2.17, scikit-learn 1.7.2 and SQLite. Browser evidence below is from 18 September 2026; browser checks were not rerun for this documentation update.
 
 ## Automated results
 
-**35 Django tests passed** with a freshly migrated temporary database. Covered behaviors:
+**40 tests passed** with a freshly migrated temporary database. Covered behaviors:
 
 - Exact certification and experience constants, weighted formula and ranking for equal-text profiles.
 - Term-frequency saturation at 2 before TF-IDF; repeated text cannot keep increasing its term count.
@@ -20,6 +20,7 @@ Verified locally on 18 September 2026 using Python 3.12, Django 5.2.17, scikit-l
 - Job creation, closure and deletion; role-specific templates and result pagination.
 - Relevance thresholds, Precision@k denominators and SUS scoring.
 - Manual-label requirements, changed-corpus fingerprint rejection, empty/duplicate SUS response rejection.
+- Startup dependency reuse, setup when dependencies or the interpreter are missing, included lock-file checks, and preventing server startup after migration failure.
 
 `manage.py check` and the production-setting `check --deploy` reported no issues. Migrations match the models (`makemigrations --check --dry-run`). `pip check` reported no broken requirements. Static-file collection completed successfully. This checks configuration and dependencies; it does not mean external hosting has been configured.
 
@@ -46,11 +47,19 @@ Formal Precision@k results need a frozen study corpus and completed manual relev
 
 Run the Django commands in the README. `tools/browser_check.cjs` additionally needs Playwright and Microsoft Edge, uses only the local demo application, and reads generated credentials from `demo-credentials.txt`. Playwright is a QA dependency, not a requirement for running SkillMatch. The script defaults to the bundled Codex package path; set `PLAYWRIGHT_MODULE` to your own Playwright module path when running elsewhere.
 
-## Development environment follow-up
+## Development environment follow-up (18 September 2026)
 
 The full `tools/dev.py check` workflow passed after source formatting: Ruff lint/format, Django template formatting, CSS/JavaScript/JSON formatting, dependency compatibility, all 35 tests, migration consistency, Django checks, production-setting checks, static-file collection and Git-index checks. Browser checks also passed after formatting, and the desktop landing page was visually inspected.
 
 Setup was rerun successfully with pinned development dependencies and without resetting the database. The environment inspector confirmed Python 3.12.14, current migrations, SQLite integrity `ok`, 30 candidate profiles and 10 job posts. Unicode output is configured for child processes to support the existing Windows folder name.
 
 The GitHub Actions and VS Code configuration files parse successfully. The repository is now connected to `https://github.com/Trix0909/SkillMatch.git`, with `master` tracking `origin/master`. Both hosted Windows and Linux jobs passed for commit `28f4bcf` in [GitHub Actions run 35301744459](https://github.com/Trix0909/SkillMatch/actions/runs/35301744459). These jobs install the locked dependencies and execute the full development validation workflow. See `docs/DEVELOPMENT.md` for the requirement checklist and `docs/BACKLOG.md` for pending research tasks.
+
+## Current status (29 September 2026)
+
+The full `tools/dev.py check` workflow passed with all 40 tests, formatting and lint checks, dependency checks, migration consistency, Django development and production checks, static collection and the Git-index privacy check. `tools/dev.py doctor` confirmed current migrations, SQLite integrity `ok`, 30 candidate profiles and 10 job posts.
+
+The Windows entry point is now `start.cmd`, which prepares the environment when necessary and starts the application without changing PowerShell execution policy. The startup fix at commit `66ad397` passed both Windows and Linux in [GitHub Actions run 35345983695](https://github.com/Trix0909/SkillMatch/actions/runs/35345983695). Windows CI uses the launcher to set up a fresh environment. `SkillMatch.url` opens the local site after the server has started.
+
+Manual study labels, participant SUS responses and user acceptance observations remain outstanding. This update adds no research findings or external deployment claim.
 

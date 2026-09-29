@@ -14,6 +14,8 @@ This build uses **Django templates, Bootstrap 5, SQLite and scikit-learn**, as s
 
 When the server is ready, open **http://127.0.0.1:8000** in your browser. Keep the terminal window open while using the app; press **Ctrl+C** to stop it.
 
+You can also double-click `SkillMatch.url` to open that address after starting the server. The shortcut opens the browser only; use `start.cmd` to start the application.
+
 The launcher finds Python 3.12, creates the project environment if needed, installs missing or changed pinned dependencies, applies database migrations and starts Django. The first setup needs internet access; later starts reuse installed dependencies. Your existing database, accounts and demo passwords are preserved. You do not need to activate an environment or run a separate setup command.
 
 ### First installation and troubleshooting
