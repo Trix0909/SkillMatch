@@ -1,0 +1,50 @@
+<div class="field-group{% if field.errors %} sm-field-invalid{% endif %}">
+  <label class="form-label" for="{{ field.id_for_label }}">
+    {{ field.label }}{% if field.field.required %}<span class="required-mark"
+      aria-hidden="true">*</span>{% endif %}
+  </label>
+  <div class="sm-auth-input{% if login_field %} sm-auth-input-icon{% endif %}">
+    {% if login_field %}
+      <span class="sm-auth-field-icon" aria-hidden="true">
+        {% if field.name == "username" %}
+          {% include "skillmatch/includes/brand_icon.html" with icon="person" %}
+        {% else %}
+          <svg width="20"
+               height="20"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="1.6">
+            <rect x="5" y="10" width="14" height="11" rx="2" />
+            <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+          </svg>
+        {% endif %}
+      </span>
+    {% endif %}
+    {{ field }}
+    {% if field.field.widget.input_type == "password" %}
+      <button class="sm-password-toggle"
+              type="button"
+              hidden
+              data-password-toggle
+              aria-controls="{{ field.id_for_label }}"
+              aria-label="Show {{ field.label|lower }}"
+              aria-pressed="false">
+        <svg width="20"
+             height="20"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.6"
+             aria-hidden="true">
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+          <path class="sm-eye-slash" d="m3 3 18 18" />
+        </svg>
+      </button>
+    {% endif %}
+  </div>
+  {% if field.help_text %}<div class="form-text"
+     id="{{ field.auto_id }}_helptext">{{ field.help_text|safe }}</div>{% endif %}
+  {% if field.errors %}<div id="{{ field.auto_id }}_error" role="alert">{% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}</div>{% endif %}
+</div>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% block favicon %}
+  <link rel="icon"
+        href="{% static 'images/brand/match-point.svg' %}"
+        type="image/svg+xml">
+{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+  <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+  <script src="{% static 'js/auth.js' %}" defer></script>
+{% endblock %}
+{% block body_class %}sm-landing sm-auth{% endblock %}
+{% block main_class %}sm-auth-main{% endblock %}
+{% block public_header %}{% endblock %}
+{% block footer %}{% endblock %}

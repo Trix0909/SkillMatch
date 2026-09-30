@@ -1,82 +1,121 @@
 {% extends "base.html" %}
-{% block title %}SkillMatch · Your skills, the right opportunity{% endblock %}
-{% block main_class %}landing-content{% endblock %}
-{% block content %}
-  <section class="hero row align-items-center g-5">
-    <div class="col-lg-7">
-      <span class="eyebrow blue">
-        <span class="live-dot"></span> BUILT FOR KENYAN TALENT & SMEs</span>
-      <h1>
-        Your skills deserve
-        <br>
-        the <span>right match.</span>
-      </h1>
-      <p class="hero-copy">Bring your experience and work together in one professional profile. Discover opportunities that connect with what you can do.</p>
-      <div class="d-flex gap-3 flex-wrap">
-        <a class="btn btn-primary btn-lg"
-           href="{% url 'register' %}">Create your profile <span aria-hidden="true">↗</span>
-        </a>
-        <a class="btn btn-outline-secondary btn-lg"
-           href="{% url 'register' %}">Find skilled talent</a>
-      </div>
-      <div class="hero-footnote">
-        <span>✓ Structured profiles</span>
-        <span>✓ Transparent matching</span>
-      </div>
-    </div>
-    <div class="col-lg-5">
-      <div class="match-illustration"
-           aria-label="How a profile is matched to an opportunity">
-        <span class="illustration-label">SKILLS MEET OPPORTUNITY</span>
-        <div class="illustration-profile">
-          <span class="avatar">You</span>
-          <div>
-            <h3>Your professional profile</h3>
-            <p>Skills · Experience · Project work</p>
-          </div>
-          <span class="mini-check">✓</span>
-        </div>
-        <div class="illustration-line">
-          <span>✧</span>
-        </div>
-        <div class="illustration-result">
-          <div class="d-flex justify-content-between align-items-center">
-            <span class="eyebrow blue">A MORE RELEVANT CONNECTION</span>
-            <span class="match-symbol">↗</span>
-          </div>
-          <h3>Work that fits your skills.</h3>
-          <p>Your profile is compared with job descriptions, then ranked using certification and experience.</p>
-          <div class="illustration-tags">
-            <span>Skills</span>
-            <span>Certification</span>
-            <span>Experience</span>
-          </div>
-        </div>
-        <span class="illustration-caption">One profile. A clearer picture of your potential.</span>
-      </div>
-    </div>
-  </section>
-  <section class="how-section">
-    <div class="section-heading">
-      <span class="eyebrow">THE PATH TO YOUR NEXT OPPORTUNITY</span>
-      <h2>A little structure. A better connection.</h2>
-    </div>
-    <div class="row g-4">
-      <div class="col-md-4 how-step">
-        <span>01 /</span>
-        <h3>Show what you can do</h3>
-        <p>Add your skills, certification level, experience and project descriptions to a structured profile.</p>
-      </div>
-      <div class="col-md-4 how-step">
-        <span>02 /</span>
-        <h3>Find the relevant matches</h3>
-        <p>Get ranked job recommendations, or find candidates for the job description you have in mind.</p>
-      </div>
-      <div class="col-md-4 how-step">
-        <span>03 /</span>
-        <h3>Understand the connection</h3>
-        <p>See matching skills and the score breakdown. Explore project descriptions and supporting links.</p>
-      </div>
-    </div>
-  </section>
+{% load static %}
+{% block title %}SkillMatch · Where skills meet opportunity{% endblock %}
+{% block favicon %}
+  <link rel="icon"
+        href="{% static 'images/brand/match-point.svg' %}"
+        type="image/svg+xml">
 {% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+  <script src="{% static 'js/landing.js' %}" defer></script>
+  <link rel="preload"
+        href="{% static 'fonts/playfair-display-normal-600.ttf' %}"
+        as="font"
+        type="font/ttf"
+        crossorigin>
+{% endblock %}
+{% block body_class %}sm-landing{% endblock %}
+{% block main_class %}sm-main{% endblock %}
+{% block public_header %}
+  <header class="sm-header">
+    <div class="sm-container sm-header-inner">
+      <a class="sm-brand"
+         href="{% url 'landing' %}"
+         aria-label="SkillMatch home"><img src="{% static 'images/brand/match-point.svg' %}"
+     width="32"
+     height="38"
+     alt=""><span>SkillMatch</span></a>
+      <nav class="sm-desktop-nav" aria-label="Main navigation">
+        <a href="#for-job-seekers">For job seekers</a><a href="#for-employers">For employers</a><a href="#how-it-works">How it works</a><a href="#about">About</a>
+      </nav>
+      <div class="sm-header-actions"><a class="sm-button sm-button-white" href="{% url 'login' %}">Sign in</a><a class="sm-button sm-button-primary" href="{% url 'register' %}">Get started {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div>
+      <details class="sm-mobile-nav"><summary aria-label="Navigation menu"><span></span><span></span><span></span></summary><nav aria-label="Mobile navigation"><a href="#for-job-seekers">For job seekers</a><a href="#for-employers">For employers</a><a href="#how-it-works">How it works</a><a href="#about">About SkillMatch</a><a href="{% url 'login' %}">Sign in</a><a href="{% url 'register' %}">Get started →</a></nav></details>
+    </div>
+  </header>
+{% endblock %}
+{% block content %}
+  <section class="sm-hero" aria-labelledby="hero-title">
+    <div class="sm-container sm-hero-inner">
+      <div class="sm-hero-copy">
+        <span class="sm-eyebrow">Kenyan talent. Brighter opportunities.</span>
+        <h1 id="hero-title">
+          Where skills meet
+          <br class="sm-heading-break">
+          the right <em>opportunity.</em>
+        </h1>
+        <p class="sm-hero-description">SkillMatch connects Kenyan professionals and SMEs through skills, experience and professional profiles — for more meaningful opportunities and stronger businesses.</p>
+        <div class="sm-hero-actions"><a id="for-job-seekers"
+   class="sm-button sm-button-primary"
+   href="{% url 'register' %}">{% include "skillmatch/includes/brand_icon.html" with icon="person" %} I’m looking for work {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a><a id="for-employers"
+   class="sm-button sm-button-sage"
+   href="{% url 'register' %}">{% include "skillmatch/includes/brand_icon.html" with icon="building" %} I’m hiring {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div>
+        <p class="sm-hero-note">Real people. Real skills. A stronger Kenya.</p>
+      </div>
+      <div class="sm-hero-art"
+           role="group"
+           aria-label="An illustrative SkillMatch connection">
+        <img class="sm-hero-photo"
+             src="{% static 'images/landing-professional.jpg' %}"
+             width="1536"
+             height="1024"
+             alt="A Kenyan professional in an emerald blazer working on her laptop in a sunlit office"
+             fetchpriority="high">
+        <div class="sm-preview-card sm-person-card"><div class="sm-person-heading"><span class="sm-initials">AK</span><div><strong>Amina Kamau</strong><span>Backend Developer</span><small>{% include "skillmatch/includes/brand_icon.html" with icon="pin" %} Nairobi, Kenya</small></div></div><div class="sm-tags"><span>Python</span><span>Django</span><span>PostgreSQL</span><span>API Design</span><span>Problem Solving</span></div></div>
+        <div class="sm-preview-card sm-match-card">
+          <div class="sm-card-heading">{% include "skillmatch/includes/brand_icon.html" with icon="target" %}<strong>Why this match?</strong></div>
+          <div class="sm-match-score">92<span>% Match</span></div>
+          <div class="sm-match-track" aria-hidden="true">
+            <span></span>
+          </div>
+          <p class="sm-match-reason">Shared skills: Python &amp; Django</p>
+          <span class="sm-example-label">Illustrative score</span>
+        </div>
+        <div class="sm-preview-card sm-job-card"><div class="sm-person-heading"><span class="sm-company-mark">N</span><div><strong>Backend Developer</strong><span>Nairobi Works</span></div></div><div class="sm-job-meta"><span>{% include "skillmatch/includes/brand_icon.html" with icon="pin" %} Nairobi, Kenya</span><span>{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %} Full-time</span></div><div class="sm-tags"><span>Python</span><span>Django</span><span>SQL</span></div></div>
+        <div class="sm-city">
+          <img src="{% static 'images/landing-nairobi.jpg' %}"
+               width="2062"
+               height="763"
+               alt=""
+               loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="sm-benefits" aria-label="Why SkillMatch">
+    <div class="sm-container sm-benefit-grid">
+      <div class="sm-benefit"><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="document" %}</span><div><h2>Structured professional profiles</h2><p>Your professional strengths, in one place.</p></div></div>
+      <div class="sm-benefit"><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="search" %}</span><div><h2>Transparent matching</h2><p>See why each match fits.</p></div></div>
+      <div class="sm-benefit"><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}</span><div><h2>Built for Kenyan talent &amp; SMEs</h2><p>Local talent. Growing teams.</p></div></div>
+      <div class="sm-benefit"><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}</span><div><h2>Skills, certification &amp; experience matter</h2><p>Matching that considers all three.</p></div></div>
+    </div>
+  </section>
+  <section id="how-it-works" class="sm-how" aria-labelledby="how-title">
+    <div class="sm-container">
+      <div class="sm-section-heading">
+        <span class="sm-eyebrow">Simple. Clear. Meaningful.</span>
+        <h2 id="how-title">How it works</h2>
+        <p>From profile to opportunity — for job seekers and employers.</p>
+      </div>
+      <div class="sm-flow" role="group" aria-labelledby="seeker-flow-title">
+        <h3 id="seeker-flow-title" class="sm-flow-title">For job seekers</h3>
+        <ol class="sm-steps">
+          <li><span class="sm-step-number" aria-hidden="true">1</span><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="document" %}</span><div><h4>Create your profile</h4><p>Add your skills, experience and certifications.</p></div>{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</li>
+          <li><span class="sm-step-number" aria-hidden="true">2</span><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="search" %}</span><div><h4>Discover matching jobs</h4><p>Explore opportunities that fit your strengths.</p></div>{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</li>
+          <li><span class="sm-step-number" aria-hidden="true">3</span><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}</span><div><h4>Explore the fit</h4><p>Review job details and why you match.</p></div></li>
+        </ol>
+      </div>
+      <div class="sm-flow" role="group" aria-labelledby="employer-flow-title">
+        <h3 id="employer-flow-title" class="sm-flow-title">For employers</h3>
+        <ol class="sm-steps">
+          <li><span class="sm-step-number" aria-hidden="true">1</span><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="building" %}</span><div><h4>Set up &amp; post a job</h4><p>Create your company profile and add a role.</p></div>{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</li>
+          <li><span class="sm-step-number" aria-hidden="true">2</span><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}</span><div><h4>Find matching candidates</h4><p>Discover ranked talent for your job or search.</p></div>{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</li>
+          <li><span class="sm-step-number" aria-hidden="true">3</span><span class="sm-icon-tile">{% include "skillmatch/includes/brand_icon.html" with icon="document" %}</span><div><h4>Review their strengths</h4><p>Explore profiles and understand each match.</p></div></li>
+        </ol>
+      </div>
+      <a class="sm-text-link" href="{% url 'methodology' %}">Explore how matching works {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a>
+    </div>
+  </section>
+  <section id="about" class="sm-about" aria-labelledby="about-title"><div class="sm-container sm-about-inner"><div><span class="sm-eyebrow">Rooted in Kenya. Built around skills.</span><h2 id="about-title">Talent deserves the right connection.</h2></div><div><p>For professionals taking their next step and small businesses building their teams, SkillMatch brings structured profiles and explainable matching together.</p><a class="sm-text-link" href="{% url 'register' %}">Find your starting point {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div></div></section>
+{% endblock %}
+{% block footer %}<footer class="sm-footer sm-container"><span>SkillMatch · Real skills. Real opportunities.</span><span>Made for Kenyan talent &amp; SMEs.</span></footer>{% endblock %}

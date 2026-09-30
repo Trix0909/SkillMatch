@@ -47,6 +47,8 @@ For a clean installation, skip demo seeding, register your own accounts, and cre
 
 ## Features
 
+The landing, login and signup pages use the Match Point visual design, local Inter/Playfair fonts and responsive Kenyan editorial imagery. See [landing design and asset notes](docs/LANDING-DESIGN.md) and [authentication design notes](docs/AUTH-DESIGN.md). Other pages retain their current UI pending design approval.
+
 - Separate job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks.
 - Structured profiles: names, unique skill tags, certification and experience dropdowns, professional summary, project descriptions and optional HTTP(S) evidence links.
 - Employer company profile, job creation/editing, closing/reopening, deletion confirmation and candidate search.

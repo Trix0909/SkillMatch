@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 300">
+  <defs>
+    <linearGradient id="navy" x2="1" y2="1"><stop stop-color="#0B2D3B"/><stop offset=".5" stop-color="#104658"/><stop offset="1" stop-color="#071F2D"/></linearGradient>
+    <linearGradient id="emerald" x2="1" y2="1"><stop stop-color="#00866B"/><stop offset="1" stop-color="#075747"/></linearGradient>
+    <linearGradient id="gold" x2="1" y2="1"><stop stop-color="#E9BF85"/><stop offset="1" stop-color="#BC8648"/></linearGradient>
+  </defs>
+  <path d="M115 10C60 13 11 50 2 94C-8 138 22 163 74 168C55 142 63 118 91 100L252 3Q258-1 249 0Z" fill="url(#navy)"/>
+  <path d="M115 10C65 20 46 77 81 109L252 3Q258-1 249 0Z" fill="url(#emerald)"/>
+  <path d="M171 139C221 144 246 174 242 213C238 259 196 295 135 297H6Q-3 297 5 292L155 210C181 195 187 166 171 139Z" fill="url(#navy)"/>
+  <path d="M154 210C203 251 167 297 135 297H6Q-3 297 5 292Z" fill="url(#emerald)"/>
+  <circle cx="121" cy="158" r="26" fill="url(#gold)"/>
+</svg>

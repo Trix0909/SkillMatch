@@ -6,13 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
           content="SkillMatch connects Kenyan job seekers and SME employers through structured profiles and transparent skill matching.">
-    <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    {% block favicon %}
+      <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+    {% endblock %}
     <title>{% block title %}SkillMatch{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <script src="{% static 'js/app.js' %}" defer></script>
+    {% block extra_head %}{% endblock %}
   </head>
-  <body class="{% if user.is_authenticated %}signed-in{% else %}public{% endif %}">
+  <body class="{% if user.is_authenticated %}signed-in{% else %}public{% endif %} {% block body_class %}{% endblock %}">
     <a href="#main" class="skip-link">Skip to content</a>
     {% if user.is_authenticated %}
       <aside class="sidebar">
@@ -83,19 +86,21 @@
         </div>
       </aside>
     {% else %}
-      <header class="public-header">
-        <a class="brand" href="{% url 'landing' %}">
-          <span class="brand-icon">s<span>m</span>
-          </span>SkillMatch<span class="brand-dot">.</span>
-        </a>
-        <nav aria-label="Main navigation">
-          <a href="{% url 'methodology' %}">How it works</a>
-          <a href="{% url 'login' %}">Sign in</a>
-          <a class="btn btn-primary btn-sm"
-             href="{% url 'register' %}">Get started <span aria-hidden="true">↗</span>
+      {% block public_header %}
+        <header class="public-header">
+          <a class="brand" href="{% url 'landing' %}">
+            <span class="brand-icon">s<span>m</span>
+            </span>SkillMatch<span class="brand-dot">.</span>
           </a>
-        </nav>
-      </header>
+          <nav aria-label="Main navigation">
+            <a href="{% url 'methodology' %}">How it works</a>
+            <a href="{% url 'login' %}">Sign in</a>
+            <a class="btn btn-primary btn-sm"
+               href="{% url 'register' %}">Get started <span aria-hidden="true">↗</span>
+            </a>
+          </nav>
+        </header>
+      {% endblock %}
     {% endif %}
     <div class="main-shell">
       {% if user.is_authenticated %}
@@ -118,10 +123,12 @@
         {% endif %}
         {% block content %}{% endblock %}
       </main>
-      <footer class="site-footer">
-        <span>SkillMatch · A skill-first connection.</span>
-        <span>CS Project II · Trina Kinyua · 168111</span>
-      </footer>
+      {% block footer %}
+        <footer class="site-footer">
+          <span>SkillMatch · A skill-first connection.</span>
+          <span>CS Project II · Trina Kinyua · 168111</span>
+        </footer>
+      {% endblock %}
     </div>
   </body>
 </html>

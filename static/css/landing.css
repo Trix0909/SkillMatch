@@ -1,0 +1,1265 @@
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/inter-normal-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../fonts/inter-normal-500.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/inter-normal-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/playfair-display-normal-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../fonts/playfair-display-normal-700.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/playfair-display-italic-600.ttf') format('truetype');
+}
+
+/* Brand tokens are loaded only on the landing page during the staged redesign. */
+.sm-landing {
+  --sm-navy: #0b2d3b;
+  --sm-emerald: #0f6b5b;
+  --sm-sage: #a7c1b3;
+  --sm-gold: #d4a574;
+  --sm-paper: #faf7f0;
+  --sm-surface: #fffefa;
+  --sm-soft: #edf0e7;
+  --sm-text: #0b2d3b;
+  --sm-muted: #54616a;
+  --sm-line: #e3e2d9;
+  --sm-shadow: 0 12px 36px #0b2d3b12;
+  font-family: Inter, 'Segoe UI', sans-serif;
+  color: var(--sm-text);
+  background: var(--sm-paper);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.sm-landing[data-theme='dark'] {
+  --sm-paper: #0a202b;
+  --sm-surface: #14313d;
+  --sm-soft: #1d3e43;
+  --sm-text: #faf7f0;
+  --sm-muted: #bacbc5;
+  --sm-line: #36515a;
+}
+
+.sm-landing .main-shell {
+  margin: 0;
+  min-height: auto;
+}
+
+.sm-main {
+  padding: 0;
+  max-width: none;
+}
+
+.sm-container {
+  width: min(1390px, 84%);
+  margin-inline: auto;
+}
+
+.sm-landing a {
+  color: inherit;
+}
+
+.sm-landing a:focus-visible,
+.sm-landing summary:focus-visible {
+  outline: 3px solid var(--sm-emerald);
+  outline-offset: 5px;
+}
+
+.sm-landing [id] {
+  scroll-margin-top: 28px;
+}
+
+.sm-icon {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.sm-header {
+  position: relative;
+  z-index: 5;
+  background: #fffefaee;
+  border-bottom: 1px solid #e3e2d940;
+}
+
+.sm-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  min-height: 82px;
+}
+
+.sm-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.sm-brand span {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -1.3px;
+}
+
+.sm-brand img {
+  object-fit: contain;
+}
+
+.sm-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.4vw, 40px);
+}
+
+.sm-desktop-nav a {
+  font-size: 13px;
+  font-weight: 500;
+  padding-block: 14px;
+}
+
+.sm-desktop-nav a:hover,
+.sm-text-link:hover {
+  color: var(--sm-emerald);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.sm-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.sm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 22px;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 13px;
+  border: 1px solid transparent;
+  transition: background-color .18s, box-shadow .18s;
+  line-height: 1.4;
+}
+
+.sm-button .sm-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.sm-landing .sm-button-primary {
+  background: var(--sm-navy);
+  color: #fffefa;
+  box-shadow: 0 6px 14px #0b2d3b10;
+}
+
+.sm-landing .sm-button-primary:hover {
+  background: var(--sm-emerald);
+  box-shadow: 0 8px 18px #0b2d3b18;
+}
+
+.sm-landing .sm-button-white {
+  background: #fff;
+  box-shadow: 0 4px 18px #0b2d3b07;
+}
+
+.sm-landing .sm-button-white:hover,
+.sm-landing .sm-button-sage:hover {
+  background: #dce7db;
+}
+
+.sm-button:active {
+  box-shadow: inset 0 2px 5px #0002;
+}
+
+.sm-landing .sm-button-sage {
+  background: var(--sm-soft);
+  color: var(--sm-navy);
+}
+
+.sm-mobile-nav {
+  display: none;
+}
+
+.sm-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(110deg, #faf8f3, #fffdfa 57%, #f2ede1);
+}
+
+.sm-hero-inner {
+  display: grid;
+  grid-template-columns: 49% 51%;
+  min-height: 530px;
+  position: relative;
+}
+
+.sm-hero-copy {
+  padding: 38px 0 32px;
+  align-self: center;
+  position: relative;
+  z-index: 2;
+}
+
+.sm-eyebrow {
+  display: inline-block;
+  border-radius: 30px;
+  padding: 6px 16px;
+  background: #eeeae2;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 2.7px;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.sm-hero h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  color: var(--sm-navy);
+  font-size: clamp(42px, 4.15vw, 70px);
+  font-weight: 600;
+  line-height: 1.09;
+  letter-spacing: -2.6px;
+  margin: 27px -40px 36px 0;
+}
+
+.sm-hero h1 em {
+  color: #095449;
+  position: relative;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.sm-hero h1 em::after {
+  content: '';
+  position: absolute;
+  left: 7%;
+  right: 2%;
+  bottom: -15px;
+  height: 17px;
+  border-top: 4px solid #93ae9b;
+  border-radius: 50%;
+  transform: rotate(1deg);
+}
+
+.sm-hero-description {
+  max-width: 535px;
+  font-size: clamp(15px, 1.13vw, 19px);
+  line-height: 1.55;
+  color: #495a66;
+  margin-bottom: 24px;
+  padding-right: 30px;
+}
+
+.sm-hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sm-hero-actions .sm-button {
+  font-size: 14px;
+  min-height: 57px;
+  padding-inline: 24px;
+}
+
+.sm-hero-actions .sm-button-sage {
+  min-width: 190px;
+}
+
+.sm-hero-note {
+  font-size: 13px;
+  color: var(--sm-muted);
+  margin: 18px 0 0;
+}
+
+.sm-hero-art {
+  position: relative;
+  margin-right: calc((100vw - min(1390px, 84vw)) / -2);
+  min-height: 530px;
+  isolation: isolate;
+}
+
+.sm-hero-photo {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: 58% center;
+  border-bottom-left-radius: 20% 26%;
+  border-top-left-radius: 8% 20%;
+}
+
+.sm-preview-card {
+  position: absolute;
+  background: #fffefaf5;
+  border: 1px solid #ffffffb3;
+  border-radius: 16px;
+  box-shadow: var(--sm-shadow);
+  z-index: 2;
+  padding: 17px;
+  font-size: 12px;
+  color: var(--sm-navy);
+}
+
+.sm-person-card {
+  top: 46px;
+  left: 15px;
+  width: 247px;
+}
+
+.sm-person-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sm-person-heading strong {
+  font-size: 13px;
+  display: block;
+  font-weight: 600;
+}
+
+.sm-person-heading div>span {
+  display: block;
+  margin-top: 2px;
+}
+
+.sm-person-heading small {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--sm-muted);
+}
+
+.sm-person-heading small .sm-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.sm-initials {
+  width: 47px;
+  height: 47px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e3ebe0;
+  color: var(--sm-emerald);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.sm-tags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.sm-tags span {
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: #eeeee7;
+  line-height: 1.5;
+}
+
+.sm-match-card {
+  right: 5%;
+  top: 78px;
+  width: 180px;
+  padding: 13px;
+  box-shadow: 0 6px 20px #0b2d3b0c;
+}
+
+.sm-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+}
+
+.sm-card-heading .sm-icon {
+  width: 20px;
+  color: var(--sm-emerald);
+}
+
+.sm-match-score {
+  font-size: 23px;
+  font-weight: 600;
+  color: var(--sm-emerald);
+  margin: 9px 0 8px;
+  line-height: 1;
+}
+
+.sm-match-score>span {
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+.sm-match-track {
+  height: 4px;
+  background: #e6e9e2;
+  border-radius: 20px;
+}
+
+.sm-match-track span {
+  display: block;
+  width: 92%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0f6b5b, #7aaa95);
+}
+
+.sm-match-reason {
+  font-size: 10px;
+  line-height: 1.4;
+  margin: 8px 0 0;
+  color: var(--sm-muted);
+}
+
+.sm-example-label {
+  font-size: 9px;
+  color: var(--sm-muted);
+  display: block;
+  margin-top: 4px;
+}
+
+.sm-job-card {
+  left: 16px;
+  bottom: 93px;
+  width: 276px;
+}
+
+.sm-company-mark {
+  height: 40px;
+  width: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--sm-navy);
+  color: #d7e5d6;
+  font-size: 25px;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.sm-job-meta {
+  display: flex;
+  gap: 15px;
+  margin-top: 19px;
+  font-size: 10px;
+}
+
+.sm-job-meta>span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sm-job-meta .sm-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.sm-city {
+  position: absolute;
+  width: 57%;
+  height: 29%;
+  bottom: 0;
+  right: 0;
+  overflow: hidden;
+  border-radius: 100% 0 0 0;
+  border-top: 5px solid #f9f5e6;
+}
+
+.sm-city img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+
+.sm-benefits {
+  background: #fffefa;
+  position: relative;
+  z-index: 2;
+  border-bottom: 1px solid #e3e2d965;
+}
+
+.sm-benefit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-block: 28px;
+}
+
+.sm-benefit {
+  display: flex;
+  gap: 18px;
+  padding-inline: 23px;
+  border-right: 1px solid var(--sm-line);
+}
+
+.sm-benefit:first-child {
+  padding-left: 0;
+}
+
+.sm-benefit:last-child {
+  border: 0;
+  padding-right: 0;
+}
+
+.sm-icon-tile {
+  height: 58px;
+  width: 58px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--sm-soft);
+  color: #134b3d;
+}
+
+.sm-icon-tile .sm-icon {
+  width: 29px;
+  height: 29px;
+}
+
+.sm-benefit h2,
+.sm-steps h4 {
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: -.25px;
+  color: var(--sm-navy);
+  margin: 5px 0 7px;
+  font-weight: 600;
+}
+
+.sm-benefit p,
+.sm-steps p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--sm-muted);
+  margin: 0;
+}
+
+.sm-how {
+  position: relative;
+  padding: 26px 0 36px;
+  background: radial-gradient(ellipse at 0 100%, #d9e5d980, transparent 30%), #faf8f3;
+}
+
+.sm-section-heading {
+  text-align: center;
+}
+
+.sm-section-heading h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--sm-navy);
+  margin: 4px 0;
+  letter-spacing: -1.2px;
+}
+
+.sm-section-heading p {
+  color: var(--sm-muted);
+  font-size: 13px;
+  margin: 3px 0 0;
+}
+
+.sm-flow {
+  margin-top: 24px;
+}
+
+.sm-flow+.sm-flow {
+  border-top: 1px solid var(--sm-line);
+  padding-top: 20px;
+}
+
+.sm-flow-title {
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--sm-emerald);
+  margin: 0 0 14px;
+}
+
+.sm-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  gap: 38px;
+}
+
+.sm-steps li {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.sm-step-number {
+  width: 28px;
+  height: 28px;
+  background: #efe9dd;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+.sm-steps li>.sm-icon {
+  margin-top: 19px;
+  color: #99a29c;
+  width: 35px;
+  margin-left: 12px;
+}
+
+.sm-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sm-text-link .sm-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.sm-how .sm-text-link {
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  margin: 0 auto;
+  color: var(--sm-emerald);
+}
+
+.sm-about {
+  border-top: 1px solid var(--sm-line);
+  padding: 48px 0;
+  background: var(--sm-soft);
+}
+
+.sm-about-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.sm-about .sm-eyebrow {
+  padding: 0;
+  background: transparent;
+  font-size: 9px;
+  color: var(--sm-emerald);
+}
+
+.sm-about h2 {
+  font-family: 'Playfair Display', Georgia, serif;
+  color: var(--sm-navy);
+  font-weight: 600;
+  font-size: 32px;
+  max-width: 450px;
+  margin: 12px 0 0;
+}
+
+.sm-about p {
+  font-size: 14px;
+  color: var(--sm-muted);
+  line-height: 1.7;
+  margin-bottom: 12px;
+  max-width: 520px;
+}
+
+.sm-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-block: 24px;
+  color: var(--sm-muted);
+  font-size: 11px;
+}
+
+@media (min-width: 1700px) {
+
+  .sm-hero-inner,
+  .sm-hero-art {
+    min-height: 580px;
+  }
+}
+
+@media (max-width: 1250px) {
+  .sm-container {
+    width: 90%;
+  }
+
+  .sm-hero-art {
+    margin-right: -5vw;
+  }
+
+  .sm-header-inner {
+    gap: 18px;
+  }
+
+  .sm-desktop-nav {
+    gap: 18px;
+  }
+
+  .sm-desktop-nav a {
+    font-size: 12px;
+  }
+
+  .sm-header-actions .sm-button {
+    padding-inline: 16px;
+  }
+
+  .sm-hero h1 {
+    font-size: 4.3vw;
+  }
+
+  .sm-hero-description {
+    font-size: 15px;
+    padding-right: 28px;
+  }
+
+  .sm-hero-actions {
+    gap: 10px;
+  }
+
+  .sm-hero-actions .sm-button {
+    padding-inline: 15px;
+    font-size: 12px;
+    gap: 9px;
+  }
+
+  .sm-hero-actions .sm-button-sage {
+    min-width: 150px;
+  }
+
+  .sm-match-card {
+    right: 3%;
+    top: 235px;
+    width: 164px;
+  }
+
+  .sm-job-card {
+    bottom: 46px;
+    width: 246px;
+  }
+
+  .sm-person-card {
+    width: 230px;
+  }
+
+  .sm-benefit {
+    padding-inline: 16px;
+    gap: 12px;
+  }
+
+  .sm-benefit .sm-icon-tile {
+    width: 44px;
+    height: 48px;
+    border-radius: 18px;
+  }
+
+  .sm-benefit h2 {
+    font-size: 12px;
+  }
+
+  .sm-benefit p {
+    font-size: 11px;
+  }
+
+  .sm-steps {
+    gap: 20px;
+  }
+
+  .sm-steps li {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .sm-desktop-nav {
+    display: none;
+  }
+
+  .sm-mobile-nav {
+    display: block;
+  }
+
+  .sm-header-actions {
+    margin-left: auto;
+  }
+
+  .sm-mobile-nav summary {
+    width: 40px;
+    height: 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    padding: 9px;
+    border-radius: 10px;
+  }
+
+  .sm-mobile-nav summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .sm-mobile-nav summary span {
+    height: 1.5px;
+    background: var(--sm-navy);
+    width: 22px;
+  }
+
+  .sm-mobile-nav[open] summary {
+    background: var(--sm-soft);
+  }
+
+  .sm-mobile-nav nav {
+    position: absolute;
+    top: calc(100% - 1px);
+    left: 5%;
+    right: 5%;
+    background: var(--sm-surface);
+    border: 1px solid var(--sm-line);
+    border-radius: 0 0 16px 16px;
+    box-shadow: var(--sm-shadow);
+    padding: 12px;
+    display: grid;
+    z-index: 10;
+  }
+
+  .sm-mobile-nav nav a {
+    padding: 12px;
+    border-radius: 8px;
+  }
+
+  .sm-mobile-nav nav a:hover {
+    background: var(--sm-soft);
+  }
+
+  .sm-hero-inner {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sm-hero h1 {
+    font-size: 4.5vw;
+    line-height: 1.15;
+    margin-right: -10px;
+    letter-spacing: -1.5px;
+  }
+
+  .sm-hero-copy .sm-eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.4px;
+    padding-inline: 10px;
+  }
+
+  .sm-hero-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sm-hero-actions .sm-button {
+    min-width: 240px;
+  }
+
+  .sm-person-card {
+    left: 0;
+    top: 25px;
+    width: 210px;
+    padding: 13px;
+  }
+
+  .sm-match-card {
+    top: 215px;
+    right: 10px;
+    width: 158px;
+  }
+
+  .sm-job-card {
+    left: 0;
+    bottom: 40px;
+    width: 237px;
+    padding: 13px;
+  }
+
+  .sm-hero-photo {
+    object-position: 59% center;
+  }
+
+  .sm-hero-art {
+    min-height: 580px;
+  }
+
+  .sm-benefit-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .sm-benefit {
+    padding: 0;
+    border: 0;
+  }
+
+  .sm-benefit h2 {
+    font-size: 13px;
+  }
+
+  .sm-benefit p {
+    font-size: 12px;
+    max-width: 280px;
+  }
+
+  .sm-steps li {
+    flex-wrap: wrap;
+  }
+
+  .sm-steps li>div {
+    flex-basis: 100%;
+  }
+
+  .sm-steps li>.sm-icon {
+    display: none;
+  }
+}
+
+@media (max-width: 699px) {
+  .sm-header-inner {
+    min-height: 74px;
+    gap: 10px;
+  }
+
+  .sm-brand {
+    gap: 9px;
+  }
+
+  .sm-brand span {
+    font-size: 24px;
+  }
+
+  .sm-brand img {
+    width: 27px;
+    height: 32px;
+  }
+
+  .sm-header-actions .sm-button-primary {
+    display: none;
+  }
+
+  .sm-header-actions .sm-button-white {
+    min-height: 40px;
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+
+  .sm-hero-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .sm-hero-copy {
+    padding: 32px 5% 30px;
+    width: 100%;
+  }
+
+  .sm-hero-copy .sm-eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.65px;
+    padding: 6px 12px;
+  }
+
+  .sm-hero h1 {
+    font-size: clamp(34px, 7.8vw, 53px);
+    letter-spacing: -1.6px;
+    margin: 22px 0 30px;
+    line-height: 1.17;
+  }
+
+  .sm-hero h1 em::after {
+    bottom: -12px;
+    height: 12px;
+    border-width: 3px;
+  }
+
+  .sm-hero-description {
+    padding: 0;
+    font-size: 14px;
+    max-width: 510px;
+    margin-bottom: 20px;
+  }
+
+  .sm-hero-actions {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .sm-hero-actions .sm-button {
+    min-width: 0;
+    font-size: 12px;
+    padding-inline: 13px;
+    min-height: 50px;
+    gap: 8px;
+    border-radius: 13px;
+  }
+
+  .sm-hero-actions .sm-button>.sm-icon:first-child {
+    display: none;
+  }
+
+  .sm-hero-note {
+    font-size: 11px;
+    margin-top: 15px;
+  }
+
+  .sm-hero-art {
+    min-height: 480px;
+    margin: 0;
+    width: 100%;
+  }
+
+  .sm-hero-photo {
+    border-radius: 40px 40px 0 0;
+    object-position: center;
+  }
+
+  .sm-person-card {
+    top: 20px;
+    left: 5%;
+    width: 195px;
+  }
+
+  .sm-person-heading strong {
+    font-size: 11px;
+  }
+
+  .sm-person-heading>div>span {
+    font-size: 10px;
+  }
+
+  .sm-initials {
+    width: 36px;
+    height: 36px;
+    font-size: 17px;
+  }
+
+  .sm-person-heading {
+    gap: 8px;
+  }
+
+  .sm-person-card .sm-tags {
+    margin-top: 10px;
+    gap: 4px;
+  }
+
+  .sm-tags span {
+    font-size: 9px;
+    padding: 3px 7px;
+  }
+
+  .sm-match-card {
+    top: 168px;
+    right: 5%;
+    width: 144px;
+    padding: 11px;
+  }
+
+  .sm-card-heading {
+    font-size: 9px;
+    gap: 6px;
+  }
+
+  .sm-card-heading .sm-icon {
+    width: 17px;
+  }
+
+  .sm-match-score {
+    font-size: 22px;
+  }
+
+  .sm-match-score>span {
+    font-size: 12px;
+  }
+
+  .sm-job-card {
+    left: 5%;
+    bottom: 41px;
+    width: 205px;
+    padding: 13px;
+  }
+
+  .sm-job-meta {
+    gap: 8px;
+    font-size: 9px;
+    margin-top: 14px;
+  }
+
+  .sm-company-mark {
+    width: 33px;
+    height: 33px;
+    font-size: 22px;
+  }
+
+  .sm-city {
+    height: 22%;
+    width: 48%;
+  }
+
+  .sm-benefit-grid {
+    gap: 23px 20px;
+    padding-block: 30px;
+  }
+
+  .sm-benefit {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sm-benefit .sm-icon-tile {
+    width: 46px;
+    height: 46px;
+  }
+
+  .sm-benefit h2 {
+    font-size: 12px;
+    margin-top: 0;
+  }
+
+  .sm-benefit p {
+    font-size: 11px;
+  }
+
+  .sm-how {
+    padding: 28px 0 32px;
+  }
+
+  .sm-section-heading h2 {
+    font-size: 32px;
+  }
+
+  .sm-section-heading p {
+    font-size: 12px;
+    max-width: 280px;
+    margin-inline: auto;
+  }
+
+  .sm-steps {
+    grid-template-columns: 1fr;
+    margin-block: 0 24px;
+    gap: 23px;
+  }
+
+  .sm-steps li {
+    flex-wrap: nowrap;
+    gap: 13px;
+  }
+
+  .sm-steps li>div {
+    flex-basis: auto;
+  }
+
+  .sm-steps .sm-icon-tile {
+    height: 48px;
+    width: 48px;
+    border-radius: 17px;
+  }
+
+  .sm-steps h4 {
+    margin-top: 1px;
+  }
+
+  .sm-step-number {
+    width: 25px;
+    height: 25px;
+    font-size: 11px;
+  }
+
+  .sm-about {
+    padding: 32px 0;
+  }
+
+  .sm-about-inner {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .sm-about h2 {
+    font-size: 29px;
+    max-width: 340px;
+  }
+
+  .sm-about p {
+    font-size: 13px;
+  }
+
+  .sm-about .sm-eyebrow {
+    letter-spacing: 1.7px;
+  }
+
+  .sm-footer {
+    flex-direction: column;
+    gap: 4px;
+    font-size: 10px;
+    padding-block: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-button {
+    transition: none;
+  }
+}

@@ -1,31 +1,44 @@
-{% extends "base.html" %}
+{% extends "registration/auth_base.html" %}
+{% load static %}
 {% block title %}Sign in · SkillMatch{% endblock %}
 {% block content %}
-  <div class="auth-layout">
-    <div class="auth-intro">
-      <span class="eyebrow blue">YOUR NEXT CONNECTION STARTS HERE</span>
-      <h1>
-        Welcome
-        <br>
-        back<span class="blue">.</span>
-      </h1>
-      <p>Your skills, your experience and your next opportunity. All in one place.</p>
-      <div class="auth-decoration">✧</div>
+  <div class="sm-auth-layout sm-auth-login">
+    <aside class="sm-auth-story" aria-label="Your next opportunity">
+      <img class="sm-auth-photo"
+           src="{% static 'images/landing-professional.jpg' %}"
+           width="1536"
+           height="1024"
+           alt="A Kenyan professional working on her laptop in a warm, contemporary office"
+           fetchpriority="high">
+      <div class="sm-auth-story-copy">
+        {% include "registration/brand.html" %}
+        <span class="sm-eyebrow">Kenyan talent. Brighter opportunities.</span>
+        <h2>
+          Your next <em>opportunity</em> is closer than you think.
+        </h2>
+        <p>Connect with Kenyan professionals and SMEs through skills, experience and meaningful opportunities.</p>
+        {% include "registration/value_points.html" %}
+      </div>
+      {% include "registration/botanical.html" %}
+    </aside>
+    <div class="sm-auth-form-side">
+      <section class="sm-auth-card" aria-labelledby="login-title">
+        {% include "registration/brand.html" %}
+        <h1 id="login-title">Welcome back</h1>
+        <p class="sm-auth-intro">Sign in to explore your matches and continue where you left off.</p>
+        <form method="post">
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="sm-auth-errors"
+     role="alert">{{ form.non_field_errors }}</div>{% endif %}
+          {% for field in form %}
+            {% include "registration/field.html" with login_field=True %}
+          {% endfor %}
+          <input type="hidden" name="next" value="{{ next }}">
+          <button type="submit" class="sm-button sm-button-primary sm-auth-submit">Sign in {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button>
+        </form>
+        <p class="sm-auth-switch">Don’t have an account? <a href="{% url 'register' %}">Create one {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></p>
+      </section>
+      {% include "registration/botanical.html" %}
     </div>
-    <section class="auth-card">
-      <h2>Sign in to SkillMatch</h2>
-      <p class="muted mb-4">Continue to your workspace.</p>
-      <form method="post">
-        {% csrf_token %}{{ form.non_field_errors }}{% for field in form %}
-        {% include "partials/field.html" %}
-{% endfor %}
-<input type="hidden" name="next" value="{{ next }}">
-<button class="btn btn-primary w-100 mt-2">
-  Sign in <span aria-hidden="true">→</span>
-</button>
-</form>
-<p class="auth-switch">New to SkillMatch? <a href="{% url 'register' %}">Create an account</a>
-</p>
-</section>
-</div>
+  </div>
 {% endblock %}

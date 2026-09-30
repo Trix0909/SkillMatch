@@ -1,0 +1,38 @@
+<svg class="sm-icon"
+     width="24"
+     height="24"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="1.6"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     aria-hidden="true">
+  {% if icon == "person" %}
+    <circle cx="12" cy="7" r="4" />
+    <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
+  {% elif icon == "building" %}
+    <path d="M7 21V3h10v18M3 21h18M3 21V10h4m10 0h4v11M10 7h.01M14 7h.01M10 11h.01M14 11h.01M10 15h.01M14 15h.01M11 21v-3h2v3" />
+  {% elif icon == "document" %}
+    <path d="M5 2h9l5 5v15H5zM14 2v6h5M9 12h6M9 16h6M9 19h3" />
+  {% elif icon == "search" %}
+    <circle cx="10" cy="10" r="7" />
+    <path d="m15 15 6 6" />
+  {% elif icon == "people" %}
+    <circle cx="12" cy="7" r="3" />
+    <path d="M6 21v-3a6 6 0 0 1 12 0v3zM4 4a3 3 0 0 0 0 6M20 4a3 3 0 0 1 0 6M3 13a5 5 0 0 0-2 4v3h2m18-7a5 5 0 0 1 2 4v3h-2" />
+  {% elif icon == "shield" %}
+    <path d="m12 2 8 3v6c0 5-4 9-8 11-4-2-8-6-8-11V5zM8 12l3 3 5-6" />
+  {% elif icon == "briefcase" %}
+    <rect x="3" y="7" width="18" height="14" rx="2" />
+    <path d="M8 7V3h8v4" />
+  {% elif icon == "pin" %}
+    <path d="M19 10c0 5-7 12-7 12S5 15 5 10a7 7 0 0 1 14 0Z" />
+    <circle cx="12" cy="10" r="2.5" />
+  {% elif icon == "target" %}
+    <circle cx="11" cy="13" r="8" /><circle cx="11" cy="13" r="4" />
+    <path d="m11 13 9-10M16 3h4v4" />
+  {% else %}
+    <path d="M4 12h16m-6-6 6 6-6 6" />
+  {% endif %}
+</svg>
