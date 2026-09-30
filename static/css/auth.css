@@ -16,7 +16,9 @@
 }
 
 .sm-auth-story {
-  position: relative;
+  position: sticky;
+  top: 0;
+  align-self: start;
   isolation: isolate;
   min-width: 0;
   min-height: 100vh;
@@ -73,6 +75,8 @@
 }
 
 .sm-auth-story h2 {
+  /* Reserve the same editorial grid for all three headline variants. */
+  min-height: 4lh;
   font-family: 'Playfair Display', Georgia, serif;
   color: var(--sm-navy);
   font-size: clamp(43px, 4.1vw, 68px);
@@ -102,6 +106,7 @@
 }
 
 .sm-auth-story-copy>p {
+  min-height: 3lh;
   font-size: clamp(14px, 1.12vw, 18px);
   line-height: 1.65;
   color: #4d6070;
@@ -453,12 +458,6 @@
   height: 17px;
 }
 
-.sm-auth-signup .sm-auth-story {
-  position: sticky;
-  top: 0;
-  align-self: start;
-}
-
 .sm-auth-signup .sm-auth-form-side {
   padding: 45px 10%;
 }
@@ -471,8 +470,20 @@
   margin-bottom: 24px;
 }
 
-.sm-auth-card-top {
-  margin: 0 0 12px;
+.sm-auth-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.sm-auth-heading-row h1 {
+  margin: 0;
+}
+
+.sm-auth-heading-row .sm-role-badge {
+  flex-shrink: 0;
 }
 
 .sm-role-badge {
@@ -716,8 +727,7 @@
     grid-template-columns: 1fr;
   }
 
-  .sm-auth-story,
-  .sm-auth-signup .sm-auth-story {
+  .sm-auth-story {
     position: relative;
     min-height: 0;
     height: auto;
@@ -751,6 +761,7 @@
   }
 
   .sm-auth-story-copy>p {
+    min-height: 2lh;
     font-size: 12px;
     margin-bottom: 0;
   }
@@ -798,6 +809,16 @@
 }
 
 @media (max-width: 480px) {
+  .sm-auth-heading-row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .sm-auth-heading-row h1 {
+    flex-basis: 100%;
+  }
+
   .sm-auth-story-copy {
     width: 65%;
     padding-top: 21px;
@@ -830,6 +851,7 @@
   }
 
   .sm-auth-story-copy>p {
+    min-height: 3lh;
     font-size: 11px;
     line-height: 1.6;
   }

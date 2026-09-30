@@ -3,27 +3,13 @@
 {% block title %}Create an account · SkillMatch{% endblock %}
 {% block content %}
   <div class="sm-auth-layout sm-auth-signup">
-    <aside class="sm-auth-story" aria-label="Start your SkillMatch journey">
-      <img class="sm-auth-photo"
-           src="{% static 'images/landing-professional.jpg' %}"
-           width="1536"
-           height="1024"
-           alt="A Kenyan professional at work in a sunlit office"
-           fetchpriority="high">
-      <div class="sm-auth-story-copy">
-        {% include "registration/brand.html" %}
-        <span class="sm-eyebrow">Kenyan talent. Brighter opportunities.</span>
-        <h2 data-role-headline>{% if form.role.value == "employer" %}Your next <em>great hire</em> starts here.{% else %}Your next <em>opportunity</em> starts with you.{% endif %}</h2>
-        <p data-role-story>{% if form.role.value == "employer" %}Build your team with Kenyan professionals whose skills and experience fit your business.{% else %}Let your skills and experience open doors. Connect with opportunities that help you grow.{% endif %}</p>
-        {% include "registration/value_points.html" %}
-      </div>
-      {% include "registration/botanical.html" %}
-    </aside>
+    {% include "registration/story.html" with signup=True %}
     <div class="sm-auth-form-side">
       <section class="sm-auth-card" aria-labelledby="signup-title">
         {% include "registration/brand.html" %}
-        <div class="sm-auth-card-top"><span class="sm-role-badge" data-role-badge aria-live="polite">{% if form.role.value == "employer" %}Employer{% elif form.role.value == "seeker" or not form.role.value %}Job Seeker{% else %}Choose account type{% endif %}</span></div>
-        <h1 id="signup-title">Create your account</h1>
+        <div class="sm-auth-heading-row">
+          <h1 id="signup-title">Create your account</h1>
+          <span class="sm-role-badge" data-role-badge aria-live="polite">{% if form.role.value == "employer" %}Employer{% elif form.role.value == "seeker" or not form.role.value %}Job Seeker{% else %}Choose account type{% endif %}</span></div>
         <p class="sm-auth-intro" data-role-helper>{% if form.role.value == "employer" %}Find the skills your business needs. Complete your company profile after signup.{% else %}Take the first step. Add your skills and professional profile after signup.{% endif %}</p>
         <form method="post">
           {% csrf_token %}
