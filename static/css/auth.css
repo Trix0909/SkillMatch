@@ -461,7 +461,7 @@
 /* Move signup's shorter headline into its reserved space, closer to its copy.
    Keep the panel, supporting content and form at their existing positions. */
 .sm-auth-signup .sm-auth-story h2 {
-  padding-top: .65lh;
+  padding-top: .5lh;
 }
 
 .sm-auth-signup .sm-auth-form-side {
