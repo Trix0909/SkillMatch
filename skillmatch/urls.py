@@ -14,6 +14,7 @@ urlpatterns = [
     ),
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("accounts/security/", mfa_views.security, name="account_security"),
+    path("accounts/2fa/reminder/", mfa_views.reminder, name="mfa_reminder"),
     path("accounts/2fa/setup/", mfa_views.setup, name="mfa_setup"),
     path("accounts/2fa/verify/", mfa_views.verify, name="mfa_verify"),
     path("accounts/2fa/cancel/", mfa_views.cancel, name="mfa_cancel"),

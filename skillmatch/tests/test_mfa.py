@@ -53,7 +53,13 @@ class MFATests(TestCase):
         data = {"username": (user or self.seeker).username, "password": self.password}
         if next_url:
             data["next"] = next_url
-        return (client or self.client).post(reverse("login"), data)
+        client = client or self.client
+        response = client.post(reverse("login"), data)
+        # Existing MFA tests exercise the unchanged flow after declining the
+        # optional invitation. Dedicated reminder tests cover both choices.
+        if response.status_code == 302 and response.url == reverse("mfa_reminder"):
+            response = client.post(reverse("mfa_reminder"), {"action": "later"})
+        return response
 
     def device(self, user=None, *, confirmed=True):
         return TOTPDevice.objects.create(user=user or self.seeker, confirmed=confirmed)
