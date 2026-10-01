@@ -72,7 +72,7 @@ The repository has a real initial application commit. Development setup is recor
 For subsequent work:
 
 ```bash
-git switch -c codex/describe-the-change
+git switch -c feature/describe-the-change
 # Implement the task, then run tools/dev.py check.
 git diff
 git add path/to/changed/files

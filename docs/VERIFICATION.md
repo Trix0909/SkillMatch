@@ -45,7 +45,7 @@ Formal Precision@k results need a frozen study corpus and completed manual relev
 
 ## Reproduce
 
-Run the Django commands in the README. `tools/browser_check.cjs` additionally needs Playwright and Microsoft Edge, uses only the local demo application, and reads generated credentials from `demo-credentials.txt`. Playwright is a QA dependency, not a requirement for running SkillMatch. The script defaults to the bundled Codex package path; set `PLAYWRIGHT_MODULE` to your own Playwright module path when running elsewhere.
+Run the Django commands in the README. `tools/browser_check.cjs` additionally needs Playwright and Microsoft Edge, uses only the local demo application, and reads generated credentials from `demo-credentials.txt`. Playwright is a QA dependency, not a requirement for running SkillMatch. Set `PLAYWRIGHT_MODULE` when Playwright is installed outside the default Node.js module path.
 
 ## Development environment follow-up (18 September 2026)
 

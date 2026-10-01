@@ -1,20 +1,15 @@
 // Browser integration checks for this local application only.
-// Set PLAYWRIGHT_MODULE if Playwright is installed outside the bundled runtime.
+// Set PLAYWRIGHT_MODULE if Playwright is installed outside the default Node.js module path.
 const fs = require('node:fs');
 const path = require('node:path');
-const os = require('node:os');
 const assert = require('node:assert/strict');
 let playwright;
 try {
   playwright = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 } catch (error) {
-  const bundledModule = path.join(os.homedir(), '.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
-  if (process.env.PLAYWRIGHT_MODULE || !fs.existsSync(bundledModule)) {
-    throw new Error('Install Playwright or set PLAYWRIGHT_MODULE to its module path.', {
-      cause: error
-    });
-  }
-  playwright = require(bundledModule);
+  throw new Error('Install Playwright or set PLAYWRIGHT_MODULE to its module path.', {
+    cause: error
+  });
 }
 const {
   chromium
