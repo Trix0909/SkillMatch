@@ -1,0 +1,26 @@
+{% extends "registration/mfa_base.html" %}
+{% block title %}Set up two-factor authentication · SkillMatch{% endblock %}
+{% block mfa_content %}
+  <h1 id="mfa-title">Secure your account</h1>
+  <p class="sm-auth-intro">{% if mandatory %}Two-factor authentication is required for administrators. Complete setup to continue.{% else %}Add an extra layer of protection with an authenticator app.{% endif %}</p>
+  <p>Scan this QR code with Google Authenticator, Microsoft Authenticator, Authy or another compatible TOTP app.</p>
+  <img class="sm-mfa-qr"
+       src="{{ qr_image }}"
+       width="240"
+       height="240"
+       alt="Scan to add your SkillMatch account to your authenticator app">
+  <details class="sm-mfa-manual">
+    <summary>Can’t scan? Enter a setup key</summary>
+    <p>Add a time-based account named SkillMatch, using this key. Keep it private.</p>
+    <code>{{ manual_key }}</code>
+    <p>6 digits · 30 seconds · SHA-1</p>
+  </details>
+  <p>Enter the current 6-digit code to verify and enable 2FA. Setup expires after five minutes; you can confirm your password again to continue.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="sm-auth-errors"
+     role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    {% include "registration/field.html" with field=form.code %}
+    <button class="sm-button sm-button-primary sm-auth-submit" type="submit">Verify and enable {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button>
+  </form>
+{% endblock %}

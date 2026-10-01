@@ -50,6 +50,7 @@ For a clean installation, skip demo seeding, register your own accounts, and cre
 The landing, login and signup pages use the Match Point visual design, local Inter/Playfair fonts and responsive Kenyan editorial imagery. See [landing design and asset notes](docs/LANDING-DESIGN.md) and [authentication design notes](docs/AUTH-DESIGN.md). Other pages retain their current UI pending design approval.
 
 - Separate job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks.
+- Authenticator-app 2FA: optional for job seekers/employers and mandatory for staff/superusers, including direct Django admin access. Enable it through the profile page's **Account security** link. See the [MFA setup, testing and implementation guide](docs/MFA.md). Recovery and disabling are deferred; keep access to your authenticator.
 - Structured profiles: names, unique skill tags, certification and experience dropdowns, professional summary, project descriptions and optional HTTP(S) evidence links.
 - Employer company profile, job creation/editing, closing/reopening, deletion confirmation and candidate search.
 - Ranked candidates for an employer’s job or free-text search, ranked job recommendations for seekers, and employer access to candidate profiles.
@@ -88,7 +89,7 @@ The same algorithm works in reverse. A single seeker’s multipliers are constan
 
 The command runs Python linting, formatting checks, dependency and Django checks, migration drift detection, all tests, production-setting checks, static collection and a Git-index privacy check. `tools/dev.py format` formats first-party code, and `tools/dev.py doctor` inspects the environment and prepared database. GitHub Actions is configured to run validation on Windows and Linux when the repository is pushed to GitHub.
 
-Tests cover the real ranking pipeline, repetition capping, qualification multipliers, bidirectional matching, duplicate prevention, evidence safety, registration, role permissions, ownership, CSRF, escaped content, job lifecycle and research metric calculations.
+Tests cover the real ranking pipeline, repetition capping, qualification multipliers, bidirectional matching, duplicate prevention, evidence safety, registration, role permissions, ownership, CSRF, escaped content, job lifecycle and research metric calculations. MFA tests cover optional enrollment, mandatory admin setup, second-factor login, direct admin protection, replay/throttling, expiry, session isolation and safe redirects.
 
 ## Evaluate
 
