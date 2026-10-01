@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from .models import (
     Account,
@@ -13,6 +14,11 @@ from .models import (
 admin.site.site_header = "SkillMatch administration"
 admin.site.site_title = "SkillMatch"
 admin.site.index_title = "Manage users and project data"
+
+# Enrollment must verify a code. Do not expose secret editing, manual confirmation,
+# or device deletion as an administrative bypass/recovery mechanism.
+if admin.site.is_registered(TOTPDevice):
+    admin.site.unregister(TOTPDevice)
 
 
 class SkillInline(admin.TabularInline):

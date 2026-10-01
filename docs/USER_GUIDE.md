@@ -8,6 +8,10 @@ Select **Get started** to register. Enter your name, email, username and passwor
 
 If demo data has been seeded, use the usernames and generated password in `demo-credentials.txt`. The demo is fictional and intended for local demonstrations only.
 
+## Account security
+
+Before or after editing a profile, you can open **Two-factor authentication settings** from **My profile** or **Company profile**. It is optional for ordinary users. Confirm your password, scan the QR with a compatible authenticator app, and enter its current code to enable it. Every later login will require that app's code. Staff/superusers, including the demo administrator, must complete setup at their next login. Recovery and disabling are not available in this stage, so retain access to the app. See the [complete MFA guide](MFA.md).
+
 ## Job seekers
 
 1. Open **My profile**. Add each skill using **Add skill** or Enter. Remove a skill with its × button. Repeated names are rejected even if capitalization changes.

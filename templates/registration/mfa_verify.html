@@ -1,0 +1,14 @@
+{% extends "registration/mfa_base.html" %}
+{% block title %}Two-factor authentication · SkillMatch{% endblock %}
+{% block mfa_content %}
+  <h1 id="mfa-title">Two-factor authentication</h1>
+  <p class="sm-auth-intro">Enter the 6-digit code from your authenticator app.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="sm-auth-errors"
+     role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    {% include "registration/field.html" with field=form.code %}
+    <button class="sm-button sm-button-primary sm-auth-submit"
+            type="submit">Verify {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,48 @@
+/* Only the new MFA steps use these rules; login and registration stay unchanged. */
+.sm-mfa .sidebar,
+.sm-mfa .topbar {
+  display: none;
+}
+
+.sm-mfa .sm-auth-card>p {
+  color: #4d6070;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.sm-mfa-qr {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 20px auto;
+  background: white;
+  border-radius: 12px;
+}
+
+.sm-mfa-manual {
+  margin-bottom: 20px;
+  color: var(--sm-navy);
+}
+
+.sm-mfa-manual summary {
+  cursor: pointer;
+  color: var(--sm-emerald);
+}
+
+.sm-mfa-manual p {
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+.sm-mfa-manual code {
+  overflow-wrap: anywhere;
+  color: var(--sm-navy);
+}
+
+.sm-mfa-cancel {
+  background: none;
+  border: 0;
+  color: var(--sm-emerald);
+  text-decoration: underline;
+  padding: 0;
+}
