@@ -13,7 +13,20 @@ Both packages are pinned in `requirements.txt` and `requirements-lock.txt`. The 
 
 ## Enable and use 2FA
 
-Ordinary users can keep using their entire existing workspace without 2FA. Registration and password-only login are unchanged for accounts without a confirmed device.
+Ordinary users can keep using their entire existing workspace without 2FA. Registration remains unchanged. After a successful password login, an ordinary user without a confirmed device sees one optional reminder.
+
+### Optional login reminder
+
+The reminder offers **Enable now** and **Not now**. It never gates workspace access: the user is already authenticated and may navigate normally without choosing. It does not appear for administrators, users with enabled 2FA, or new registrations.
+
+- **Not now** removes the invitation from the current session and follows the original validated login destination, including `next` and role-based redirects. A future fresh password login may create a new invitation; there is no permanent preference.
+- **Enable now** reuses `/accounts/2fa/setup/` and its existing enrollment verification. The just-completed password login authorizes enrollment for the existing five-minute freshness window; after that, the existing account-security page asks for the password again. No second setup flow or device model is added.
+- The server-side session stores the destination, password-verification time and a `shown` marker. The marker prevents refreshes or revisits from displaying the reminder again. Choosing either option removes the invitation. No background redirect or access restriction depends on that invitation.
+- The reminder uses the existing workspace card/button styles and CSRF-protected POST choices at `/accounts/2fa/reminder/`. Its explanatory links use **My profile → Two-factor authentication settings** for seekers and **Company profile → Two-factor authentication settings** for employers; both paths already existed.
+
+The reminder addition modifies `skillmatch/mfa_views.py`, `skillmatch/mfa.py` (redirect-loop exclusion only), `skillmatch/urls.py`, `skillmatch/tests/test_mfa.py`, `skillmatch/tests/test_project.py` and this guide. It creates `templates/registration/mfa_reminder.html` and `skillmatch/tests/test_mfa_reminder.py`. Existing MFA policy, admin enforcement, QR/TOTP code, registration and profile navigation are unchanged.
+
+### Enrollment from profile settings
 
 1. Sign in and open **My profile** or **Company profile**.
 2. Select **Two-factor authentication settings** in the existing profile sidebar panel.
