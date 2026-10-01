@@ -1,0 +1,23 @@
+{% load static %}
+<aside class="sm-auth-story"
+       aria-label="{% if signup %}Start your SkillMatch journey{% else %}Your next opportunity{% endif %}">
+  <img class="sm-auth-photo"
+       src="{% static 'images/landing-professional.jpg' %}"
+       width="1536"
+       height="1024"
+       alt="A Kenyan professional working on her laptop in a warm, contemporary office"
+       fetchpriority="high">
+  <div class="sm-auth-story-copy">
+    {% include "registration/brand.html" %}
+    <span class="sm-eyebrow">Kenyan talent. Brighter opportunities.</span>
+    {% if signup %}
+      <h2 data-role-headline>{% if form.role.value == "employer" %}Your next <em>great hire</em> starts here.{% else %}Your next <em>opportunity</em> starts with you.{% endif %}</h2>
+      <p data-role-story>{% if form.role.value == "employer" %}Build your team with Kenyan professionals whose skills and experience fit your business.{% else %}Let your skills and experience open doors. Connect with opportunities that help you grow.{% endif %}</p>
+    {% else %}
+      <h2>Your next <em>opportunity</em> is closer than you think.</h2>
+      <p>Connect with Kenyan professionals and SMEs through skills, experience and meaningful opportunities.</p>
+    {% endif %}
+    {% include "registration/value_points.html" %}
+  </div>
+  {% include "registration/botanical.html" %}
+</aside>

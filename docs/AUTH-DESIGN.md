@@ -4,6 +4,10 @@ Login and signup share `templates/registration/auth_base.html`, which reuses the
 
 The editorial area includes sage circular value icons and restrained decorative botanical SVGs. Signup's headline and supporting copy follow the real selected role. At mobile widths the shorter image/brand area stacks above the form.
 
+Both pages now render the same `registration/story.html` partial. Shared headline and supporting-copy minimum heights keep the logo, eyebrow, text and value points on the same grid for login and either signup role. The photograph crop, panel width, padding, botanical decoration and desktop sticky behaviour are identical. Registration's existing role badge sits beside its heading and wraps below it on narrow mobile screens. Form controls and their styling are unchanged.
+
+Registration's shorter headline is inset downward within its reserved block to reduce the gap before its supporting copy. This registration-only spacing refinement leaves all other element positions unchanged, including the logo, eyebrow, photograph, decoration, value points and form. Login is unaffected. Browser comparison at eight viewport sizes confirmed those boundaries for both registration roles; captures are in ignored `tmp/registration-spacing/`.
+
 The viewport refinement removes the old 850 px minimum on the image column and uses viewport-aware desktop headline/spacing rules. Login fits a single normal desktop viewport; signup and validation content may scroll naturally. Existing input heights, radii and icon placement are preserved. Typed/focused inputs retain the ivory surface, and standard/WebKit autofill selectors use an inset ivory fill with navy text without disabling saved credentials. Both pages share the Better opportunities, Transparent matching and Real impact value points.
 
 ## Preserved behaviour
@@ -26,3 +30,5 @@ Additional captures in `tmp/auth-refinement/` verify single-viewport login at 13
 - `/accounts/register/`
 
 Further page redesigns await approval.
+
+The alignment refinement was compared against the preceding form styles at eight viewport sizes (320–1672 px). Browser measurements verified matching left-panel geometry across login and both registration roles, unchanged field/button dimensions and styles, and no horizontal overflow. Review screenshots are in ignored `tmp/auth-alignment/`. This refinement awaits visual approval.
