@@ -163,7 +163,8 @@ class MFATests(TestCase):
         device = self.start_enrollment()
         old_session = self.client.session.session_key
         response = self.client.post(reverse("mfa_setup"), {"code": self.code(device)})
-        self.assertRedirects(response, reverse("account_security"))
+        self.assertContains(response, "Save your recovery codes")
+        self.assertContains(response, 'href="' + reverse("account_security") + '"')
         device.refresh_from_db()
         self.assertTrue(device.confirmed)
         self.assertEqual(self.client.session[DEVICE_ID_SESSION_KEY], device.persistent_id)
@@ -227,7 +228,8 @@ class MFATests(TestCase):
         self.assertFalse(device.confirmed)
         self.assertContains(self.client.get(reverse("mfa_setup")), "required for administrators")
         response = self.client.post(reverse("mfa_setup"), {"code": self.code(device)})
-        self.assertRedirects(response, "/admin/auth/user/")
+        self.assertContains(response, "Save your recovery codes")
+        self.assertContains(response, 'href="/admin/auth/user/"')
         self.assertTrue(TOTPDevice.objects.get(pk=device.pk).confirmed)
 
     def test_staff_and_superuser_flags_both_trigger_mandatory_mfa(self):
@@ -489,6 +491,6 @@ class MFATests(TestCase):
             self.assertEqual(self.client.get(reverse("jobs")).status_code, 302)
             self.assert_no_login()
 
-    def test_no_recovery_or_alternative_factor_apps_installed(self):
+    def test_no_plaintext_backup_or_alternative_factor_apps_installed(self):
         self.assertNotIn("django_otp.plugins.otp_static", settings.INSTALLED_APPS)
         self.assertNotIn("django_otp.plugins.otp_email", settings.INSTALLED_APPS)

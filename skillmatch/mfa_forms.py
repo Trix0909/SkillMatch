@@ -37,3 +37,35 @@ class EnableTwoFactorForm(StyledForm, forms.Form):
         if not self.user.check_password(password):
             raise forms.ValidationError("Your password was incorrect. Please try again.")
         return password
+
+
+class RecoveryCodeForm(StyledForm, forms.Form):
+    code = forms.CharField(
+        label="Recovery code",
+        max_length=128,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "off",
+                "autocapitalize": "none",
+                "spellcheck": "false",
+                "required": True,
+            }
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.style()
+
+
+class RegenerateRecoveryCodesForm(StyledForm, forms.Form):
+    password = forms.CharField(
+        label="Current password",
+        required=False,
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password", "required": True}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.style()

@@ -1,3 +1,5 @@
+import hashlib
+import re
 import unicodedata
 
 from django.conf import settings
@@ -5,10 +7,67 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxLengthValidator, URLValidator
 from django.db import models
 from django.db.models.functions import Lower
+from django.utils.crypto import constant_time_compare
+from django.views.decorators.debug import sensitive_variables
+from django_otp.models import Device, ThrottlingMixin, TimestampMixin
 
 
 def normalize_skill(value):
     return " ".join(unicodedata.normalize("NFKC", value).split())
+
+
+class RecoveryDevice(TimestampMixin, ThrottlingMixin, Device):
+    """Hashed recovery tokens using django-otp's device/session/throttle contract."""
+
+    authenticator = models.OneToOneField(
+        "otp_totp.TOTPDevice", on_delete=models.CASCADE, related_name="recovery_device"
+    )
+
+    def get_throttle_factor(self):
+        return 1
+
+    @staticmethod
+    @sensitive_variables()
+    def token_digest(token):
+        # 128 random bits make a fast one-way hash appropriate; no password or
+        # low-entropy PIN is stored here. Separators/case are presentation only.
+        normalized = token.strip().replace("-", "").lower()
+        if not re.fullmatch(r"[0-9a-f]{32}", normalized):
+            return None
+        return hashlib.sha256(normalized.encode("ascii")).hexdigest()
+
+    @sensitive_variables()
+    def verify_token(self, token):
+        # Callers must lock the user/device inside a transaction, as required by
+        # django-otp for stateful verification. Failure counters must commit.
+        if not self.verify_is_allowed()[0]:
+            return False
+        if not self.confirmed or not self.authenticator.confirmed:
+            return False
+        if self.authenticator.user_id != self.user_id:
+            return False
+        digest = self.token_digest(token)
+        match = None
+        for code in self.codes.select_for_update():
+            if constant_time_compare(code.digest, digest or ""):
+                match = code
+        if match is None or not self.codes.filter(pk=match.pk).delete()[0]:
+            self.throttle_increment()
+            return False
+        self.throttle_reset(commit=False)
+        self.set_last_used_timestamp(commit=False)
+        self.save()
+        return True
+
+
+class RecoveryCode(models.Model):
+    device = models.ForeignKey(RecoveryDevice, on_delete=models.CASCADE, related_name="codes")
+    digest = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["device", "digest"], name="unique_recovery_digest")
+        ]
 
 
 CERTIFICATIONS = [

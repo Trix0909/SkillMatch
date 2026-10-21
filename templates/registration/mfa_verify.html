@@ -11,4 +11,5 @@
     <button class="sm-button sm-button-primary sm-auth-submit"
             type="submit">Verify {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button>
   </form>
+  <p class="sm-auth-switch"><a href="{% url 'mfa_recovery' %}">Use a recovery code</a></p>
 {% endblock %}

@@ -12,10 +12,12 @@
       <section class="sm-auth-card" aria-labelledby="mfa-title">
         {% include "registration/brand.html" %}
         {% block mfa_content %}{% endblock %}
-        <form method="post" action="{% url 'mfa_cancel' %}" class="sm-auth-switch">
-          {% csrf_token %}
-          <button class="sm-mfa-cancel" type="submit">{% if user.is_authenticated %}Cancel setup{% else %}Cancel and return to sign in{% endif %}</button>
-        </form>
+        {% block mfa_footer %}
+          <form method="post" action="{% url 'mfa_cancel' %}" class="sm-auth-switch">
+            {% csrf_token %}
+            <button class="sm-mfa-cancel" type="submit">{% if user.is_authenticated %}Cancel setup{% else %}Cancel and return to sign in{% endif %}</button>
+          </form>
+        {% endblock %}
       </section>
       {% include "registration/botanical.html" %}
     </div>

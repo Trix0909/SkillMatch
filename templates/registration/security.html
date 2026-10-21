@@ -15,9 +15,15 @@
         <p><strong>Status: {% if enabled %}Enabled{% else %}Not enabled{% endif %}</strong></p>
         {% if enabled %}
           <p>You’ll be asked for a code from your authenticator app each time you sign in.</p>
+          <h3 class="mt-4">Recovery codes</h3>
+          <p>Available recovery codes: {{ remaining_codes }} of {{ total_codes }}</p>
+          <p>Use a saved recovery code if you lose access to your authenticator app. Each code works once. Existing codes cannot be viewed again.</p>
+          <p>If you no longer have your authenticator, you can keep using unused recovery codes and generate a replacement set after confirming your password. Replacing the authenticator itself is not available yet.</p>
+          <a class="btn btn-primary"
+             href="{% url 'mfa_recovery_generate' %}">Generate new recovery codes</a>
         {% else %}
           <p>2FA is optional for job seekers and employers. You can continue using all your usual features without enabling it.</p>
-          <p>When enabled, you’ll need your password and authenticator app each time you sign in. Keep access to that app: recovery and disabling are not available in this stage.</p>
+          <p>When enabled, you’ll need your password and authenticator app each time you sign in. After setup, save the one-time recovery codes in case you lose access to your app.</p>
           <form method="post">
             {% csrf_token %}
             {{ form.non_field_errors }}

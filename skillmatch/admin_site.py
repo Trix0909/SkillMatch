@@ -10,9 +10,9 @@ class SkillMatchAdminSite(OTPAdminSite):
         super().__init__(name)
 
     def has_permission(self, request):
-        from .mfa import is_totp_verified
+        from .mfa import is_mfa_verified
 
-        return super().has_permission(request) and is_totp_verified(request.user)
+        return super().has_permission(request) and is_mfa_verified(request.user)
 
     def login(self, request, extra_context=None):
         # No parallel password-only admin login, including direct POSTs here.
