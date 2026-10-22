@@ -7,9 +7,11 @@ from tempfile import TemporaryDirectory
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.db import IntegrityError, transaction
-from django.test import Client, TestCase
+from django.db import IntegrityError, connection, transaction
+from django.db.migrations.executor import MigrationExecutor
+from django.test import Client, TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from skillmatch.evaluation import precision_at_k, rule_relevance, sus_score
 from skillmatch.forms import ProfileForm, parse_skills
@@ -21,21 +23,21 @@ class ProjectCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.employer_user = User.objects.create_user("employer", password="Workplace-Test-832!")
-        Account.objects.create(user=cls.employer_user, role="employer")
+        Account.objects.create(user=cls.employer_user, active_role="employer")
         cls.employer = EmployerProfile.objects.create(
             user=cls.employer_user, company_name="Test SME"
         )
         cls.other_employer_user = User.objects.create_user(
             "other_employer", password="Workplace-Test-832!"
         )
-        Account.objects.create(user=cls.other_employer_user, role="employer")
+        Account.objects.create(user=cls.other_employer_user, active_role="employer")
         cls.other_employer = EmployerProfile.objects.create(
             user=cls.other_employer_user, company_name="Other SME"
         )
         cls.seeker = User.objects.create_user(
             "seeker", password="Workplace-Test-832!", first_name="Amina", last_name="Kamau"
         )
-        Account.objects.create(user=cls.seeker, role="seeker")
+        Account.objects.create(user=cls.seeker, active_role="seeker")
         cls.profile = JobSeekerProfile.objects.create(
             user=cls.seeker,
             bio="Python Django software developer",
@@ -46,7 +48,7 @@ class ProjectCase(TestCase):
         for name in ["Python", "Django", "SQL"]:
             Skill.objects.create(profile=cls.profile, name=name)
         cls.second_user = User.objects.create_user("second", first_name="Second")
-        Account.objects.create(user=cls.second_user, role="seeker")
+        Account.objects.create(user=cls.second_user, active_role="seeker")
         cls.second = JobSeekerProfile.objects.create(
             user=cls.second_user, bio=cls.profile.bio, portfolio=cls.profile.portfolio
         )
@@ -215,7 +217,7 @@ class ProjectCase(TestCase):
         self.assertRedirects(response, reverse("profile_edit"))
         user = User.objects.get(username="new_person")
         self.assertTrue(user.check_password(data["password1"]))
-        self.assertEqual(user.account.role, "seeker")
+        self.assertEqual(user.account.active_role, "seeker")
         self.assertFalse(user.seeker_profile.is_complete)
 
     def test_employer_registration_requires_company(self):
@@ -381,6 +383,260 @@ class ProjectCase(TestCase):
         self.job.required_skills = ["Python", "Django", "SQL", "Git", "Linux"]
         self.assertFalse(rule_relevance(self.profile, self.job)[1])
 
+    def test_seeker_switch_requires_company_then_allows_job_creation(self):
+        self.client.force_login(self.seeker)
+        response = self.client.post(reverse("switch_role"), {"active_role": "employer"})
+        self.assertContains(response, "Company name")
+        self.seeker.account.refresh_from_db()
+        self.assertEqual(self.seeker.account.active_role, "seeker")
+        self.assertFalse(EmployerProfile.objects.filter(user=self.seeker).exists())
+        for company_name in ("", "   ", "x" * 151):
+            response = self.client.post(
+                reverse("switch_role"),
+                {"active_role": "employer", "company_name": company_name},
+            )
+            self.assertIn("company_name", response.context["form"].errors)
+            self.assertFalse(EmployerProfile.objects.filter(user=self.seeker).exists())
+        response = self.client.post(
+            reverse("switch_role"),
+            {"active_role": "employer", "company_name": "  Amina Studio  "},
+        )
+        self.assertRedirects(response, reverse("employer_jobs"))
+        employer = EmployerProfile.objects.get(user=self.seeker)
+        self.assertEqual(employer.company_name, "Amina Studio")
+        self.seeker.account.refresh_from_db()
+        self.assertEqual(self.seeker.account.active_role, "employer")
+        response = self.client.post(
+            reverse("job_create"),
+            {
+                "title": "Studio developer",
+                "description": "Python work",
+                "skills_json": '["Python"]',
+                "certification_level": "basic",
+                "experience_level": "junior",
+            },
+        )
+        job = JobPost.objects.get(title="Studio developer")
+        self.assertEqual(job.employer, employer)
+        self.assertRedirects(response, reverse("job_candidates", args=[job.pk]))
+
+    def test_employer_switch_creates_empty_seeker_and_opens_profile_edit(self):
+        self.client.force_login(self.employer_user)
+        response = self.client.post(reverse("switch_role"), {"active_role": "seeker"})
+        self.assertRedirects(response, reverse("profile_edit"))
+        profile = JobSeekerProfile.objects.get(user=self.employer_user)
+        self.assertEqual(profile.bio, "")
+        self.assertEqual(profile.portfolio, "")
+        self.assertFalse(profile.skills.exists())
+        self.assertFalse(profile.evidence_links.exists())
+        self.employer_user.account.refresh_from_db()
+        self.assertEqual(self.employer_user.account.active_role, "seeker")
+        self.assertRedirects(self.client.get(reverse("home")), reverse("recommendations"))
+
+    def test_switching_preserves_both_profiles_skills_evidence_and_jobs(self):
+        employer = EmployerProfile.objects.create(
+            user=self.seeker, company_name="Amina Studio", description="Existing business"
+        )
+        self.profile.evidence_links.create(url="https://example.test/portfolio")
+        JobPost.objects.create(
+            employer=employer,
+            title="Existing job",
+            description="Python",
+            required_skills=["Python"],
+        )
+
+        def snapshot():
+            return (
+                list(JobSeekerProfile.objects.filter(user=self.seeker).values()),
+                list(EmployerProfile.objects.filter(user=self.seeker).values()),
+                list(self.profile.skills.values()),
+                list(self.profile.evidence_links.values()),
+                list(employer.jobs.values()),
+            )
+
+        before = snapshot()
+        self.client.force_login(self.seeker)
+        for target, destination in [
+            ("employer", "employer_jobs"),
+            ("employer", "employer_jobs"),
+            ("seeker", "recommendations"),
+            ("employer", "employer_jobs"),
+            ("seeker", "recommendations"),
+        ]:
+            response = self.client.post(
+                reverse("switch_role"),
+                {"active_role": target, "company_name": "Must not overwrite"},
+            )
+            self.assertRedirects(response, reverse(destination))
+            self.assertEqual(snapshot(), before)
+            self.assertRedirects(self.client.get(reverse("home")), reverse(destination))
+            response = self.client.get(reverse("profile_edit"))
+            self.assertEqual(response.context["seeker"], target == "seeker")
+
+    def test_dual_profile_access_follows_active_role(self):
+        EmployerProfile.objects.create(user=self.seeker, company_name="Amina Studio")
+        self.client.force_login(self.seeker)
+        for target, denied, allowed in [
+            ("seeker", ["employer_jobs", "candidates", "job_create"], ["recommendations", "jobs"]),
+            (
+                "employer",
+                ["recommendations", "jobs"],
+                ["employer_jobs", "candidates", "job_create"],
+            ),
+        ]:
+            self.client.post(reverse("switch_role"), {"active_role": target})
+            for name in denied:
+                self.assertEqual(self.client.get(reverse(name)).status_code, 403, name)
+            for name in allowed:
+                self.assertEqual(self.client.get(reverse(name)).status_code, 200, name)
+            self.assertEqual(
+                self.client.get(reverse("profile_detail", args=[self.second.pk])).status_code,
+                200 if target == "employer" else 403,
+            )
+            self.assertEqual(
+                self.client.get(reverse("job_detail", args=[self.job.pk])).status_code,
+                200 if target == "seeker" else 403,
+            )
+
+    def test_missing_matching_profile_denies_role_access(self):
+        self.client.force_login(self.employer_user)
+        self.employer.delete()
+        for name in ["employer_jobs", "candidates", "job_create", "profile_edit"]:
+            self.assertEqual(self.client.get(reverse(name)).status_code, 403)
+        self.assertEqual(
+            self.client.get(reverse("profile_detail", args=[self.profile.pk])).status_code, 403
+        )
+        self.client.force_login(self.seeker)
+        self.profile.delete()
+        for name in ["recommendations", "jobs", "profile_edit"]:
+            self.assertEqual(self.client.get(reverse(name)).status_code, 403)
+
+    def test_recommendations_exclude_own_jobs(self):
+        employer = EmployerProfile.objects.create(user=self.seeker, company_name="Amina Studio")
+        own_job = JobPost.objects.create(
+            employer=employer,
+            title="Own Python job",
+            description="Python",
+            required_skills=["Python"],
+        )
+        self.client.force_login(self.seeker)
+        response = self.client.get(reverse("recommendations"))
+        ids = [match.item.pk for match in response.context["page_obj"]]
+        self.assertNotIn(own_job.pk, ids)
+        self.assertIn(self.job.pk, ids)
+
+    def test_candidates_exclude_job_owner_but_include_other_users_in_employer_mode(self):
+        owner_profile = JobSeekerProfile.objects.create(
+            user=self.employer_user, bio="Python", portfolio="Python project"
+        )
+        Skill.objects.create(profile=owner_profile, name="Python")
+        EmployerProfile.objects.create(user=self.seeker, company_name="Amina Studio")
+        Account.objects.filter(user=self.seeker).update(active_role="employer")
+        self.client.force_login(self.employer_user)
+        response = self.client.get(reverse("job_candidates", args=[self.job.pk]))
+        ids = [match.item.pk for match in response.context["page_obj"]]
+        self.assertNotIn(owner_profile.pk, ids)
+        self.assertIn(self.profile.pk, ids)
+        response = self.client.get(reverse("candidates"), {"q": "Python"})
+        self.assertIn(self.profile.pk, [match.item.pk for match in response.context["page_obj"]])
+        self.assertEqual(
+            self.client.get(reverse("profile_detail", args=[self.profile.pk])).status_code, 200
+        )
+
+    def test_switch_requires_post_csrf_and_valid_account_role(self):
+        self.client.force_login(self.seeker)
+        self.assertEqual(self.client.get(reverse("switch_role")).status_code, 405)
+        for target in ("admin", "", "staff"):
+            self.assertEqual(
+                self.client.post(reverse("switch_role"), {"active_role": target}).status_code, 403
+            )
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.force_login(self.seeker)
+        self.assertEqual(
+            csrf_client.post(reverse("switch_role"), {"active_role": "employer"}).status_code, 403
+        )
+        self.seeker.account.refresh_from_db()
+        self.assertEqual(self.seeker.account.active_role, "seeker")
+        self.client.logout()
+        self.assertEqual(
+            self.client.post(reverse("switch_role"), {"active_role": "employer"}).status_code, 302
+        )
+        user = User.objects.create_user("no_account")
+        self.client.force_login(user)
+        self.assertEqual(
+            self.client.post(reverse("switch_role"), {"active_role": "seeker"}).status_code, 403
+        )
+
+    def test_switch_cannot_bypass_required_mfa(self):
+        TOTPDevice.objects.create(user=self.seeker, confirmed=True)
+        self.client.force_login(self.seeker)
+        response = self.client.post(
+            reverse("switch_role"), {"active_role": "employer", "company_name": "Not allowed"}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(EmployerProfile.objects.filter(user=self.seeker).exists())
+        self.seeker.account.refresh_from_db()
+        self.assertEqual(self.seeker.account.active_role, "seeker")
+        admin_user = User.objects.create_superuser("switch_admin", password="Admin-Test-832!")
+        Account.objects.create(user=admin_user, active_role="seeker")
+        JobSeekerProfile.objects.create(user=admin_user)
+        self.client.force_login(admin_user)
+        response = self.client.post(
+            reverse("switch_role"), {"active_role": "employer", "company_name": "Not allowed"}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(EmployerProfile.objects.filter(user=admin_user).exists())
+
+    def test_valid_registration_ignores_privilege_fields(self):
+        for role in ("seeker", "employer"):
+            self.client.logout()
+            response = self.client.post(
+                reverse("register"),
+                {
+                    "username": "safe_" + role,
+                    "first_name": "Test",
+                    "last_name": "Person",
+                    "email": "safe@example.test",
+                    "role": role,
+                    "company_name": "Test business",
+                    "password1": "New-Account-832#!",
+                    "password2": "New-Account-832#!",
+                    "active_role": "admin",
+                    "is_staff": True,
+                    "is_superuser": True,
+                },
+            )
+            self.assertRedirects(response, reverse("profile_edit"))
+            user = User.objects.get(username="safe_" + role)
+            self.assertEqual(user.account.active_role, role)
+            self.assertFalse(user.is_staff)
+            self.assertFalse(user.is_superuser)
+
+    def test_database_rejects_invalid_active_role(self):
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Account.objects.filter(user=self.seeker).update(active_role="admin")
+
+    def test_sidebar_switch_label_follows_active_role(self):
+        self.client.force_login(self.seeker)
+        self.assertContains(self.client.get(reverse("profile_edit")), "Switch to hiring")
+        self.client.force_login(self.employer_user)
+        self.assertContains(self.client.get(reverse("profile_edit")), "Switch to job seeking")
+
+    def test_seed_demo_includes_user_with_both_profiles(self):
+        with (
+            TemporaryDirectory() as directory,
+            override_settings(BASE_DIR=Path(directory).resolve()),
+        ):
+            call_command("seed_demo", stdout=StringIO())
+            user = User.objects.get(username="demo_dual")
+            self.assertEqual(user.account.active_role, "seeker")
+            self.assertTrue(user.seeker_profile.is_complete)
+            self.assertTrue(user.employer_profile.company_name)
+            self.assertFalse(user.is_staff)
+            self.assertEqual(
+                JobSeekerProfile.objects.filter(user__username__startswith="demo_").count(), 31
+            )
+
     def test_precision_denominator_and_sus(self):
         self.assertEqual(precision_at_k([1, 2], {1, 2}, 5), 0.4)
         self.assertEqual(sus_score([5, 1] * 5), 100)
@@ -435,3 +691,50 @@ class ProjectCase(TestCase):
             path.write_text(header + row * 2, encoding="utf-8")
             with self.assertRaises(CommandError):
                 call_command("score_sus", path, stdout=StringIO())
+
+
+class ActiveRoleMigrationTests(TransactionTestCase):
+    def test_role_rename_preserves_values_and_profiles(self):
+        previous = ("skillmatch", "0002_mfa_recovery_codes")
+        current = ("skillmatch", "0003_account_active_role")
+        executor = MigrationExecutor(connection)
+        executor.migrate([previous])
+        try:
+            apps = executor.loader.project_state([previous]).apps
+            UserModel = apps.get_model("auth", "User")
+            AccountModel = apps.get_model("skillmatch", "Account")
+            SeekerModel = apps.get_model("skillmatch", "JobSeekerProfile")
+            EmployerModel = apps.get_model("skillmatch", "EmployerProfile")
+            user_ids = []
+            for role in ("seeker", "employer"):
+                user = UserModel.objects.create(username="migration_" + role)
+                user_ids.append(user.pk)
+                AccountModel.objects.create(user=user, role=role)
+                SeekerModel.objects.create(user=user, bio="Keep this profile")
+                EmployerModel.objects.create(user=user, company_name="Keep this company")
+            executor = MigrationExecutor(connection)
+            executor.migrate([current])
+            apps = executor.loader.project_state([current]).apps
+            accounts = apps.get_model("skillmatch", "Account")
+            self.assertEqual(
+                list(
+                    accounts.objects.filter(user_id__in=user_ids)
+                    .order_by("user_id")
+                    .values_list("active_role", flat=True)
+                ),
+                ["seeker", "employer"],
+            )
+            self.assertEqual(
+                apps.get_model("skillmatch", "JobSeekerProfile")
+                .objects.filter(user_id__in=user_ids, bio="Keep this profile")
+                .count(),
+                2,
+            )
+            self.assertEqual(
+                apps.get_model("skillmatch", "EmployerProfile")
+                .objects.filter(user_id__in=user_ids, company_name="Keep this company")
+                .count(),
+                2,
+            )
+        finally:
+            MigrationExecutor(connection).migrate([current])

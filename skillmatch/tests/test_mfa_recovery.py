@@ -29,7 +29,7 @@ class RecoveryTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create_user("recovery_seeker", password=cls.password)
-        Account.objects.create(user=cls.user, role="seeker")
+        Account.objects.create(user=cls.user, active_role="seeker")
         JobSeekerProfile.objects.create(user=cls.user)
         cls.other = User.objects.create_user("recovery_other", password=cls.password)
         cls.staff = User.objects.create_superuser("recovery_admin", password=cls.password)

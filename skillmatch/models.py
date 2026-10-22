@@ -83,19 +83,20 @@ class Account(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="account"
     )
-    role = models.CharField(
+    active_role = models.CharField(
         max_length=10, choices=[("seeker", "Job seeker"), ("employer", "Employer")]
     )
 
     class Meta:
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(role__in=["seeker", "employer"]), name="valid_account_role"
+                condition=models.Q(active_role__in=["seeker", "employer"]),
+                name="valid_account_active_role",
             )
         ]
 
     def __str__(self):
-        return f"{self.user} ({self.get_role_display()})"
+        return f"{self.user} ({self.get_active_role_display()})"
 
 
 class JobSeekerProfile(models.Model):

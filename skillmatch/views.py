@@ -5,12 +5,20 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from .forms import EmployerForm, JobForm, ProfileForm, RegistrationForm, SearchForm
+from .forms import (
+    EmployerForm,
+    HiringSwitchForm,
+    JobForm,
+    ProfileForm,
+    RegistrationForm,
+    SearchForm,
+)
 from .matching import MatchingAlgorithm
-from .models import JobPost, JobSeekerProfile
+from .models import Account, EmployerProfile, JobPost, JobSeekerProfile
 
 
 def role_required(role):
@@ -19,7 +27,12 @@ def role_required(role):
         @wraps(view)
         def wrapped(request, *args, **kwargs):
             account = getattr(request.user, "account", None)
-            if not account or account.role != role:
+            profile_name = "seeker_profile" if role == "seeker" else "employer_profile"
+            if (
+                not account
+                or account.active_role != role
+                or not hasattr(request.user, profile_name)
+            ):
                 raise PermissionDenied
             return view(request, *args, **kwargs)
 
@@ -30,7 +43,7 @@ def role_required(role):
 
 def profiles():
     return (
-        JobSeekerProfile.objects.filter(user__is_active=True, user__account__role="seeker")
+        JobSeekerProfile.objects.filter(user__is_active=True)
         .select_related("user")
         .prefetch_related("skills", "evidence_links")
     )
@@ -67,7 +80,33 @@ def home(request):
         if request.user.is_staff:
             return redirect("admin:index")
         raise PermissionDenied
-    return redirect("recommendations" if account.role == "seeker" else "employer_jobs")
+    return redirect("recommendations" if account.active_role == "seeker" else "employer_jobs")
+
+
+@login_required
+@require_POST
+@transaction.atomic
+def switch_role(request):
+    account = Account.objects.select_for_update().filter(user=request.user).first()
+    target = request.POST.get("active_role")
+    if not account or target not in ("seeker", "employer"):
+        raise PermissionDenied
+    created = False
+    if target == "employer":
+        if not EmployerProfile.objects.filter(user=request.user).exists():
+            form = HiringSwitchForm(request.POST if "company_name" in request.POST else None)
+            if not form.is_bound or not form.is_valid():
+                return render(request, "skillmatch/switch_to_hiring.html", {"form": form})
+            EmployerProfile.objects.get_or_create(
+                user=request.user, defaults={"company_name": form.cleaned_data["company_name"]}
+            )
+    else:
+        _, created = JobSeekerProfile.objects.get_or_create(user=request.user)
+    account.active_role = target
+    account.save(update_fields=["active_role"])
+    if created:
+        return redirect("profile_edit")
+    return redirect("recommendations" if target == "seeker" else "employer_jobs")
 
 
 @login_required
@@ -75,8 +114,10 @@ def profile_edit(request):
     account = getattr(request.user, "account", None)
     if not account:
         raise PermissionDenied
-    seeker = account.role == "seeker"
-    profile = request.user.seeker_profile if seeker else request.user.employer_profile
+    seeker = account.active_role == "seeker"
+    profile = getattr(request.user, "seeker_profile" if seeker else "employer_profile", None)
+    if profile is None:
+        raise PermissionDenied
     form_class = ProfileForm if seeker else EmployerForm
     form = form_class(request.POST or None, instance=profile)
     if request.method == "POST" and form.is_valid():
@@ -95,7 +136,12 @@ def profile_detail(request, pk):
     profile = get_object_or_404(profiles(), pk=pk)
     account = getattr(request.user, "account", None)
     if profile.user_id != request.user.id and not request.user.is_staff:
-        if not account or account.role != "employer" or not profile.is_complete:
+        if (
+            not account
+            or account.active_role != "employer"
+            or not hasattr(request.user, "employer_profile")
+            or not profile.is_complete
+        ):
             raise PermissionDenied
     return render(
         request, "skillmatch/profile_detail.html", {"profile": profile, "active": "profile"}
@@ -105,7 +151,9 @@ def profile_detail(request, pk):
 @role_required("seeker")
 def recommendations(request):
     profile = get_object_or_404(profiles(), user=request.user)
-    matches = MatchingAlgorithm().rank_jobs(profile, active_jobs())
+    matches = MatchingAlgorithm().rank_jobs(
+        profile, active_jobs().exclude(employer__user=request.user)
+    )
     page = Paginator(matches, 10).get_page(request.GET.get("page"))
     return render(
         request,
@@ -147,7 +195,8 @@ def job_detail(request, pk):
         and not request.user.is_staff
         and (
             not account
-            or account.role != "seeker"
+            or account.active_role != "seeker"
+            or not hasattr(request.user, "seeker_profile")
             or not job.is_active
             or not job.employer.user.is_active
         )
@@ -213,7 +262,9 @@ def candidates(request, pk=None):
     matches = []
     searched = bool(job)
     if job:
-        matches = MatchingAlgorithm().rank_candidates(job.matching_text, profiles())
+        matches = MatchingAlgorithm().rank_candidates(
+            job.matching_text, profiles().exclude(user=job.employer.user)
+        )
     elif form.is_bound and form.is_valid():
         searched = True
         matches = MatchingAlgorithm().rank_candidates(form.cleaned_data["q"], profiles())

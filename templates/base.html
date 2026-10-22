@@ -43,6 +43,15 @@
               <span aria-hidden="true">⌕</span>Find candidates</a>
           {% endif %}
           {% if account_role %}
+            <form method="post" action="{% url 'switch_role' %}">
+              {% csrf_token %}
+              <input type="hidden"
+                     name="active_role"
+                     value="{% if account_role == 'seeker' %}employer{% else %}seeker{% endif %}">
+              <button type="submit" class="btn btn-outline-secondary btn-sm">
+                {% if account_role == "seeker" %}Switch to hiring{% else %}Switch to job seeking{% endif %}
+              </button>
+            </form>
             <a class="{% if active == 'profile' %}active{% endif %}"
                href="{% url 'profile_edit' %}">
               <span aria-hidden="true">◎</span>
