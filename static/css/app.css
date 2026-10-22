@@ -200,7 +200,7 @@ small {
 
 .sidebar>.brand,
 .workspace-label,
-.workspace-switch,
+.role-switcher,
 .sidebar-bottom {
   flex-shrink: 0
 }
@@ -213,52 +213,72 @@ small {
   margin: 41px 11px 15px
 }
 
-.workspace-switch {
+.role-switcher {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 3px;
   margin: -4px 0 16px;
   padding: 3px;
+  width: 100%;
+  height: 40px;
   min-width: 0;
   background: #f0f3ed;
   border: 1px solid #dfe6de;
-  border-radius: 11px
-}
-
-.workspace-switch>button,
-.workspace-switch>.current {
-  appearance: none;
-  border: 0;
-  border-radius: 8px;
-  padding: 8px 10px;
-  min-width: 0;
-  font-family: inherit;
+  border-radius: 11px;
   font-size: 11px;
-  font-weight: 600;
-  text-align: center;
-  line-height: 1.2;
-  white-space: nowrap
+  line-height: 1.2
 }
 
-.workspace-switch .current {
-  background: #fffefa;
-  color: #0f6b5b;
-  box-shadow: 0 1px 3px rgba(11, 45, 59, .1)
+.role-switcher__form {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0
 }
 
-.workspace-switch button {
+.role-switcher__segment {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  border-radius: 8px;
+  padding: 0 8px;
+  min-width: 0;
   background: transparent;
   color: #63716e;
+  font: inherit;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: background-color .15s ease, color .15s ease, box-shadow .15s ease
+}
+
+.role-switcher__segment.is-active {
+  background: #fffefa;
+  color: #0f6b5b;
+  box-shadow: 0 1px 3px rgba(11, 45, 59, .1);
+  font-weight: 650
+}
+
+.role-switcher button {
   cursor: pointer
 }
 
-.workspace-switch button:hover,
-.workspace-switch button:focus-visible {
+.role-switcher button:hover,
+.role-switcher button:focus-visible {
   color: #0b2d3b;
   background: #e6ece3
 }
 
-.workspace-switch button:focus-visible {
+.role-switcher button:focus-visible {
   outline: 2px solid #0f6b5b;
   outline-offset: 1px
 }
@@ -1780,7 +1800,7 @@ hr {
     display: none
   }
 
-  .workspace-switch {
+  .role-switcher {
     margin: 0 0 12px;
     max-width: 260px
   }

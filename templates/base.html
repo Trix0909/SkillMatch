@@ -11,7 +11,8 @@
     {% endblock %}
     <title>{% block title %}SkillMatch{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'css/app.css' %}{% if user.is_authenticated %}?v=sidebar-2{% endif %}">
     <script src="{% static 'js/app.js' %}" defer></script>
     {% block extra_head %}{% endblock %}
   </head>
@@ -27,25 +28,33 @@
           {% if account_role == "employer" %}EMPLOYER WORKSPACE{% elif account_role == "seeker" %}JOB SEEKER WORKSPACE{% else %}ADMINISTRATION{% endif %}
         </span>
         {% if account_role %}
-          <form class="workspace-switch"
-                method="post"
-                action="{% url 'switch_role' %}"
-                aria-label="Switch workspace">
-            {% csrf_token %}
+          <div class="role-switcher" role="group" aria-label="Account mode">
             {% if account_role == "seeker" %}
-              <span class="current" aria-current="true">Job seeking</span>
-              <button type="submit"
-                      name="active_role"
-                      value="employer"
-                      title="Switch to hiring">Hiring</button>
+              <span class="role-switcher__segment is-active" aria-current="true">Job seeking</span>
+              <form class="role-switcher__form"
+                    method="post"
+                    action="{% url 'switch_role' %}">
+                {% csrf_token %}
+                <button class="role-switcher__segment"
+                        type="submit"
+                        name="active_role"
+                        value="employer"
+                        title="Switch to hiring">Hiring</button>
+              </form>
             {% else %}
-              <button type="submit"
-                      name="active_role"
-                      value="seeker"
-                      title="Switch to job seeking">Job seeking</button>
-              <span class="current" aria-current="true">Hiring</span>
+              <form class="role-switcher__form"
+                    method="post"
+                    action="{% url 'switch_role' %}">
+                {% csrf_token %}
+                <button class="role-switcher__segment"
+                        type="submit"
+                        name="active_role"
+                        value="seeker"
+                        title="Switch to job seeking">Job seeking</button>
+              </form>
+              <span class="role-switcher__segment is-active" aria-current="true">Hiring</span>
             {% endif %}
-          </form>
+          </div>
         {% endif %}
         <div class="sidebar-content">
           <nav class="side-nav" aria-label="Main navigation">
