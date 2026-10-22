@@ -3,24 +3,7 @@
 {% block title %}Sign in · SkillMatch{% endblock %}
 {% block content %}
   <div class="sm-auth-layout sm-auth-login">
-    <aside class="sm-auth-story" aria-label="Your next opportunity">
-      <img class="sm-auth-photo"
-           src="{% static 'images/landing-professional.jpg' %}"
-           width="1536"
-           height="1024"
-           alt="A Kenyan professional working on her laptop in a warm, contemporary office"
-           fetchpriority="high">
-      <div class="sm-auth-story-copy">
-        {% include "registration/brand.html" %}
-        <span class="sm-eyebrow">Kenyan talent. Brighter opportunities.</span>
-        <h2>
-          Your next <em>opportunity</em> is closer than you think.
-        </h2>
-        <p>Connect with Kenyan professionals and SMEs through skills, experience and meaningful opportunities.</p>
-        {% include "registration/value_points.html" %}
-      </div>
-      {% include "registration/botanical.html" %}
-    </aside>
+    {% include "registration/story.html" %}
     <div class="sm-auth-form-side">
       <section class="sm-auth-card" aria-labelledby="login-title">
         {% include "registration/brand.html" %}
