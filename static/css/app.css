@@ -187,13 +187,22 @@ small {
   top: 0;
   left: 0;
   bottom: 0;
+  height: 100vh;
+  height: 100dvh;
   background: #fff;
   border-right: 1px solid var(--line);
-  padding: 34px 23px 0;
+  padding: 34px 23px max(8px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
   z-index: 10
+}
+
+.sidebar>.brand,
+.workspace-label,
+.workspace-switch,
+.sidebar-bottom {
+  flex-shrink: 0
 }
 
 .workspace-label {
@@ -206,43 +215,67 @@ small {
 
 .workspace-switch {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 3px;
   margin: -4px 0 16px;
   padding: 3px;
-  background: #f2f5fa;
-  border: 1px solid var(--line);
-  border-radius: 9px
+  min-width: 0;
+  background: #f0f3ed;
+  border: 1px solid #dfe6de;
+  border-radius: 11px
 }
 
-.workspace-switch>* {
+.workspace-switch>button,
+.workspace-switch>.current {
+  appearance: none;
   border: 0;
-  border-radius: 6px;
-  padding: 7px 4px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-width: 0;
+  font-family: inherit;
   font-size: 11px;
   font-weight: 600;
   text-align: center;
-  line-height: 1.2
+  line-height: 1.2;
+  white-space: nowrap
 }
 
 .workspace-switch .current {
-  background: #fff;
-  color: var(--blue);
-  box-shadow: 0 1px 2px rgba(16, 24, 40, .08)
+  background: #fffefa;
+  color: #0f6b5b;
+  box-shadow: 0 1px 3px rgba(11, 45, 59, .1)
 }
 
 .workspace-switch button {
   background: transparent;
-  color: #617080
+  color: #63716e;
+  cursor: pointer
 }
 
 .workspace-switch button:hover,
 .workspace-switch button:focus-visible {
-  color: var(--blue);
-  background: #eaf0fc
+  color: #0b2d3b;
+  background: #e6ece3
+}
+
+.workspace-switch button:focus-visible {
+  outline: 2px solid #0f6b5b;
+  outline-offset: 1px
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain
 }
 
 .side-nav {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 7px
@@ -279,11 +312,13 @@ small {
 }
 
 .sidebar-bottom {
-  margin-top: auto
+  margin-top: auto;
+  min-width: 0
 }
 
 .sidebar-note {
-  margin: 30px 7px 27px;
+  flex-shrink: 0;
+  margin: auto 7px 27px;
   border-top: 1px solid var(--line);
   padding-top: 22px
 }
@@ -323,7 +358,8 @@ small {
   display: block;
   max-width: 100px;
   overflow: hidden;
-  text-overflow: ellipsis
+  text-overflow: ellipsis;
+  white-space: nowrap
 }
 
 .account-card small {
@@ -333,7 +369,16 @@ small {
 }
 
 .account-card form {
-  margin-left: auto
+  margin-left: auto;
+  flex-shrink: 0
+}
+
+.account-card>div {
+  min-width: 0
+}
+
+.account-card>.avatar {
+  flex-shrink: 0
 }
 
 .logout {
@@ -1615,7 +1660,7 @@ hr {
 
   .sidebar {
     width: 195px;
-    padding: 28px 12px 0
+    padding: 28px 12px max(8px, env(safe-area-inset-bottom))
   }
 
   .brand {
@@ -1719,6 +1764,7 @@ hr {
 @media(max-width:767px) {
   .sidebar {
     width: auto;
+    height: auto;
     position: relative;
     padding: 20px 20px 10px;
     border-right: 0;
@@ -1730,14 +1776,26 @@ hr {
   }
 
   .workspace-label,
-  .sidebar-note,
-  .sidebar-bottom {
+  .sidebar-note {
     display: none
   }
 
   .workspace-switch {
     margin: 0 0 12px;
     max-width: 260px
+  }
+
+  .sidebar-content {
+    flex: 0 0 auto;
+    overflow: visible
+  }
+
+  .sidebar-bottom {
+    margin-top: 10px
+  }
+
+  .account-card {
+    padding: 10px 0 0
   }
 
   .side-nav {
@@ -2106,25 +2164,6 @@ hr {
 
   .page-heading h1 {
     font-size: 30px
-  }
-}
-
-.mobile-signout {
-  display: none
-}
-
-@media(max-width:767px) {
-  .mobile-signout {
-    display: block;
-    flex-shrink: 0
-  }
-
-  .mobile-signout button {
-    border: 0;
-    background: transparent;
-    color: #617080;
-    font-size: 11px;
-    padding: 9px 12px
   }
 }
 

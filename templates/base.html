@@ -47,41 +47,37 @@
             {% endif %}
           </form>
         {% endif %}
-        <nav class="side-nav" aria-label="Main navigation">
-          {% if account_role == "seeker" %}
-            <a class="{% if active == 'recommendations' %}active{% endif %}"
-               href="{% url 'recommendations' %}">
-              <span aria-hidden="true">✧</span>My matches</a>
-            <a class="{% if active == 'jobs' %}active{% endif %}"
-               href="{% url 'jobs' %}">
-              <span aria-hidden="true">▤</span>Browse jobs</a>
-          {% elif account_role == "employer" %}
-            <a class="{% if active == 'jobs' %}active{% endif %}"
-               href="{% url 'employer_jobs' %}">
-              <span aria-hidden="true">▤</span>My job posts</a>
-            <a class="{% if active == 'candidates' %}active{% endif %}"
-               href="{% url 'candidates' %}">
-              <span aria-hidden="true">⌕</span>Find candidates</a>
-          {% endif %}
-          {% if account_role %}
-            <a class="{% if active == 'profile' %}active{% endif %}"
-               href="{% url 'profile_edit' %}">
-              <span aria-hidden="true">◎</span>
-              {% if account_role == "employer" %}Company profile{% else %}My profile{% endif %}
-            </a>
-          {% endif %}
-          <a class="{% if active == 'methodology' %}active{% endif %}"
-             href="{% url 'methodology' %}">
-            <span aria-hidden="true">◈</span>How matching works</a>
-          {% if user.is_staff %}
-            <a href="{% url 'admin:index' %}">Administration ↗</a>
-          {% endif %}
-          <form class="mobile-signout" method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button>Sign out ↪</button>
-          </form>
-        </nav>
-        <div class="sidebar-bottom">
+        <div class="sidebar-content">
+          <nav class="side-nav" aria-label="Main navigation">
+            {% if account_role == "seeker" %}
+              <a class="{% if active == 'recommendations' %}active{% endif %}"
+                 href="{% url 'recommendations' %}">
+                <span aria-hidden="true">✧</span>My matches</a>
+              <a class="{% if active == 'jobs' %}active{% endif %}"
+                 href="{% url 'jobs' %}">
+                <span aria-hidden="true">▤</span>Browse jobs</a>
+            {% elif account_role == "employer" %}
+              <a class="{% if active == 'jobs' %}active{% endif %}"
+                 href="{% url 'employer_jobs' %}">
+                <span aria-hidden="true">▤</span>My job posts</a>
+              <a class="{% if active == 'candidates' %}active{% endif %}"
+                 href="{% url 'candidates' %}">
+                <span aria-hidden="true">⌕</span>Find candidates</a>
+            {% endif %}
+            {% if account_role %}
+              <a class="{% if active == 'profile' %}active{% endif %}"
+                 href="{% url 'profile_edit' %}">
+                <span aria-hidden="true">◎</span>
+                {% if account_role == "employer" %}Company profile{% else %}My profile{% endif %}
+              </a>
+            {% endif %}
+            <a class="{% if active == 'methodology' %}active{% endif %}"
+               href="{% url 'methodology' %}">
+              <span aria-hidden="true">◈</span>How matching works</a>
+            {% if user.is_staff %}
+              <a href="{% url 'admin:index' %}">Administration ↗</a>
+            {% endif %}
+          </nav>
           <div class="sidebar-note">
             <span class="eyebrow">A BETTER WAY TO CONNECT</span>
             <p>
@@ -91,6 +87,8 @@
             </p>
             <span>Built for Kenyan job seekers & SMEs.</span>
           </div>
+        </div>
+        <div class="sidebar-bottom">
           <div class="account-card">
             <span class="avatar small">{{ user.first_name|first|default:user.username|first|upper }}</span>
             <div>
