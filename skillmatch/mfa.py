@@ -14,6 +14,8 @@ from django.views.decorators.debug import sensitive_variables
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
+from .models import RecoveryDevice
+
 PENDING_KEY = "skillmatch_mfa_pending"
 
 
@@ -25,14 +27,18 @@ def confirmed_device(user):
     return TOTPDevice.objects.filter(user=user, confirmed=True).order_by("pk").first()
 
 
-def is_totp_verified(user):
+def is_mfa_verified(user):
     device = getattr(user, "otp_device", None)
     return (
         user.is_authenticated
-        and isinstance(device, TOTPDevice)
+        and isinstance(device, (TOTPDevice, RecoveryDevice))
         and device.confirmed
         and device.user_id == user.pk
         and user.is_verified()
+        and (
+            not isinstance(device, RecoveryDevice)
+            or (device.authenticator.confirmed and device.authenticator.user_id == user.pk)
+        )
     )
 
 
@@ -45,7 +51,15 @@ def safe_destination(request, destination):
 
         excluded = {
             reverse(name)
-            for name in ("login", "mfa_setup", "mfa_verify", "mfa_cancel", "mfa_reminder")
+            for name in (
+                "login",
+                "mfa_setup",
+                "mfa_verify",
+                "mfa_cancel",
+                "mfa_reminder",
+                "mfa_recovery",
+                "mfa_recovery_generate",
+            )
         }
         excluded.add(reverse("admin:login"))
         if urlsplit(destination).path not in excluded:
@@ -122,7 +136,7 @@ class MFAEnforcementMiddleware:
         user = request.user
         if user.is_authenticated and request.path != reverse("logout"):
             required = is_admin(user) or had_device or confirmed_device(user) is not None
-            if required and not is_totp_verified(user):
+            if required and not is_mfa_verified(user):
                 destination = safe_destination(request, request.get_full_path())
                 logout(request)
                 return redirect_to_login(destination)

@@ -1,0 +1,16 @@
+{% extends "registration/mfa_base.html" %}
+{% block title %}Generate recovery codes · SkillMatch{% endblock %}
+{% block mfa_content %}
+  <h1 id="mfa-title">New recovery codes</h1>
+  <p class="sm-auth-intro">Confirm your current password to generate ten new one-time recovery codes.</p>
+  <p>All previous recovery codes will stop working immediately. Save the new set before leaving the next screen.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="sm-auth-errors"
+     role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    {% include "registration/field.html" with field=form.password %}
+    <button class="sm-button sm-button-primary sm-auth-submit"
+            type="submit">Generate new recovery codes</button>
+  </form>
+{% endblock %}
+{% block mfa_footer %}<p class="sm-auth-switch"><a href="{% url 'account_security' %}">Back to security settings</a></p>{% endblock %}

@@ -1,6 +1,6 @@
 # Authenticator-app two-factor authentication
 
-This stage implements standard TOTP only. It was explicitly requested on 1 October 2026. Recovery codes, lost-phone flows, email/SMS factors and disabling 2FA are not implemented. Keep access to the authenticator used for enrollment.
+Standard TOTP was implemented first. The recovery-code extension adds ten one-time codes after successful setup and a password-confirmed replacement flow. Ordinary-user 2FA remains optional and administrator 2FA remains mandatory. Email/SMS factors, disabling 2FA and authenticator replacement are not implemented.
 
 ## Compatibility and dependencies
 
@@ -32,7 +32,7 @@ The reminder addition modifies `skillmatch/mfa_views.py`, `skillmatch/mfa.py` (r
 2. Select **Two-factor authentication settings** in the existing profile sidebar panel.
 3. The security page shows **Not enabled**. Enter your current password and select **Enable Two-Factor Authentication**.
 4. Scan the QR code with Google Authenticator, Microsoft Authenticator, Authy or another compatible TOTP app. Alternatively expand the manual-key instructions. Provisioning uses issuer `SkillMatch`, your username, six digits, SHA-1 and a 30-second period.
-5. Enter the current six-digit code and select **Verify and enable**. An incorrect code leaves 2FA disabled. Successful verification confirms the device and shows **Enabled**.
+5. Enter the current six-digit code and select **Verify and enable**. An incorrect code leaves 2FA disabled. Successful verification confirms the device and displays ten recovery codes once. Save them, then choose **Continue** to reach the original destination.
 6. On subsequent logins, enter your username/password, then your authenticator code. Only after both succeed does SkillMatch create the authenticated session and follow the original safe `next` destination or normal workspace redirect.
 
 The first setup verification consumes that code. If you immediately sign out and back in, wait for the next code in the app. Reusing a successful code is deliberately rejected. Keep the phone's clock set automatically; the library tolerates one adjacent 30-second time step and tracks clock drift.
@@ -45,7 +45,7 @@ Accounts with `is_staff` **or** `is_superuser` require 2FA, including existing a
 
 `MFAEnforcementMiddleware` blocks password-only authenticated sessions belonging to administrators or users with enabled 2FA, including old sessions and users promoted to staff. Such sessions are signed out and asked to authenticate again. Ordinary users without 2FA are unaffected.
 
-The default admin site now extends `OTPAdminSite`; it retains the existing model registry, URLs and permissions and additionally requires a confirmed TOTP-verified session. `/admin/login/`, including direct password POSTs, routes through the existing SkillMatch sign-in page. The admin permission gate also enforces verification independently of the middleware. TOTP device editing/deletion is unregistered from admin so manually confirming a device or exposing its key is not an alternate enrollment/recovery mechanism.
+The default admin site extends `OTPAdminSite`; it retains the existing model registry, URLs and permissions and requires a confirmed TOTP or recovery device belonging to that administrator. Recovery devices must also have a confirmed authenticator. `/admin/login/`, including direct password POSTs, routes through the existing SkillMatch sign-in page. The admin permission gate enforces verification independently of the middleware. Device and recovery-code editing is not exposed in admin.
 
 ## State and security
 
@@ -91,7 +91,92 @@ The dependencies were installed and these three upstream migrations were applied
 - `otp_totp.0002_auto_20190420_0723`
 - `otp_totp.0003_add_timestamps`
 
-No SkillMatch model fields or custom migrations were needed. There are **no new environment variables or external-service credentials**. Settings use issuer `SkillMatch`, throttling factor `1` and a five-minute pending-challenge timeout. Existing production HTTPS/secret-key requirements still apply. No real account was enrolled automatically.
+The original TOTP stage required no custom migration. The recovery extension adds `skillmatch.0002_mfa_recovery_codes`, described below. There are **no new environment variables or external-service credentials**. Settings use issuer `SkillMatch`, throttling factor `1` and a five-minute pending-challenge timeout. Existing production HTTPS/secret-key requirements still apply. No real account was enrolled automatically.
+
+## One-time recovery codes
+
+### Library integration and storage
+
+The installed library remains **django-otp 1.7.3**. Its `otp_static` plugin stores recovery tokens as plaintext strings, so it is not enabled. Instead, `RecoveryDevice` extends the same library's `Device`, `ThrottlingMixin` and `TimestampMixin`, and uses its `random_hex(16)` cryptographic generator. This preserves the existing OTP middleware, verified-session mechanism and exponential back-off without adding another MFA library. [django-otp's device API](https://django-otp-official.readthedocs.io/en/stable/extend.html) defines these extension points.
+
+Ten distinct codes are generated, each with **128 random bits**, displayed as four groups of eight hexadecimal characters. Only a SHA-256 digest of each normalized code is stored. These are high-entropy random credentials, not human-selected passwords or six-digit PINs. Case and hyphens do not affect verification. Comparisons use Django's constant-time comparison helper.
+
+Two models are added, without changing the user or profile fields:
+
+- `RecoveryDevice`: a django-otp device, its user, throttle counters/timestamps, and a one-to-one cascading link to the confirmed `TOTPDevice`.
+- `RecoveryCode`: the device and a 64-character one-way digest, with a uniqueness constraint per device. A successful use deletes that row within the verification transaction.
+
+Migration **`skillmatch.0002_mfa_recovery_codes`** creates both tables and depends on the existing TOTP migrations. No new Python dependency, installed app, environment variable or external service is needed. Existing enrolled accounts are not silently assigned codes: they sign in with TOTP and use the password-confirmed generation screen to get their first set.
+
+### Setup, saving and login
+
+Successful TOTP setup confirms the authenticator and generates the recovery set in one transaction. The resulting POST response establishes the existing verified login and shows **Save your recovery codes**. Codes never appear before a valid setup code. The **Continue** link follows the original validated destination, including a safe `next` URL.
+
+Plaintext codes exist only in the successful response and its page DOM. They are never stored in database sessions, messages, URLs, application files or logs. The existing no-store and sensitive-parameter protections cover the new screens. Refreshing setup after success does not generate or reveal a second set. Settings show only **Available recovery codes: N of 10**.
+
+**Copy all recovery codes** uses the browser clipboard. **Download recovery codes** creates a text file locally in the browser from the displayed list, with a storage warning and no account details. There is no later server download endpoint or plaintext retrieval API. Without JavaScript, codes remain selectable for manual saving. Leaving the page also clears the displayed list for browser history restoration. Saved downloads/clipboard content remain the user's responsibility to secure.
+
+After password verification, the existing TOTP page offers **Use a recovery code**. The recovery view requires the same unexpired, password-hash-bound login challenge; public requests, inactive users, changed passwords and expired challenges cannot consume tokens. A code only replaces the second factor. The server selects that user's recovery device and confirmed authenticator, consumes a matching unused code atomically, and calls the existing `complete_challenge()` / `django_otp.login()` mechanism. It does not disable or delete the authenticator.
+
+An invalid, malformed, foreign or used code produces **Invalid or already used recovery code.** Failed attempts retain the library's persistent exponential throttle (1, 2, 4, 8… seconds), including across fresh password logins. Recovery verification serializes per account and device. SQLite write conflicts fail closed; row locks support databases with row-level locking. Logout clears the verified session and the next login requires both factors again.
+
+A successful recovery login shows a non-blocking notice linking to **Two-factor authentication settings** from the existing profile area. Administrators use this identical second-factor flow, including direct `/admin/` access. Recovery devices without a confirmed authenticator cannot satisfy mandatory admin setup or verified-session checks.
+
+### Replacing codes and lost authenticators
+
+From **My profile** (or **Company profile**) → **Two-factor authentication settings**, choose **Generate new recovery codes**. A fully verified session **and the current password again** are required, including after recovery login. An unlocked browser by itself is insufficient. Incorrect password attempts use the recovery device's persistent throttle. GET requests never replace codes.
+
+Successful regeneration deletes every remaining old digest and inserts ten fresh ones in one transaction. Previously used codes have already been deleted. A failure rolls back the replacement. The new codes are shown once; there is no permanent plaintext list. A user with a lost phone can sign in using an unused recovery code, confirm their password, and generate another set, even after using the last code. Their TOTP device remains configured.
+
+There is currently **no disable, reset or authenticator-replacement interface**, and this task does not add one. Those acceptance cases are therefore not applicable as user flows. Deleting a TOTP device cascades to its recovery device and all codes; an unconfirmed/missing authenticator cannot use recovery. A later confirmed setup gets an independent fresh set. Any future disable/reset implementation must perform the same invalidation. If all recovery codes and the authenticator are lost before signing in, no additional bypass is provided.
+
+### New routes and manual review
+
+| URL | Purpose |
+| --- | --- |
+| `/accounts/2fa/recovery/` | Verify a saved code after the existing password stage |
+| `/accounts/2fa/recovery/generate/` | Verified-account password confirmation and replacement set |
+
+To test locally:
+
+1. Enable 2FA on a separate ordinary test account. Check that incorrect TOTP does not generate recovery codes; correct TOTP shows ten different codes. Copy and download them, then Continue.
+2. Log out, log in with the password, choose **Use a recovery code**, and enter one saved code. Confirm the intended destination, the notice and the settings counter of 9 of 10.
+3. Log out and try that same code again after the password stage. It must fail. Try a malformed code and a different account's code; both must fail. Wait for the retry delay between attempts.
+4. Sign in with a different unused code. From security settings, try generation with an incorrect password, wait, then use the correct password. Save the replacement set. The old unused codes must fail; a new code must work.
+5. Repeat recovery login for a test administrator. Before the second factor, direct admin URLs must remain blocked; after a valid code, normal admin permissions apply.
+6. Confirm regular TOTP login, logout, ordinary registration and the optional **Enable now / Not now** reminder still work. A normal user without 2FA must have no recovery requirement.
+
+Run `./start.cmd --setup-only` to apply the included migration, or `./.venv/Scripts/python.exe manage.py migrate` explicitly. Run `./.venv/Scripts/python.exe tools/dev.py check` for the complete validation gate. No configuration values need adding.
+
+Recovery-stage verification passed **120 automated tests**, including **29 recovery regression tests**, and the complete development gate. Coverage includes concurrent duplicate submissions, rollback on generation failure, first-factor expiry/password changes, invalid/foreign/used codes, admin verification independent of enforcement middleware, regeneration, persistent throttling and the existing TOTP/reminder flows. Browser checks exercised actual clipboard and text-file download, setup and replacement, recovery login and notices, administrator enrollment/recovery/replay, existing TOTP and the optional reminder. The three recovery screens were checked at 320, 390, 768, 1024 and 1440 pixels using isolated synthetic accounts. Migration `skillmatch.0002_mfa_recovery_codes` was applied locally; no real account was enrolled or assigned codes.
+
+### Recovery extension file inventory
+
+Created:
+
+- `skillmatch/mfa_recovery.py`
+- `skillmatch/migrations/0002_mfa_recovery_codes.py`
+- `skillmatch/tests/test_mfa_recovery.py`
+- `templates/registration/mfa_recovery.html`
+- `templates/registration/recovery_generate.html`
+- `templates/registration/recovery_codes.html`
+- `static/js/mfa_recovery.js`
+
+Modified:
+
+- `skillmatch/models.py`
+- `skillmatch/mfa.py`
+- `skillmatch/mfa_views.py`
+- `skillmatch/mfa_forms.py`
+- `skillmatch/admin_site.py`
+- `skillmatch/urls.py`
+- `skillmatch/tests/test_mfa.py`
+- `skillmatch/tests/test_mfa_reminder.py`
+- `templates/registration/mfa_base.html`
+- `templates/registration/mfa_verify.html`
+- `templates/registration/security.html`
+- `static/css/mfa.css`
+- `docs/MFA.md`
 
 ## Manual acceptance checks
 

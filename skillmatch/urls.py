@@ -17,6 +17,10 @@ urlpatterns = [
     path("accounts/2fa/reminder/", mfa_views.reminder, name="mfa_reminder"),
     path("accounts/2fa/setup/", mfa_views.setup, name="mfa_setup"),
     path("accounts/2fa/verify/", mfa_views.verify, name="mfa_verify"),
+    path("accounts/2fa/recovery/", mfa_views.recovery, name="mfa_recovery"),
+    path(
+        "accounts/2fa/recovery/generate/", mfa_views.recovery_generate, name="mfa_recovery_generate"
+    ),
     path("accounts/2fa/cancel/", mfa_views.cancel, name="mfa_cancel"),
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("profiles/<int:pk>/", views.profile_detail, name="profile_detail"),

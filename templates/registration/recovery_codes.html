@@ -1,0 +1,35 @@
+{% extends "registration/mfa_base.html" %}
+{% load static %}
+{% block title %}Save your recovery codes · SkillMatch{% endblock %}
+{% block extra_head %}
+  {{ block.super }}
+  <script src="{% static 'js/mfa_recovery.js' %}" defer></script>
+{% endblock %}
+{% block mfa_content %}
+  <h1 id="mfa-title">Save your recovery codes</h1>
+  <p class="sm-auth-intro">These codes can be used to access your SkillMatch account if you lose access to your authenticator app.</p>
+  <p>Each code can only be used once. Store them somewhere safe. You will not be able to view these exact codes again.</p>
+  <ul class="sm-recovery-codes"
+      data-recovery-codes
+      aria-label="Your one-time recovery codes">
+    {% for code in codes %}<li><code>{{ code }}</code></li>{% endfor %}
+  </ul>
+  <div class="sm-recovery-actions" data-recovery-actions hidden>
+    <button class="sm-button sm-button-secondary"
+            type="button"
+            data-recovery-copy>Copy all recovery codes</button>
+    <button class="sm-button sm-button-secondary"
+            type="button"
+            data-recovery-download>Download recovery codes</button>
+  </div>
+  <p class="sm-recovery-status"
+     data-recovery-status
+     role="status"
+     aria-live="polite"></p>
+  <noscript>
+    <p>Select and copy the codes above, or print this page and store it securely.</p>
+  </noscript>
+  <a class="sm-button sm-button-primary sm-auth-submit"
+     href="{{ destination }}">Continue {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a>
+{% endblock %}
+{% block mfa_footer %}{% endblock %}

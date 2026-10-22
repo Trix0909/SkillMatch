@@ -46,3 +46,38 @@
   text-decoration: underline;
   padding: 0;
 }
+
+.sm-recovery-codes {
+  list-style: none;
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid #dce2db;
+  border-radius: 14px;
+  background: #faf7f0;
+}
+
+.sm-recovery-codes li+li {
+  margin-top: 8px;
+}
+
+.sm-recovery-codes code {
+  color: var(--sm-navy);
+  font-size: clamp(11px, 3.1vw, 13px);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.sm-recovery-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sm-recovery-actions[hidden] {
+  display: none;
+}
+
+.sm-recovery-status {
+  font-size: 13px;
+  min-height: 1.5em;
+}

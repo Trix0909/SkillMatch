@@ -14,6 +14,7 @@ from django.db import OperationalError, transaction
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.html import format_html
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
 from django.views.decorators.http import require_http_methods, require_POST
@@ -31,7 +32,19 @@ from .mfa import (
     pending_user,
     safe_destination,
 )
-from .mfa_forms import AuthenticatorCodeForm, EnableTwoFactorForm
+from .mfa_forms import (
+    AuthenticatorCodeForm,
+    EnableTwoFactorForm,
+    RecoveryCodeForm,
+    RegenerateRecoveryCodesForm,
+)
+from .mfa_recovery import (
+    RECOVERY_CODE_COUNT,
+    generate_codes,
+    regenerate_codes,
+    verify_recovery_code,
+)
+from .models import RecoveryDevice
 
 REMINDER_KEY = "skillmatch_mfa_reminder"
 
@@ -129,7 +142,23 @@ def security(request):
             mode="enroll",
         )
         return redirect("mfa_setup")
-    return render(request, "registration/security.html", {"enabled": enabled, "form": form})
+    recovery = (
+        RecoveryDevice.objects.filter(
+            user=request.user, authenticator__confirmed=True, confirmed=True
+        ).first()
+        if enabled
+        else None
+    )
+    return render(
+        request,
+        "registration/security.html",
+        {
+            "enabled": enabled,
+            "form": form,
+            "remaining_codes": recovery.codes.count() if recovery else 0,
+            "total_codes": RECOVERY_CODE_COUNT,
+        },
+    )
 
 
 def expired_challenge(request):
@@ -155,6 +184,7 @@ def verify_code(user, device_id, code, *, confirm=False):
         if confirm:
             device.confirmed = True
             device.save(update_fields=["confirmed"])
+            device.recovery_codes = generate_codes(device)
         return device
 
 
@@ -182,7 +212,10 @@ def check_code(request, form, user, device, *, confirm=False):
         form.add_error(None, "Another request is in progress. Please try again shortly.")
         return None
     if verified is not None:
-        return complete_challenge(request, user, verified)
+        response = complete_challenge(request, user, verified)
+        if confirm:
+            return recovery_codes_page(request, verified.recovery_codes, response.url)
+        return response
     form.add_error(
         "code",
         "Invalid authentication code. Please try again. After repeated attempts, "
@@ -241,6 +274,83 @@ def verify(request):
         if response is not None
         else render(request, "registration/mfa_verify.html", {"form": form})
     )
+
+
+@sensitive_variables()
+def recovery_codes_page(request, codes, destination):
+    # Render directly from the successful POST. No plaintext is persisted in
+    # sessions, messages, URLs, files or a later GET/download endpoint.
+    return render(
+        request,
+        "registration/recovery_codes.html",
+        {
+            "codes": codes,
+            "destination": safe_destination(request, destination),
+        },
+    )
+
+
+@private_mfa_page
+@sensitive_variables()
+@require_http_methods(["GET", "POST"])
+def recovery(request):
+    user = pending_user(request)
+    if user is None:
+        return expired_challenge(request)
+    if request.session[PENDING_KEY]["mode"] != "login" or confirmed_device(user) is None:
+        return redirect(pending_route(user))
+    form = RecoveryCodeForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST":
+        valid = form.is_valid()
+        try:
+            verified = verify_recovery_code(
+                user, form.cleaned_data.get("code", "") if valid else ""
+            )
+        except OperationalError:
+            verified = None
+        if verified is not None:
+            response = complete_challenge(request, user, verified)
+            messages.info(
+                request,
+                format_html(
+                    "You signed in using a recovery code. If you no longer have access to your "
+                    'authenticator app, update your <a href="{}">Two-factor authentication settings</a> '
+                    "from your profile. Your account is still protected by 2FA.",
+                    reverse("account_security"),
+                ),
+            )
+            return response
+        form.add_error(
+            None,
+            "Invalid or already used recovery code. Wait before retrying after repeated attempts.",
+        )
+    return render(request, "registration/mfa_recovery.html", {"form": form})
+
+
+@private_mfa_page
+@login_required
+@sensitive_variables()
+@require_http_methods(["GET", "POST"])
+def recovery_generate(request):
+    if confirmed_device(request.user) is None:
+        return redirect("account_security")
+    form = RegenerateRecoveryCodesForm(request.POST if request.method == "POST" else None)
+    if request.method == "POST":
+        valid = form.is_valid()
+        try:
+            codes = regenerate_codes(
+                request.user, form.cleaned_data.get("password", "") if valid else ""
+            )
+        except OperationalError:
+            codes = None
+        if codes is not None:
+            request.session.cycle_key()
+            return recovery_codes_page(request, codes, reverse("account_security"))
+        form.add_error(
+            None,
+            "Unable to verify your password. Please try again, waiting before retrying after repeated attempts.",
+        )
+    return render(request, "registration/recovery_generate.html", {"form": form})
 
 
 @private_mfa_page

@@ -1,0 +1,14 @@
+{% extends "registration/mfa_base.html" %}
+{% block title %}Use a recovery code · SkillMatch{% endblock %}
+{% block mfa_content %}
+  <h1 id="mfa-title">Use a recovery code</h1>
+  <p class="sm-auth-intro">Enter one of the recovery codes you saved when setting up two-factor authentication. Each code works only once.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="sm-auth-errors"
+     role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    {% include "registration/field.html" with field=form.code %}
+    <button class="sm-button sm-button-primary sm-auth-submit" type="submit">Verify recovery code {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button>
+  </form>
+  <p class="sm-auth-switch"><a href="{% url 'mfa_verify' %}">Use your authenticator app instead</a></p>
+{% endblock %}
