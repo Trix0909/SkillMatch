@@ -59,6 +59,13 @@ def safe_destination(request, destination):
                 "mfa_reminder",
                 "mfa_recovery",
                 "mfa_recovery_generate",
+                "socialaccount_signup",
+                "google_login",
+                "google_callback",
+                "microsoft_login",
+                "microsoft_callback",
+                "github_login",
+                "github_callback",
             )
         }
         excluded.add(reverse("admin:login"))

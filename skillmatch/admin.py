@@ -1,3 +1,5 @@
+from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
 from django.contrib import admin
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
@@ -19,6 +21,12 @@ admin.site.index_title = "Manage users and project data"
 # or device deletion as an administrative bypass/recovery mechanism.
 if admin.site.is_registered(TOTPDevice):
     admin.site.unregister(TOTPDevice)
+
+# Provider identities must be managed through the re-authenticated connection
+# flow; credentials come exclusively from environment settings.
+for social_model in (SocialAccount, SocialApp, SocialToken, EmailAddress):
+    if admin.site.is_registered(social_model):
+        admin.site.unregister(social_model)
 
 
 class SkillInline(admin.TabularInline):

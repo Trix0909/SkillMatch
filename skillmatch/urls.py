@@ -1,9 +1,19 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
-from . import mfa_views, views
+from . import mfa_views, social_views, views
 
 urlpatterns = [
+    path("accounts/social/onboarding/", social_views.onboarding, name="socialaccount_signup"),
+    path("accounts/security/connections/", social_views.connections, name="social_connections"),
+    path("accounts/security/confirm/", social_views.reauthenticate, name="social_reauthenticate"),
+    path("accounts/security/password/set/", social_views.first_password, name="first_password"),
+    path("accounts/security/enable-2fa/", social_views.social_enable_mfa, name="social_enable_mfa"),
+    path(
+        "accounts/security/connections/<int:pk>/disconnect/",
+        social_views.disconnect_provider,
+        name="social_disconnect",
+    ),
     path("", views.landing, name="landing"),
     path("home/", views.home, name="home"),
     path("accounts/register/", views.register, name="register"),
@@ -37,3 +47,22 @@ urlpatterns = [
     path("employer/candidates/", views.candidates, name="candidates"),
     path("how-matching-works/", views.methodology, name="methodology"),
 ]
+
+for provider in social_views.ADAPTERS:
+    urlpatterns += [
+        path(
+            f"accounts/social/{provider}/login/",
+            social_views.provider_start,
+            {"provider": provider},
+            name=f"{provider}_login",
+        ),
+        path(
+            f"accounts/social/{provider}/login/callback/",
+            social_views.provider_callback,
+            {"provider": provider},
+            name=f"{provider}_callback",
+        ),
+    ]
+
+# allauth's internal redirects resolve to the existing canonical SkillMatch login.
+urlpatterns.append(path("accounts/login/", mfa_views.MFALoginView.as_view(), name="account_login"))
