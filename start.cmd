@@ -33,9 +33,6 @@ if not errorlevel 1 exit /b 0
 call :try_python py.exe -3.12
 if not errorlevel 1 exit /b 0
 call :try_python python.exe
-if not errorlevel 1 exit /b 0
-rem Reuse the Python bundled on the original development machine when available.
-call :try_python "%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"
 exit /b
 
 :try_python

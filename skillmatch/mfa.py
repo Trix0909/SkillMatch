@@ -43,7 +43,10 @@ def safe_destination(request, destination):
         # Avoid cycling into a completed or expired authentication step.
         from urllib.parse import urlsplit
 
-        excluded = {reverse(name) for name in ("login", "mfa_setup", "mfa_verify", "mfa_cancel")}
+        excluded = {
+            reverse(name)
+            for name in ("login", "mfa_setup", "mfa_verify", "mfa_cancel", "mfa_reminder")
+        }
         excluded.add(reverse("admin:login"))
         if urlsplit(destination).path not in excluded:
             return destination

@@ -350,6 +350,8 @@ class ProjectCase(TestCase):
                 "next": "https://example.com/evil",
             },
         )
+        self.assertRedirects(response, reverse("mfa_reminder"))
+        response = self.client.post(reverse("mfa_reminder"), {"action": "later"})
         self.assertRedirects(response, reverse("home"), fetch_redirect_response=False)
 
     def test_invalid_search_does_not_run_matching(self):

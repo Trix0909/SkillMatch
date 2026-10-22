@@ -1,14 +1,17 @@
 """Small integration around the existing password form and django-otp devices."""
 
+import time
 from base64 import b32encode
 from functools import wraps
 
 import segno
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import BACKEND_SESSION_KEY, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.db import OperationalError, transaction
+from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
@@ -29,6 +32,8 @@ from .mfa import (
     safe_destination,
 )
 from .mfa_forms import AuthenticatorCodeForm, EnableTwoFactorForm
+
+REMINDER_KEY = "skillmatch_mfa_reminder"
 
 
 def private_mfa_page(view):
@@ -62,7 +67,48 @@ class MFALoginView(LoginView):
             )
             return redirect(pending_route(user))
         self.request.session.pop(PENDING_KEY, None)
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        # The user is fully signed in. This invitation never gates site access.
+        self.request.session[REMINDER_KEY] = {
+            "next": safe_destination(self.request, response.url),
+            "password_verified_at": time.time(),
+            "shown": False,
+        }
+        return redirect("mfa_reminder")
+
+
+@private_mfa_page
+@login_required
+@require_http_methods(["GET", "POST"])
+def reminder(request):
+    invitation = request.session.get(REMINDER_KEY)
+    destination = safe_destination(request, invitation.get("next") if invitation else None)
+    if is_admin(request.user) or confirmed_device(request.user) or not invitation:
+        request.session.pop(REMINDER_KEY, None)
+        return redirect(destination)
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action not in {"enable", "later"}:
+            return HttpResponseBadRequest("Choose Enable now or Not now.")
+        request.session.pop(REMINDER_KEY, None)
+        if action == "enable":
+            if time.time() - invitation["password_verified_at"] > settings.MFA_PENDING_SECONDS:
+                # Reuse the existing password-confirmed settings flow if stale.
+                return redirect("account_security")
+            begin_pending(
+                request,
+                request.user,
+                backend=request.session[BACKEND_SESSION_KEY],
+                destination=destination,
+                mode="enroll",
+            )
+            return redirect("mfa_setup")
+        return redirect(destination)
+    if invitation["shown"]:
+        return redirect(destination)
+    invitation["shown"] = True
+    request.session[REMINDER_KEY] = invitation
+    return render(request, "registration/mfa_reminder.html")
 
 
 @private_mfa_page
