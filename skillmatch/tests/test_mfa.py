@@ -27,10 +27,10 @@ class MFATests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.seeker = User.objects.create_user("mfa_seeker", password=cls.password)
-        Account.objects.create(user=cls.seeker, role="seeker")
+        Account.objects.create(user=cls.seeker, active_role="seeker")
         JobSeekerProfile.objects.create(user=cls.seeker)
         cls.employer = User.objects.create_user("mfa_employer", password=cls.password)
-        Account.objects.create(user=cls.employer, role="employer")
+        Account.objects.create(user=cls.employer, active_role="employer")
         EmployerProfile.objects.create(user=cls.employer, company_name="Nairobi Works")
         cls.admin_user = User.objects.create_superuser("mfa_admin", password=cls.password)
 
@@ -107,7 +107,7 @@ class MFATests(TestCase):
             self.assertRedirects(response, reverse("profile_edit"))
             user = User.objects.get(username="new_" + role)
             self.assertEqual(self.client.session[SESSION_KEY], str(user.pk))
-            self.assertEqual(user.account.role, role)
+            self.assertEqual(user.account.active_role, role)
             self.assertFalse(TOTPDevice.objects.filter(user=user).exists())
 
     def test_settings_are_private_and_linked_from_profile(self):

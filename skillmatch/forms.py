@@ -90,7 +90,7 @@ class RegistrationForm(StyledForm, UserCreationForm):
     @transaction.atomic
     def save(self, commit=True):
         user = super().save(commit=True)
-        Account.objects.create(user=user, role=self.cleaned_data["role"])
+        Account.objects.create(user=user, active_role=self.cleaned_data["role"])
         if self.cleaned_data["role"] == "seeker":
             JobSeekerProfile.objects.create(user=user)
         else:
@@ -98,6 +98,14 @@ class RegistrationForm(StyledForm, UserCreationForm):
                 user=user, company_name=self.cleaned_data["company_name"]
             )
         return user
+
+
+class HiringSwitchForm(StyledForm, forms.Form):
+    company_name = forms.CharField(max_length=150, label="Company name")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.style()
 
 
 class LoginForm(StyledForm, AuthenticationForm):

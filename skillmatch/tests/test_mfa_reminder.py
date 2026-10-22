@@ -22,10 +22,10 @@ class MFAReminderTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.seeker = User.objects.create_user("reminder_seeker", password=cls.password)
-        Account.objects.create(user=cls.seeker, role="seeker")
+        Account.objects.create(user=cls.seeker, active_role="seeker")
         JobSeekerProfile.objects.create(user=cls.seeker)
         cls.employer = User.objects.create_user("reminder_employer", password=cls.password)
-        Account.objects.create(user=cls.employer, role="employer")
+        Account.objects.create(user=cls.employer, active_role="employer")
         EmployerProfile.objects.create(user=cls.employer, company_name="Nairobi Works")
         cls.admin_user = User.objects.create_superuser("reminder_admin", password=cls.password)
 

@@ -7,6 +7,7 @@ urlpatterns = [
     path("", views.landing, name="landing"),
     path("home/", views.home, name="home"),
     path("accounts/register/", views.register, name="register"),
+    path("accounts/switch-role/", views.switch_role, name="switch_role"),
     path(
         "accounts/login/",
         mfa_views.MFALoginView.as_view(),

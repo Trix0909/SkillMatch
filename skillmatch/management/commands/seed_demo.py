@@ -86,7 +86,7 @@ NAMES = [
 
 
 class Command(BaseCommand):
-    help = "Create 30 fictional candidates, 10 jobs and demo accounts. Never changes existing accounts."
+    help = "Create 31 fictional candidates, 10 jobs and demo accounts. Never changes existing accounts."
 
     def add_arguments(self, parser):
         parser.add_argument("--credentials-file", default="demo-credentials.txt")
@@ -110,7 +110,7 @@ class Command(BaseCommand):
             last_name="Njoroge",
             email="employer@example.test",
         )
-        Account.objects.create(user=employer_user, role="employer")
+        Account.objects.create(user=employer_user, active_role="employer")
         employer = EmployerProfile.objects.create(
             user=employer_user,
             company_name="Nairobi Works · Demo SME",
@@ -136,7 +136,7 @@ class Command(BaseCommand):
                     last_name=last,
                     email=f"candidate{index}@example.test",
                 )
-                Account.objects.create(user=user, role="seeker")
+                Account.objects.create(user=user, active_role="seeker")
                 profile = JobSeekerProfile.objects.create(
                     user=user,
                     certification_level=["advanced", "intermediate", "basic"][variant],
@@ -150,15 +150,35 @@ class Command(BaseCommand):
                 )
                 for name in skills[: 4 if variant < 2 else 2]:
                     Skill.objects.create(profile=profile, name=name)
+        dual_user = User.objects.create_user(
+            "demo_dual",
+            password=password,
+            first_name="Wanjiku",
+            last_name="Otieno",
+            email="dual@example.test",
+        )
+        Account.objects.create(user=dual_user, active_role="seeker")
+        dual_profile = JobSeekerProfile.objects.create(
+            user=dual_user,
+            bio="Python developer and small business owner in Nairobi.",
+            portfolio="Built a Django inventory application for a local business.",
+        )
+        for name in ["Python", "Django", "SQL"]:
+            Skill.objects.create(profile=dual_profile, name=name)
+        EmployerProfile.objects.create(
+            user=dual_user,
+            company_name="Wanjiku Digital Studio · Demo SME",
+            description="A fictional Kenyan studio demonstrating one account with both profiles.",
+        )
         User.objects.create_superuser("demo_admin", "admin@example.test", password)
         with path.open("x", encoding="utf-8") as output:
             output.write(
-                "LOCAL SYNTHETIC DEMO ONLY\n\nJob seeker: demo_seeker\nEmployer: demo_employer\nAdministrator: demo_admin\nShared demo password: "
+                "LOCAL SYNTHETIC DEMO ONLY\n\nJob seeker: demo_seeker\nEmployer: demo_employer\nBoth profiles: demo_dual\nAdministrator: demo_admin\nShared demo password: "
                 + password
-                + "\n\nSign in: http://127.0.0.1:8000/accounts/login/\nAdministration: http://127.0.0.1:8000/admin/\n\nAll 30 candidate profiles and 10 jobs are fictional. Do not deploy these demo accounts publicly.\n"
+                + "\n\nSign in: http://127.0.0.1:8000/accounts/login/\nAdministration: http://127.0.0.1:8000/admin/\n\nAll 31 candidate profiles and 10 jobs are fictional. Do not deploy these demo accounts publicly.\n"
             )
         self.stdout.write(
             self.style.SUCCESS(
-                f"Created 30 synthetic profiles and 10 jobs. Local credentials saved to {path.name}."
+                f"Created 31 synthetic profiles and 10 jobs. Local credentials saved to {path.name}."
             )
         )
