@@ -2186,9 +2186,3 @@ hr {
     font-size: 30px
   }
 }
-
-@media(min-width:768px) and (max-height:760px) {
-  .sidebar-note {
-    display: none
-  }
-}
