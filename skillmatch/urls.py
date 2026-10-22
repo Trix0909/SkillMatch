@@ -1,8 +1,7 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
-from . import views
-from .forms import LoginForm
+from . import mfa_views, views
 
 urlpatterns = [
     path("", views.landing, name="landing"),
@@ -10,12 +9,14 @@ urlpatterns = [
     path("accounts/register/", views.register, name="register"),
     path(
         "accounts/login/",
-        auth_views.LoginView.as_view(
-            authentication_form=LoginForm, redirect_authenticated_user=True
-        ),
+        mfa_views.MFALoginView.as_view(),
         name="login",
     ),
     path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("accounts/security/", mfa_views.security, name="account_security"),
+    path("accounts/2fa/setup/", mfa_views.setup, name="mfa_setup"),
+    path("accounts/2fa/verify/", mfa_views.verify, name="mfa_verify"),
+    path("accounts/2fa/cancel/", mfa_views.cancel, name="mfa_cancel"),
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("profiles/<int:pk>/", views.profile_detail, name="profile_detail"),
     path("recommendations/", views.recommendations, name="recommendations"),

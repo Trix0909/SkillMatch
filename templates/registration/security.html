@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Account security · SkillMatch{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">YOUR ACCOUNT</span>
+      <h1>Account security<span class="blue">.</span></h1>
+      <p>Manage how you protect your SkillMatch account.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-8">
+      <section class="panel form-panel" aria-labelledby="security-title">
+        <h2 id="security-title">Two-Factor Authentication</h2>
+        <p><strong>Status: {% if enabled %}Enabled{% else %}Not enabled{% endif %}</strong></p>
+        {% if enabled %}
+          <p>You’ll be asked for a code from your authenticator app each time you sign in.</p>
+        {% else %}
+          <p>2FA is optional for job seekers and employers. You can continue using all your usual features without enabling it.</p>
+          <p>When enabled, you’ll need your password and authenticator app each time you sign in. Keep access to that app: recovery and disabling are not available in this stage.</p>
+          <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% include "partials/field.html" with field=form.password %}
+            <button class="btn btn-primary" type="submit">Enable Two-Factor Authentication</button>
+          </form>
+        {% endif %}
+        <p class="mt-4 mb-0"><a href="{% url 'home' %}">Back to your workspace →</a></p>
+      </section>
+    </div>
+  </div>
+{% endblock %}

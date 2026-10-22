@@ -22,6 +22,8 @@ No other nearby project documents were used. Text extracts are private local wor
 
 ## Traceability
 
+**Authorized extension (1 October 2026):** The project owner requested standard authenticator-app TOTP, optional for ordinary users and mandatory for staff/superusers, while preserving existing registration, roles and designs. Core MFA is documented in [MFA.md](MFA.md); recovery and disabling remain deferred. This is a later explicit requirement, not a claim that MFA appeared in the original proposal.
+
 | Requirement | Source | Implementation |
 | --- | --- | --- |
 | Role-based registration/login | Proposal §1.6; slides 4, 11 | `Account`, Django auth, registration/login views, role decorator |
