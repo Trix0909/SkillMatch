@@ -1,0 +1,16 @@
+{% extends "registration/mfa_base.html" %}
+{% block title %}Finish creating your account · SkillMatch{% endblock %}
+{% block mfa_content %}
+  <h1 id="mfa-title">Your next step</h1>
+  <p class="sm-auth-intro">Choose where to start. One account works for job seeking and hiring, and you can switch later.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      {% include "registration/field.html" %}
+    {% endfor %}
+    <button class="sm-button sm-button-primary sm-auth-submit" type="submit">Create account</button>
+  </form>
+{% endblock %}
+{% block mfa_footer %}<a href="{% url 'login' %}"
+   class="sm-auth-switch">Return to sign in</a>{% endblock %}

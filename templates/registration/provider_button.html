@@ -1,0 +1,11 @@
+{% with provider_url=provider.id|add:"_login" %}
+  <form method="post" action="{% url provider_url %}">
+    {% csrf_token %}
+    <input type="hidden" name="purpose" value="{{ purpose }}">
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="sm-button sm-social-button">
+      {% include "registration/provider_icon.html" %}
+      {% if purpose == "connect" %}Connect{% else %}Continue with{% endif %} {{ provider.name }}
+    </button>
+  </form>
+{% endwith %}

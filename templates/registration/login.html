@@ -19,6 +19,14 @@
           <input type="hidden" name="next" value="{{ next }}">
           <button type="submit" class="sm-button sm-button-primary sm-auth-submit">Sign in {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button>
         </form>
+        {% if social_providers %}
+          <div class="sm-social-divider">or continue with</div>
+          <div class="sm-social-buttons">
+            {% for provider in social_providers %}
+              {% include "registration/provider_button.html" with purpose="login" %}
+            {% endfor %}
+          </div>
+        {% endif %}
         <p class="sm-auth-switch">Don’t have an account? <a href="{% url 'register' %}">Create one {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></p>
       </section>
       {% include "registration/botanical.html" %}
