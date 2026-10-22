@@ -618,9 +618,14 @@ class ProjectCase(TestCase):
 
     def test_sidebar_switch_label_follows_active_role(self):
         self.client.force_login(self.seeker)
-        self.assertContains(self.client.get(reverse("profile_edit")), "Switch to hiring")
+        response = self.client.get(reverse("profile_edit"))
+        self.assertContains(response, 'class="workspace-switch"')
+        self.assertContains(response, 'value="employer"')
+        self.assertContains(response, "Switch to hiring")
         self.client.force_login(self.employer_user)
-        self.assertContains(self.client.get(reverse("profile_edit")), "Switch to job seeking")
+        response = self.client.get(reverse("profile_edit"))
+        self.assertContains(response, 'value="seeker"')
+        self.assertContains(response, "Switch to job seeking")
 
     def test_seed_demo_includes_user_with_both_profiles(self):
         with (

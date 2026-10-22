@@ -26,6 +26,27 @@
         <span class="workspace-label">
           {% if account_role == "employer" %}EMPLOYER WORKSPACE{% elif account_role == "seeker" %}JOB SEEKER WORKSPACE{% else %}ADMINISTRATION{% endif %}
         </span>
+        {% if account_role %}
+          <form class="workspace-switch"
+                method="post"
+                action="{% url 'switch_role' %}"
+                aria-label="Switch workspace">
+            {% csrf_token %}
+            {% if account_role == "seeker" %}
+              <span class="current" aria-current="true">Job seeking</span>
+              <button type="submit"
+                      name="active_role"
+                      value="employer"
+                      title="Switch to hiring">Hiring</button>
+            {% else %}
+              <button type="submit"
+                      name="active_role"
+                      value="seeker"
+                      title="Switch to job seeking">Job seeking</button>
+              <span class="current" aria-current="true">Hiring</span>
+            {% endif %}
+          </form>
+        {% endif %}
         <nav class="side-nav" aria-label="Main navigation">
           {% if account_role == "seeker" %}
             <a class="{% if active == 'recommendations' %}active{% endif %}"
@@ -43,15 +64,6 @@
               <span aria-hidden="true">⌕</span>Find candidates</a>
           {% endif %}
           {% if account_role %}
-            <form method="post" action="{% url 'switch_role' %}">
-              {% csrf_token %}
-              <input type="hidden"
-                     name="active_role"
-                     value="{% if account_role == 'seeker' %}employer{% else %}seeker{% endif %}">
-              <button type="submit" class="btn btn-outline-secondary btn-sm">
-                {% if account_role == "seeker" %}Switch to hiring{% else %}Switch to job seeking{% endif %}
-              </button>
-            </form>
             <a class="{% if active == 'profile' %}active{% endif %}"
                href="{% url 'profile_edit' %}">
               <span aria-hidden="true">◎</span>
