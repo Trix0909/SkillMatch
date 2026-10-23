@@ -4,13 +4,13 @@
 
 Double-click `start.cmd` in the project folder, or run `.\start.cmd` in its terminal. It prepares the environment and starts the app. Open `http://127.0.0.1:8000` once the server is ready. Keep the terminal open while using SkillMatch; press Ctrl+C to stop.
 
-Select **Get started** to register. Enter your name, email, username and password. Choose **I’m looking for work** or **I’m hiring**. Employers also enter a company name. Registration signs you in and opens profile editing. Your selected role cannot be switched through a web request or form; use separate accounts for the two roles.
+Select **Get started** to register. Enter your name, email, username and password. Choose **I’m looking for work** or **I’m hiring**. Employers also enter a company name. Registration signs you in and opens profile editing. The role you pick is the workspace you start in. You can use both sides with one account: use the **Job seeking | Hiring** toggle in the sidebar. The first time you switch to Hiring you enter a company name; the first time you switch to Job seeking you complete a seeker profile. Each side keeps its own profile, and only the pages of your current workspace are available.
 
 If demo data has been seeded, use the usernames and generated password in `demo-credentials.txt`. The demo is fictional and intended for local demonstrations only.
 
 ## Account security
 
-Before or after editing a profile, you can open **Two-factor authentication settings** from **My profile** or **Company profile**. It is optional for ordinary users. Confirm your password, scan the QR with a compatible authenticator app, and enter its current code to enable it. Every later login will require that app's code. Staff/superusers, including the demo administrator, must complete setup at their next login. Recovery and disabling are not available in this stage, so retain access to the app. See the [complete MFA guide](MFA.md).
+Before or after editing a profile, you can open **Two-factor authentication settings** from **My profile** or **Company profile**. It is optional for ordinary users. Confirm your password, scan the QR with a compatible authenticator app, and enter its current code to enable it. Every later login will require that app's code. When setup succeeds you are shown ten one-time recovery codes; save them somewhere safe. If you lose your authenticator, choose **Use a recovery code** at the code prompt, then generate a new set from account security (your password is required). Staff/superusers, including the demo administrator, must complete setup at their next login. Disabling 2FA or replacing the authenticator is not yet available. See the [complete MFA guide](MFA.md).
 
 ## Job seekers
 

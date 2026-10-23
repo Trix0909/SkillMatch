@@ -1,10 +1,10 @@
 # Implementation verification
 
-Development validation was rerun locally on 29 September 2026 using Python 3.12.14, Django 5.2.17, scikit-learn 1.7.2 and SQLite. Browser evidence below is from 18 September 2026; browser checks were not rerun for this documentation update.
+The automated suite was last run on 23 October 2026 against master commit `6e307e1` using Python 3.12, Django 5.2 and SQLite: **134 tests passed**. Earlier sections record the state of the earlier stages; the first-stage list and the browser evidence below date from 18 September 2026 and were not rerun for this update.
 
 ## Automated results
 
-**40 tests passed** with a freshly migrated temporary database. Covered behaviors:
+**134 tests pass** with a freshly migrated temporary database: 49 application and algorithm tests, 37 core MFA tests, 14 MFA login reminder tests, 29 recovery code tests and 5 startup tests. The 49 application tests include account role switching. The behaviors below were the first 40:
 
 - Exact certification and experience constants, weighted formula and ranking for equal-text profiles.
 - Term-frequency saturation at 2 before TF-IDF; repeated text cannot keep increasing its term count.
@@ -63,3 +63,6 @@ The Windows entry point is now `start.cmd`, which prepares the environment when 
 
 Manual study labels, participant SUS responses and user acceptance observations remain outstanding. This update adds no research findings or external deployment claim.
 
+## Current status (23 October 2026)
+
+All 134 tests pass on master after merging 2FA, recovery codes and dual-role support (PRs #18, #19, #20, #22, #24, #25). The startup test `test_migration_failure_prevents_server_start` needs the project virtual environment in `.venv` at the repository root; with another interpreter layout it fails because the launcher cannot find that environment. Browser checks, manual study labels, participant SUS responses and user acceptance observations remain outstanding, and no external deployment has been made.

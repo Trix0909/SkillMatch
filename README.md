@@ -49,8 +49,8 @@ For a clean installation, skip demo seeding, register your own accounts, and cre
 
 The landing, login and signup pages use the Match Point visual design, local Inter/Playfair fonts and responsive Kenyan editorial imagery. See [landing design and asset notes](docs/LANDING-DESIGN.md) and [authentication design notes](docs/AUTH-DESIGN.md). Other pages retain their current UI pending design approval.
 
-- Separate job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks.
-- Authenticator-app 2FA: optional for job seekers/employers and mandatory for staff/superusers, including direct Django admin access. Enable it through the profile page's **Account security** link. See the [MFA setup, testing and implementation guide](docs/MFA.md). Recovery and disabling are deferred; keep access to your authenticator.
+- Job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks. One account can use both: a sidebar toggle switches between Job seeking and Hiring, creating the other profile on first use.
+- Authenticator-app 2FA: optional for job seekers/employers and mandatory for staff/superusers, including direct Django admin access. Enable it through the profile page's **Account security** link. See the [MFA setup, testing and implementation guide](docs/MFA.md). Ten one-time recovery codes are issued at setup and can be replaced from account security; disabling or replacing the authenticator is not yet available.
 - Structured profiles: names, unique skill tags, certification and experience dropdowns, professional summary, project descriptions and optional HTTP(S) evidence links.
 - Employer company profile, job creation/editing, closing/reopening, deletion confirmation and candidate search.
 - Ranked candidates for an employer’s job or free-text search, ranked job recommendations for seekers, and employer access to candidate profiles.
