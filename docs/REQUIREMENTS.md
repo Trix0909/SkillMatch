@@ -22,11 +22,12 @@ No other nearby project documents were used. Text extracts are private local wor
 
 ## Traceability
 
-**Authorized extension (1 October 2026):** The project owner requested standard authenticator-app TOTP, optional for ordinary users and mandatory for staff/superusers, while preserving existing registration, roles and designs. Core MFA is documented in [MFA.md](MFA.md); recovery and disabling remain deferred. This is a later explicit requirement, not a claim that MFA appeared in the original proposal.
+**Authorized extension (1 October 2026):** The project owner requested standard authenticator-app TOTP, optional for ordinary users and mandatory for staff/superusers, while preserving existing registration, roles and designs. MFA, including one-time recovery codes added on 22 October 2026, is documented in [MFA.md](MFA.md); disabling remains deferred. On the same date the project owner also requested that one account be able to act as both job seeker and employer (`Account.active_role` with a workspace switch). This is a later explicit requirement, not a claim that MFA appeared in the original proposal.
 
 | Requirement | Source | Implementation |
 | --- | --- | --- |
 | Role-based registration/login | Proposal §1.6; slides 4, 11 | `Account`, Django auth, registration/login views, role decorator |
+| One account, both roles (owner request, 22 October 2026) | Later explicit requirement | `Account.active_role`, `switch_role` view, sidebar toggle |
 | Profiles, bio, portfolio, level dropdowns | Proposal §§1.6, 3.6.2 | `JobSeekerProfile`, `ProfileForm`, profile templates |
 | Unique case-insensitive skill tags | Proposal §§1.6, 3.6.1–2 | `Skill`, canonical names and DB constraints, `parse_skills`, skill editor |
 | Optional evidence links, no uploads | Proposal §§1.6–1.7, 2.5 | `EvidenceLink`, HTTP(S) validation, linked profile evidence |
