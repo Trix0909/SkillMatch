@@ -8,7 +8,17 @@
      stroke-linecap="round"
      stroke-linejoin="round"
      aria-hidden="true">
-  {% if icon == "person" %}
+  {% if icon == "home" %}
+    <path d="m3 10 9-8 9 8v11h-6v-8H9v8H3z" />
+  {% elif icon == "bookmark" %}
+    <path d="M6 3h12v19l-6-5-6 5z" />
+  {% elif icon == "star" %}
+    <path d="m12 2 3 6.5 7 1-5 5 1 7-6-3.5L6 21l1-6.5-5-5 7-1z" />
+  {% elif icon == "lightbulb" %}
+    <path d="M8 17c0-4-3-4-3-9a7 7 0 0 1 14 0c0 5-3 5-3 9M8 17h8v3H8zM10 23h4" />
+  {% elif icon == "link" %}
+    <path d="m10 13 4-4M8 16l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 10a4 4 0 0 0 6 0l4-4a4 4 0 0 0-6-6l-1 1" transform="translate(0 -1)" />
+  {% elif icon == "person" %}
     <circle cx="12" cy="7" r="4" />
     <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
   {% elif icon == "building" %}
