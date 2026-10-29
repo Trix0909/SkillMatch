@@ -105,7 +105,7 @@ Relevance means at least **70% of required skills** and meeting both required le
 
 See [user guide](docs/USER_GUIDE.md), [technical documentation](docs/TECHNICAL.md), [evaluation protocol](docs/EVALUATION.md), [verification report](docs/VERIFICATION.md), and [editable diagrams](docs/diagrams/README.md).
 
-## Google, Microsoft and GitHub sign-in
+## Google and GitHub sign-in
 
 Optional provider sign-in uses `django-allauth[socialaccount]==65.20.1` with Django 5.2 and Python 3.12. The existing SkillMatch login, registration, logout, role switching, TOTP and recovery-code flows remain in place. Only provider handshakes and the SkillMatch onboarding/account-management routes are exposed; allauth's default password/signup pages are not mounted.
 
@@ -121,24 +121,22 @@ From the project folder, with the Python 3.12 environment:
 
 The dependency brings its own `account` and `socialaccount` migrations. There are no new SkillMatch models or migrations. Back up an existing database before applying migrations. The normal setup/start scripts also install dependencies and apply migrations.
 
-Set environment variables in the shell that starts Django or in the hosting service's environment editor. `.env.example` is a reference; the application does **not** automatically load `.env` files. Restart the server after changing configuration.
+For local development, create `.env` beside `manage.py` (use `.env.example` as a reference) and put your Google/GitHub credentials there once. Start normally with `.\start.cmd`; `python-dotenv` loads that exact file before Django reads its settings. The file is optional, Git-ignored, and must never be committed. Existing shell variables take precedence (`override=False`). Restart after editing `.env`.
+
+Production continues to use the hosting service's environment variables. When the hosting environment sets `DJANGO_DEBUG=0`, the local `.env` file is not loaded; the existing production secret-key and HTTPS requirements remain unchanged.
 
 | Provider | Required environment variables | Requested scopes |
 | --- | --- | --- |
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | `openid email profile` |
-| Microsoft | `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET` | `openid email profile User.Read` |
 | GitHub | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | `read:user user:email` |
 
-`MICROSOFT_TENANT` is optional and defaults to `common`. Use `organizations` for work/school accounts, `consumers` for personal accounts, or an explicit tenant GUID for a single tenant; match the application registration's supported account types. Tenant domain names are not accepted by the token validation policy.
-
-Both credential values must be present for a provider's login button to appear. Missing credentials leave password login and other configured providers available. Connected accounts still lists all three providers with their configuration status. Database `SocialApp` credentials are ignored and allauth identity/credential tables are not editable through Django admin. Never commit credentials or tokens.
+Google and GitHub buttons are always visible. Both credential values must be present to enable a provider's button; otherwise it remains disabled without starting OAuth or displaying a configuration label. Missing credentials leave password login and other configured providers available. Connected accounts lists only Google and GitHub with their configuration status. Database `SocialApp` credentials are ignored and allauth identity/credential tables are not editable through Django admin. Never commit credentials or tokens.
 
 ### Exact callback addresses
 
 | Provider | Local callback | Production callback (replace the example host) |
 | --- | --- | --- |
 | Google | `http://127.0.0.1:8000/accounts/social/google/login/callback/` | `https://your-skillmatch-domain.example/accounts/social/google/login/callback/` |
-| Microsoft | `http://127.0.0.1:8000/accounts/social/microsoft/login/callback/` | `https://your-skillmatch-domain.example/accounts/social/microsoft/login/callback/` |
 | GitHub | `http://127.0.0.1:8000/accounts/social/github/login/callback/` | `https://your-skillmatch-domain.example/accounts/social/github/login/callback/` |
 
 Use the same hostname throughout a sign-in attempt: `localhost` and `127.0.0.1` have different browser cookies. Match the full callback path and trailing slash. Use separate local and production applications/secrets. Production requires HTTPS and the project's existing secure Django settings; register the actual HTTPS address with each provider.
@@ -151,25 +149,6 @@ Use the same hostname throughout a sign-in attempt: `localhost` and `127.0.0.1` 
 4. Restart SkillMatch. Choose **Continue with Google**. allauth exchanges the authorization code and validates the provider identity; SkillMatch requires a verified provider email for new accounts/connections. Existing identities resolve by Google's UID.
 
 See [Google's OpenID Connect setup](https://developers.google.com/identity/openid-connect/openid-connect).
-
-### Microsoft Entra setup
-
-1. In Microsoft Entra **App registrations**, create an application. For `MICROSOFT_TENANT=common`, select accounts in any organizational directory **and personal Microsoft accounts** if both audiences are intended. Choose the narrower matching registration for other tenant settings.
-2. Add a **Web** redirect URI using the Microsoft callback above. Do not select SPA or enable implicit token grants. If the portal rejects the HTTP `127.0.0.1` address, add that loopback Web redirect through the application manifest as described in [Microsoft's redirect URI guidance](https://learn.microsoft.com/en-us/entra/identity-platform/reply-url); do not silently substitute a different hostname.
-3. Under API permissions, use delegated Microsoft Graph `User.Read` and the OpenID permissions `openid`, `email`, `profile`. Grant consent if your tenant's policy requires it. No application-wide directory permissions or `offline_access` are needed.
-4. Under **Certificates & secrets**, create a client secret. Put its **value**, not its ID, in `MICROSOFT_CLIENT_SECRET`; use the Application (client) ID for `MICROSOFT_CLIENT_ID`. Record the expiry and rotate it before it expires.
-5. Request the `email` and `xms_edov` **ID-token optional claims**. In the application manifest, merge these entries into `optionalClaims.idToken`:
-
-```json
-[
-  {"name": "email", "source": null, "essential": false, "additionalProperties": []},
-  {"name": "xms_edov", "source": null, "essential": false, "additionalProperties": []}
-]
-```
-
-6. Restart SkillMatch and test **Continue with Microsoft**. The Microsoft adapter validates the signed ID token's issuer, audience, expiry, nonce and tenant, then checks its `oid` against Graph's user ID. A new signup/connection requires an email with the explicit boolean `xms_edov: true`. Graph `mail`/`userPrincipalName` alone is not treated as verified. Some accounts/tenants may not supply these claims; they are safely refused with a friendly message and can use password/another provider instead. A previously connected UID can still sign in after its email changes.
-
-This is a deliberate fail-closed policy: Microsoft's [optional-claims reference](https://learn.microsoft.com/en-us/entra/identity-platform/optional-claims-reference) distinguishes a mutable email claim from the domain-verification assertion. No blanket `VERIFIED_EMAIL=True` setting is used.
 
 ### GitHub setup
 
@@ -186,7 +165,7 @@ See [GitHub's OAuth authorization documentation](https://docs.github.com/en/apps
 - Previously linked identities resolve by provider and UID even after an email change. Inactive users cannot log in. Connecting an identity belonging to another user is refused.
 - Normal users without 2FA receive the existing optional **Enable now / Not now** reminder. Users with confirmed TOTP enter the existing pending MFA flow and may use their authenticator or a saved recovery code. Staff/superusers must complete mandatory setup or verification before any protected/admin access. Provider login alone never satisfies SkillMatch MFA.
 - Provider start, connect and disconnect actions use CSRF-protected POSTs. allauth owns OAuth state, single-use callback handling and PKCE. Safe local `next` destinations are retained through onboarding, reminders and MFA. Cancelled, expired or failed handshakes return to login or Connected accounts without creating an account.
-- **Connected accounts** requires fresh identity confirmation for connection, disconnection and a first password. Password users re-enter their current password; social-only users complete a new OAuth round trip using an identity already connected to the same user. Microsoft requests a fresh login; Google/GitHub request account selection (Google also requests `max_age=0`). The upstream provider controls its own sign-in UI/session. No existing SkillMatch session alone grants confirmation. A required SkillMatch MFA session must already be verified.
+- **Connected accounts** requires fresh identity confirmation for connection, disconnection and a first password. Password users re-enter their current password; social-only users complete a new OAuth round trip using an identity already connected to the same user. Google/GitHub request account selection (Google also requests `max_age=0`). The upstream provider controls its own sign-in UI/session. No existing SkillMatch session alone grants confirmation. A required SkillMatch MFA session must already be verified.
 - Confirmation lasts five minutes and is bound to the current user and password hash; password changes invalidate it. The callback rechecks freshness, ownership and the initiating user. This explicit policy is necessary because allauth 65.20.1's default recent-authentication helper accepts social-only users when it has no reauthentication flow. Password confirmation is throttled after five failed attempts for five minutes using Django's cache; use a shared cache if deploying multiple application processes.
 - Disconnect cannot remove the last usable login method. Another provider counts only if configured; a usable local password also counts. Other sessions are not forcibly terminated by connecting/disconnecting.
 - Social-only users can set their first password using Django's validated `SetPasswordForm` after confirmation. Existing password users cannot use that endpoint to replace a password. This repository has no existing change-password page, so no new change-password system was added.
@@ -210,7 +189,7 @@ Configure each provider's real test application before end-to-end provider testi
 .\.venv\Scripts\python.exe tools/dev.py check
 ```
 
-The SSO tests exercise the actual allauth state/callback routes with mocked provider HTTP, including signed Microsoft-token validation, GitHub private-email retrieval, account collisions, onboarding, TOTP/recovery/admin gates, pending-state tampering/replay, recent confirmation, CSRF, lockout protection and redirect safety. The full check command also runs all existing password/MFA/dual-role tests. There is no new email verification, account merging, provider profile import or recovery mechanism.
+The SSO tests exercise the actual allauth state/callback routes with mocked provider HTTP, including Google identity validation, GitHub private-email retrieval, account collisions, onboarding, TOTP/recovery/admin gates, pending-state tampering/replay, recent confirmation, CSRF, lockout protection and redirect safety. The full check command also runs all existing password/MFA/dual-role tests. There is no new email verification, account merging, provider profile import or recovery mechanism.
 
 ## Deployment
 

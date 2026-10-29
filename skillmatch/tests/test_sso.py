@@ -1,5 +1,7 @@
 """Real OAuth state/callback/session flows with provider HTTP fully mocked."""
 
+import base64
+import hashlib
 import time
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qs, urlsplit
@@ -8,7 +10,7 @@ import jwt
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
-from cryptography.hazmat.primitives.asymmetric import rsa
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import User
@@ -30,6 +32,7 @@ PROVIDER_SETTINGS = {
     provider: {
         "APPS": [{"client_id": "test-client", "secret": "test-secret", "key": ""}],
         "OAUTH_PKCE_ENABLED": True,
+        "SCOPE": settings.SOCIALACCOUNT_PROVIDERS[provider]["SCOPE"],
     }
     for provider in PROVIDERS
 }
@@ -92,8 +95,6 @@ class SocialTests(TestCase):
                 }
                 if email:
                     payload["emails"] = [{"email": email, "verified": verified, "primary": True}]
-            elif provider == "microsoft":
-                payload = {"id": uid, "givenName": "Amina", "surname": "Kamau"}
             else:
                 payload = {
                     "sub": uid,
@@ -104,11 +105,6 @@ class SocialTests(TestCase):
                     "picture": "https://avatar.invalid/large.jpg",
                 }
             sociallogin = service.sociallogin_from_response(request, payload)
-            if provider == "microsoft":
-                sociallogin.email_addresses = (
-                    [EmailAddress(email=email, verified=verified, primary=True)] if email else []
-                )
-                sociallogin.account.extra_data = {"email": email} if verified and email else {}
             return sociallogin
 
         with (
@@ -136,23 +132,59 @@ class SocialTests(TestCase):
 
     def test_configured_provider_buttons(self):
         response = self.client.get(reverse("login"))
-        for name in PROVIDERS.values():
+        self.assertEqual(set(PROVIDERS), {"google", "github"})
+        self.assertEqual(set(ADAPTERS), {"google", "github"})
+        self.assertNotContains(response, "Microsoft")
+        self.assertNotContains(response, "Not configured")
+        for provider, name in PROVIDERS.items():
             self.assertContains(response, f"Continue with {name}")
+            self.assertContains(response, f'action="{reverse(f"{provider}_login")}"')
+            self.start(provider)
 
     @override_settings(SOCIALACCOUNT_PROVIDERS={})
     def test_missing_configuration_is_safe(self):
         response = self.client.get(reverse("login"))
-        self.assertNotContains(response, "or continue with")
-        for provider in PROVIDERS:
+        self.assertContains(response, "or continue with", count=1)
+        self.assertNotContains(response, "Microsoft")
+        self.assertNotContains(response, "Not configured")
+        self.assertContains(response, 'class="sm-button sm-social-button" disabled', count=2)
+        for provider, name in PROVIDERS.items():
+            self.assertContains(response, f"Continue with {name}")
+            self.assertNotContains(response, f'action="{reverse(f"{provider}_login")}"')
             self.assertRedirects(self.client.post(reverse(f"{provider}_login")), reverse("login"))
             self.assertRedirects(self.client.get(reverse(f"{provider}_callback")), reverse("login"))
+        self.assertNotIn("socialaccount_states", self.client.session)
+        self.assert_anonymous()
 
     @override_settings(SOCIALACCOUNT_PROVIDERS={"github": PROVIDER_SETTINGS["github"]})
     def test_one_configured_provider_still_works(self):
         response = self.client.get(reverse("login"))
-        self.assertContains(response, "Continue with GitHub")
-        self.assertNotContains(response, "Continue with Google")
+        for name in PROVIDERS.values():
+            self.assertContains(response, f"Continue with {name}")
+        self.assertNotContains(response, "Not configured")
+        self.assertContains(response, 'class="sm-button sm-social-button" disabled', count=1)
+        self.assertContains(response, f'action="{reverse("github_login")}"')
+        self.assertNotContains(response, f'action="{reverse("google_login")}"')
         self.assertRedirects(self.callback(provider="github"), reverse("socialaccount_signup"))
+
+    def test_partial_credentials_keep_provider_buttons_disabled(self):
+        for app in ({"client_id": "test-client"}, {"secret": "test-secret"}):
+            with (
+                self.subTest(app=app),
+                override_settings(
+                    SOCIALACCOUNT_PROVIDERS={key: {"APPS": [app]} for key in PROVIDERS}
+                ),
+            ):
+                response = self.client.get(reverse("login"))
+                self.assertNotContains(response, "Not configured")
+                self.assertContains(
+                    response, 'class="sm-button sm-social-button" disabled', count=2
+                )
+                for provider in PROVIDERS:
+                    self.assertNotContains(response, f'action="{reverse(f"{provider}_login")}"')
+                    self.assertRedirects(
+                        self.client.post(reverse(f"{provider}_login")), reverse("login")
+                    )
 
     def test_database_apps_do_not_override_environment(self):
         SocialApp.objects.create(provider="google", client_id="db-client", secret="db-secret")
@@ -169,7 +201,7 @@ class SocialTests(TestCase):
             self.assertRedirects(self.client.get(reverse("socialaccount_signup")), reverse("login"))
         self.assertFalse(User.objects.exists())
 
-    def test_all_three_providers_use_existing_mfa_handoff(self):
+    def test_both_providers_use_existing_mfa_handoff(self):
         user = self.user()
         TOTPDevice.objects.create(user=user, confirmed=True)
         for provider in PROVIDERS:
@@ -287,6 +319,23 @@ class SocialTests(TestCase):
 
     def test_github_verified_private_email_is_accepted(self):
         self.assertRedirects(self.callback("github"), reverse("socialaccount_signup"))
+
+    def test_github_username_collision_does_not_merge_or_block_onboarding(self):
+        self.assertRedirects(self.callback("github"), reverse("socialaccount_signup"))
+        owner = self.user("Amina", email="different@example.test")
+        self.assertRedirects(
+            self.client.post(reverse("socialaccount_signup"), {"role": "seeker"}),
+            reverse("mfa_reminder"),
+        )
+        newcomer = SocialAccount.objects.get(provider="github", uid="123").user
+        self.assertNotEqual(newcomer.pk, owner.pk)
+        self.assertNotEqual(newcomer.username.casefold(), owner.username.casefold())
+        self.assertEqual(newcomer.email, "new@example.test")
+        self.assertFalse(newcomer.has_usable_password())
+        owner.refresh_from_db()
+        self.assertEqual(owner.username, "Amina")
+        self.assertEqual(owner.email, "different@example.test")
+        self.assertTrue(owner.check_password(self.password))
 
     def test_existing_identity_uses_uid_after_email_changes(self):
         user = self.user(email="original@example.test")
@@ -657,6 +706,8 @@ class SocialTests(TestCase):
         self.client.force_login(user)
         self.assertContains(self.client.get(reverse("profile_edit")), reverse("social_connections"))
         response = self.client.get(reverse("social_connections"))
+        self.assertNotContains(response, "Microsoft")
+        self.assertEqual([p["id"] for p in response.context["providers"]], ["google", "github"])
         for name in PROVIDERS.values():
             self.assertContains(response, name)
 
@@ -693,74 +744,6 @@ class SocialTests(TestCase):
         self.callback(purpose="reauthenticate")
         self.assertRedirects(self.client.post(reverse("social_enable_mfa")), reverse("mfa_setup"))
 
-    def microsoft_callback(self, overrides=None, key=None):
-        state = self.start("microsoft")
-        nonce = self.client.session["socialaccount_states"][state][0]["data"]["nonce"]
-        signing_key = key or rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        tenant = "11111111-2222-3333-4444-555555555555"
-        claims = {
-            "iss": f"https://login.microsoftonline.com/{tenant}/v2.0",
-            "aud": "test-client",
-            "tid": tenant,
-            "oid": "123",
-            "sub": "subject",
-            "exp": time.time() + 300,
-            "iat": time.time(),
-            "nonce": nonce,
-            "email": "verified@example.test",
-            "xms_edov": True,
-        }
-        claims.update(overrides or {})
-        credential = jwt.encode(claims, signing_key, algorithm="RS256", headers={"kid": "test-key"})
-        public_key = jwt.algorithms.RSAAlgorithm.to_jwk(signing_key.public_key(), as_dict=True)
-        public_key["kid"] = "test-key"
-        keys = Mock()
-        keys.json.return_value = {"keys": [public_key]}
-        graph = Mock()
-        graph.json.return_value = {
-            "id": "123",
-            "mail": "untrusted@example.test",
-            "givenName": "Amina",
-            "surname": "Kamau",
-        }
-        session = Mock()
-        session.__enter__ = Mock(return_value=session)
-        session.__exit__ = Mock(return_value=False)
-        session.get.side_effect = [keys, graph]
-        with (
-            patch(
-                "allauth.socialaccount.providers.oauth2.client.OAuth2Client.get_access_token",
-                return_value={"access_token": "test-only-token", "id_token": credential},
-            ),
-            patch("skillmatch.social.SocialAdapter.get_requests_session", return_value=session),
-        ):
-            return self.client.get(reverse("microsoft_callback"), {"code": "mock", "state": state})
-
-    def test_microsoft_trusts_signed_email_claim_not_graph_mail(self):
-        self.assertRedirects(self.microsoft_callback(), reverse("socialaccount_signup"))
-        self.client.post(reverse("socialaccount_signup"), {"role": "seeker"})
-        self.assertEqual(User.objects.get().email, "verified@example.test")
-        self.assertEqual(SocialAccount.objects.get().uid, "123")
-        self.assertFalse(SocialToken.objects.exists())
-
-    def test_microsoft_rejects_missing_domain_verification(self):
-        for value in [False, None, "true"]:
-            with self.subTest(value=value):
-                self.assertRedirects(self.microsoft_callback({"xms_edov": value}), reverse("login"))
-                self.assertFalse(User.objects.exists())
-
-    def test_microsoft_rejects_bad_nonce_audience_issuer_expiry_and_identity(self):
-        for claims in [
-            {"nonce": "wrong"},
-            {"aud": "other-app"},
-            {"iss": "https://evil.example"},
-            {"exp": 1},
-            {"oid": "other-user"},
-        ]:
-            with self.subTest(claims=claims):
-                self.assertRedirects(self.microsoft_callback(claims), reverse("login"))
-                self.assertFalse(User.objects.exists())
-
     def test_github_fetches_verified_email_endpoint_when_public_email_absent(self):
         state = self.start("github")
         profile, emails = Mock(), Mock()
@@ -790,6 +773,192 @@ class SocialTests(TestCase):
         self.assertEqual(
             session.get.call_args_list[1].args[0], "https://api.github.com/user/emails"
         )
+
+    def test_github_public_email_without_verification_is_refused(self):
+        for addresses in (
+            [],
+            [{"email": "public@example.test", "primary": True, "verified": False}],
+        ):
+            with self.subTest(addresses=addresses):
+                state = self.start("github")
+                profile, emails = Mock(), Mock()
+                profile.json.return_value = {
+                    "id": 123,
+                    "login": "amina",
+                    "email": "public@example.test",
+                }
+                emails.status_code = 200
+                emails.json.return_value = addresses
+                session = Mock()
+                session.__enter__ = Mock(return_value=session)
+                session.__exit__ = Mock(return_value=False)
+                session.get.side_effect = [profile, emails]
+                with (
+                    patch(
+                        "allauth.socialaccount.providers.oauth2.client.OAuth2Client.get_access_token",
+                        return_value={"access_token": "test-only-token"},
+                    ),
+                    patch(
+                        "skillmatch.social.SocialAdapter.get_requests_session", return_value=session
+                    ),
+                ):
+                    response = self.client.get(
+                        reverse("github_callback"), {"code": "mock", "state": state}
+                    )
+                self.assertRedirects(response, reverse("login"))
+                self.assertFalse(User.objects.exists())
+                self.assertFalse(SocialAccount.objects.exists())
+                self.assert_anonymous()
+
+    def google_token_callback(self, overrides=None):
+        state = self.start("google")
+        verifier = self.client.session["socialaccount_states"][state][0]["pkce_code_verifier"]
+        claims = {
+            "iss": "https://accounts.google.com",
+            "aud": "test-client",
+            "sub": "google-123",
+            "exp": time.time() + 300,
+            "iat": time.time(),
+            "email": "google@example.test",
+            "email_verified": True,
+            "given_name": "Amina",
+            "family_name": "Kamau",
+        }
+        claims.update(overrides or {})
+        # Simulate Google's TLS token response; allauth validates its claims.
+        credential = jwt.encode(
+            claims, "test-token-signing-key-not-used-outside-tests", algorithm="HS256"
+        )
+        token_response = Mock(status_code=200, headers={"content-type": "application/json"})
+        token_response.json.return_value = {
+            "access_token": "test-only-token",
+            "id_token": credential,
+        }
+        session = Mock()
+        session.__enter__ = Mock(return_value=session)
+        session.__exit__ = Mock(return_value=False)
+        session.request.return_value = token_response
+        with patch("skillmatch.social.SocialAdapter.get_requests_session", return_value=session):
+            response = self.client.get(reverse("google_callback"), {"code": "mock", "state": state})
+        self.assertEqual(
+            session.request.call_args.args[:2], ("POST", "https://oauth2.googleapis.com/token")
+        )
+        self.assertEqual(session.request.call_args.kwargs["data"]["code_verifier"], verifier)
+        return response
+
+    def test_google_real_adapter_accepts_verified_identity(self):
+        self.assertRedirects(self.google_token_callback(), reverse("socialaccount_signup"))
+        self.assert_anonymous()
+        self.client.post(reverse("socialaccount_signup"), {"role": "seeker"})
+        user = User.objects.get()
+        self.assertEqual(user.email, "google@example.test")
+        self.assertFalse(user.has_usable_password())
+        self.assertEqual(SocialAccount.objects.get().uid, "google-123")
+        self.assertFalse(SocialToken.objects.exists())
+
+    def test_google_real_adapter_refuses_invalid_claims(self):
+        for claims in (
+            {"aud": "other-client"},
+            {"iss": "https://evil.example"},
+            {"exp": 1},
+            {"email_verified": False},
+            {"email": None},
+        ):
+            with self.subTest(claims=claims):
+                self.assertRedirects(self.google_token_callback(claims), reverse("login"))
+                self.assertFalse(User.objects.exists())
+                self.assert_anonymous()
+
+    def test_both_providers_start_with_correct_callback_scopes_and_pkce(self):
+        for provider, host, scopes in (
+            ("google", "accounts.google.com", {"openid", "email", "profile"}),
+            ("github", "github.com", {"read:user", "user:email"}),
+        ):
+            with self.subTest(provider=provider):
+                response = self.client.post(
+                    reverse(f"{provider}_login"), HTTP_HOST="127.0.0.1:8000"
+                )
+                self.assertEqual(response.status_code, 302)
+                url = urlsplit(response.url)
+                query = parse_qs(url.query)
+                self.assertEqual(url.hostname, host)
+                self.assertEqual(
+                    query["redirect_uri"],
+                    [f"http://127.0.0.1:8000/accounts/social/{provider}/login/callback/"],
+                )
+                self.assertEqual(set(query["scope"][0].split()), scopes)
+                self.assertEqual(query["code_challenge_method"], ["S256"])
+                state = self.client.session["socialaccount_states"][query["state"][0]][0]
+                challenge = (
+                    base64.urlsafe_b64encode(
+                        hashlib.sha256(state["pkce_code_verifier"].encode()).digest()
+                    )
+                    .rstrip(b"=")
+                    .decode()
+                )
+                self.assertEqual(query["code_challenge"], [challenge])
+
+    def test_both_providers_keep_onboarding_reminder_totp_and_recovery(self):
+        for provider in PROVIDERS:
+            with self.subTest(provider=provider):
+                self.client.logout()
+                self.assertRedirects(
+                    self.callback(provider, email=f"{provider}@example.test"),
+                    reverse("socialaccount_signup"),
+                )
+                self.assert_anonymous()
+                self.assertRedirects(
+                    self.client.post(reverse("socialaccount_signup"), {"role": "seeker"}),
+                    reverse("mfa_reminder"),
+                )
+                user = SocialAccount.objects.get(provider=provider).user
+                self.assertEqual(user.account.active_role, "seeker")
+                self.assertFalse(user.has_usable_password())
+                self.client.post(reverse("mfa_reminder"), {"action": "later"})
+                self.assertEqual(self.client.get(reverse("jobs")).status_code, 200)
+                device = TOTPDevice.objects.create(user=user, confirmed=True)
+                self.client.logout()
+                self.assertRedirects(
+                    self.callback(provider, next=reverse("jobs")), reverse("mfa_verify")
+                )
+                self.assert_anonymous()
+                self.assertRedirects(
+                    self.client.post(reverse("mfa_verify"), {"code": self.totp(device)}),
+                    reverse("jobs"),
+                )
+                self.assertEqual(self.client.session[SESSION_KEY], str(user.pk))
+                code = generate_codes(device)[0]
+                self.client.post(reverse("logout"))
+                self.assert_anonymous()
+                self.assertRedirects(
+                    self.callback(provider, next=reverse("jobs")), reverse("mfa_verify")
+                )
+                self.assert_anonymous()
+                self.assertRedirects(
+                    self.client.post(reverse("mfa_recovery"), {"code": code}), reverse("jobs")
+                )
+                self.assertIn(DEVICE_ID_SESSION_KEY, self.client.session)
+
+    def test_both_providers_enforce_staff_mfa_setup_and_verification(self):
+        for provider in PROVIDERS:
+            with self.subTest(provider=provider):
+                self.client.logout()
+                user = self.user(f"staff_{provider}", is_staff=True)
+                self.link(user, provider)
+                self.assertRedirects(
+                    self.callback(provider, next=reverse("admin:index")), reverse("mfa_setup")
+                )
+                self.assert_anonymous()
+                self.assertNotContains(self.client.get(reverse("mfa_setup")), "Not now")
+                self.assertEqual(self.client.get(reverse("admin:index")).status_code, 302)
+                device = TOTPDevice.objects.get(user=user)
+                self.client.post(reverse("mfa_setup"), {"code": self.totp(device)})
+                self.assertEqual(self.client.get(reverse("admin:index")).status_code, 200)
+                self.client.post(reverse("logout"))
+                self.assertRedirects(
+                    self.callback(provider, next=reverse("admin:index")), reverse("mfa_verify")
+                )
+                self.assert_anonymous()
 
     def test_connected_provider_with_missing_config_is_not_lockout_alternative(self):
         user = self.user(password=False)
@@ -834,8 +1003,11 @@ class SocialTests(TestCase):
             "/accounts/social/signup/",
             "/accounts/password/reset/",
             "/accounts/google/login/token/",
+            "/accounts/social/microsoft/login/",
+            "/accounts/social/microsoft/login/callback/",
         ]:
             self.assertEqual(self.client.get(path).status_code, 404)
+            self.assertEqual(self.client.post(path).status_code, 404)
 
     def test_sensitive_post_actions_require_csrf(self):
         user = self.user()

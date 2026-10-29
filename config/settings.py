@@ -3,8 +3,12 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Hosting configuration takes precedence; production never reads the local file.
+if os.environ.get("DJANGO_DEBUG", "1") == "1":
+    load_dotenv(BASE_DIR / ".env", override=False, encoding="utf-8-sig")
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
@@ -32,7 +36,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
-    "allauth.socialaccount.providers.microsoft",
     "allauth.socialaccount.providers.github",
     "skillmatch.apps.SkillmatchConfig",
 ]
@@ -111,11 +114,6 @@ SOCIALACCOUNT_QUERY_EMAIL = True
 SSO_RECENT_AUTH_SECONDS = 300
 SOCIALACCOUNT_PROVIDERS = {
     "google": {"SCOPE": ["openid", "email", "profile"], "OAUTH_PKCE_ENABLED": True},
-    "microsoft": {
-        "SCOPE": ["openid", "email", "profile", "User.Read"],
-        "OAUTH_PKCE_ENABLED": True,
-        "TENANT": os.environ.get("MICROSOFT_TENANT", "common"),
-    },
     "github": {"SCOPE": ["read:user", "user:email"], "OAUTH_PKCE_ENABLED": True},
 }
 for provider_id, provider_settings in SOCIALACCOUNT_PROVIDERS.items():

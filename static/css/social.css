@@ -35,8 +35,27 @@
   cursor: pointer;
 }
 
-.sm-social-button:hover {
+.sm-social-button:not(:disabled):hover {
   background: #eff3ed;
+}
+
+.sm-social-button:disabled {
+  background: #f6f5ef;
+  color: #66716f;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sm-social-button:disabled svg {
+  opacity: 0.6;
+}
+
+.sm-social-unavailable {
+  display: block;
+  height: 1.3em;
+  font-size: 0.7rem;
+  font-weight: 400;
+  line-height: 1.3;
 }
 
 .sm-social-button:focus-visible {

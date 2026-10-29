@@ -24,7 +24,7 @@ from .mfa import (
 )
 from .mfa_views import REMINDER_KEY
 
-PROVIDERS = {"google": "Google", "microsoft": "Microsoft", "github": "GitHub"}
+PROVIDERS = {"google": "Google", "github": "GitHub"}
 SOCIAL_BACKEND = "allauth.account.auth_backends.AuthenticationBackend"
 RECENT_KEY = "skillmatch_recent_auth"
 
@@ -39,7 +39,8 @@ def configured(provider):
 def provider_buttons(request):
     return {
         "social_providers": [
-            {"id": key, "name": name} for key, name in PROVIDERS.items() if configured(key)
+            {"id": key, "name": name, "configured": configured(key)}
+            for key, name in PROVIDERS.items()
         ]
     }
 
