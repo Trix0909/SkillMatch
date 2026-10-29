@@ -11,7 +11,8 @@ Persistence: SQLite through Django migrations. User passwords use Django’s con
 ## Modules
 
 - `config/settings.py`: environment-aware local/deployment settings.
-- `skillmatch/models.py`: accounts, profiles, jobs, skills and evidence.
+- `skillmatch/models.py`: accounts, profiles, jobs, skills, evidence and MFA recovery codes.
+- `skillmatch/mfa.py`, `mfa_forms.py`, `mfa_views.py`, `mfa_recovery.py`: authenticator-app 2FA, login reminder, session verification and recovery codes; see [MFA.md](MFA.md).
 - `skillmatch/forms.py`: validation and atomic registration/profile saving.
 - `skillmatch/matching.py`: capped TF-IDF pipeline and bidirectional rankings.
 - `skillmatch/views.py`: server-rendered workflows and authorization.
@@ -25,15 +26,19 @@ Persistence: SQLite through Django migrations. User passwords use Django’s con
 | Entity | Key fields and relationships |
 | --- | --- |
 | Django User | Username, private email/name, hashed password, active/staff flags |
-| Account | One-to-one User, constrained role `seeker` or `employer` |
+| Account | One-to-one User, `active_role` constrained to `seeker` or `employer`; the workspace currently in use |
 | JobSeekerProfile | One-to-one User, constrained certification/experience, bio, portfolio, updated timestamp |
 | Skill | Foreign key to JobSeekerProfile, display name, normalized casefolded name, optional SkillCategory |
 | SkillCategory | Unique category name, administered without changing matching |
 | EvidenceLink | Foreign key to JobSeekerProfile, validated HTTP(S) URL |
 | EmployerProfile | One-to-one User, company name and description |
+| RecoveryDevice | One-to-one TOTP device; throttled, confirmed device that owns the user's recovery codes |
+| RecoveryCode | Foreign key to RecoveryDevice, SHA-256 digest of a 128-bit code, unique per device; deleted when used |
+| SavedJob | Foreign key to the user and to a JobPost, unique per user and job; a seeker's bookmark |
+| SavedCandidate | Foreign key to the user (an employer) and to a candidate profile, unique per user and candidate; an employer's bookmark |
 | JobPost | Foreign key to employer, title, description, JSON required-skills list, constrained minimum levels, active flag, timestamps |
 
-Skill uniqueness is enforced by `(profile, normalized_name)` and a case-insensitive database constraint. Normalization applies Unicode NFKC and collapses whitespace before casefolding. User-created tags are additionally checked by server forms. Account creation saves a role and corresponding profile in one transaction. Profile saves update names, skills and evidence together.
+Skill uniqueness is enforced by `(profile, normalized_name)` and a case-insensitive database constraint. Normalization applies Unicode NFKC and collapses whitespace before casefolding. User-created tags are additionally checked by server forms. Account creation saves the chosen role as `active_role` and the corresponding profile in one transaction. A person holds one account. The first switch to the other role (`POST /accounts/switch-role/`) creates that side's profile: hiring asks for a company name, job seeking opens profile editing. Switching changes only `active_role`; both profiles are kept. Profile saves update names, skills and evidence together.
 
 ## Algorithm details
 
@@ -45,9 +50,21 @@ Minimum role requirements participate as text and evaluation criteria, but are n
 
 ## Access and validation
 
-All private pages require login. Employer routes enforce the employer role; seeker routes enforce the seeker role. Editing, closing, deletion and saved-job candidate ranking retrieve jobs scoped to the current employer. Profile views allow the profile’s owner, authorized employers for complete profiles, and administrators. Inactive accounts are removed from matching and cannot sign in. Names, emails and evidence URLs do not influence scores.
+All private pages require login. Employer routes require the account's active role to be employer; seeker routes require seeker. A user with both profiles sees only the pages of the role they are currently in. Editing, closing, deletion and saved-job candidate ranking retrieve jobs scoped to the current employer. Profile views allow the profile’s owner, authorized employers for complete profiles, and administrators. Inactive accounts are removed from matching and cannot sign in. Names, emails and evidence URLs do not influence scores.
 
 Django handles password hashing/validation, CSRF, session cookies and output escaping. Supporting URLs accept HTTP and HTTPS only; links open with `noopener noreferrer`. The app does not download linked content. Server validators enforce profile text/URL lengths, one to forty skills and at most eight links. HTML entered in descriptions is escaped. GET requests cannot sign out or close jobs; deletion requires a POST after a confirmation page.
+
+## Provider sign-in
+
+Google and GitHub sign-in use django-allauth alongside the existing login. Provider users go through the same MFA gates as password users, new users complete a short onboarding form, and a provider identity links to an existing account only when the provider's email is verified. Connected accounts are managed from account security after fresh confirmation. Setup, callbacks and security policies are in the README.
+
+## Dashboards and saved items
+
+Seekers and employers have dashboards as their home pages. Seekers save jobs from recommendations and browsing (`/saved-jobs/`), and employers save candidates from rankings (`/employer/saved-candidates/`). Both lists are private to the user who made them.
+
+## Two-factor authentication
+
+Authenticator-app TOTP uses django-otp. Ordinary users may enroll from account security; staff and superusers must enroll and are blocked from the site and from `/admin/` until their session is verified. A middleware enforces this on every request for admins and for enrolled users. Enrolled users verify with a code at login; recovery codes are an alternative second step. An optional reminder after login offers enrollment. Details, routes and manual checks are in [MFA.md](MFA.md).
 
 ## Deployment
 

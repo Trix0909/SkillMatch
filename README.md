@@ -49,8 +49,8 @@ For a clean installation, skip demo seeding, register your own accounts, and cre
 
 The landing, login and signup pages use the Match Point visual design, local Inter/Playfair fonts and responsive Kenyan editorial imagery. See [landing design and asset notes](docs/LANDING-DESIGN.md) and [authentication design notes](docs/AUTH-DESIGN.md). Other pages retain their current UI pending design approval.
 
-- Separate job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks.
-- Authenticator-app 2FA: optional for job seekers/employers and mandatory for staff/superusers, including direct Django admin access. Enable it through the profile page's **Account security** link. See the [MFA setup, testing and implementation guide](docs/MFA.md). Recovery and disabling are deferred; keep access to your authenticator.
+- Job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks. One account can use both: a sidebar toggle switches between Job seeking and Hiring, creating the other profile on first use.
+- Authenticator-app 2FA: optional for job seekers/employers and mandatory for staff/superusers, including direct Django admin access. Enable it through the profile page's **Account security** link. See the [MFA setup, testing and implementation guide](docs/MFA.md). Ten one-time recovery codes are issued at setup and can be replaced from account security; disabling or replacing the authenticator is not yet available.
 - Structured profiles: names, unique skill tags, certification and experience dropdowns, professional summary, project descriptions and optional HTTP(S) evidence links.
 - Employer company profile, job creation/editing, closing/reopening, deletion confirmation and candidate search.
 - Ranked candidates for an employer’s job or free-text search, ranked job recommendations for seekers, and employer access to candidate profiles.
@@ -119,7 +119,7 @@ From the project folder, with the Python 3.12 environment:
 .\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
 ```
 
-The dependency brings its own `account` and `socialaccount` migrations. There are no new SkillMatch models or migrations. Back up an existing database before applying migrations. The normal setup/start scripts also install dependencies and apply migrations.
+The dependency brings its own `account` and `socialaccount` migrations. SkillMatch's own migrations 0004 and 0005 add saved jobs and saved candidates. Back up an existing database before applying migrations. The normal setup/start scripts also install dependencies and apply migrations.
 
 For local development, create `.env` beside `manage.py` (use `.env.example` as a reference) and put your Google/GitHub credentials there once. Start normally with `.\start.cmd`; `python-dotenv` loads that exact file before Django reads its settings. The file is optional, Git-ignored, and must never be committed. Existing shell variables take precedence (`override=False`). Restart after editing `.env`.
 
