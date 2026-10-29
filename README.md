@@ -119,7 +119,7 @@ From the project folder, with the Python 3.12 environment:
 .\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
 ```
 
-The dependency brings its own `account` and `socialaccount` migrations. There are no new SkillMatch models or migrations. Back up an existing database before applying migrations. The normal setup/start scripts also install dependencies and apply migrations.
+The dependency brings its own `account` and `socialaccount` migrations. SkillMatch's own migrations 0004 and 0005 add saved jobs and saved candidates. Back up an existing database before applying migrations. The normal setup/start scripts also install dependencies and apply migrations.
 
 For local development, create `.env` beside `manage.py` (use `.env.example` as a reference) and put your Google/GitHub credentials there once. Start normally with `.\start.cmd`; `python-dotenv` loads that exact file before Django reads its settings. The file is optional, Git-ignored, and must never be committed. Existing shell variables take precedence (`override=False`). Restart after editing `.env`.
 

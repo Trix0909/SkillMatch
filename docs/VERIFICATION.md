@@ -1,10 +1,10 @@
 # Implementation verification
 
-The automated suite was last run on 23 October 2026 against master commit `6e307e1` using Python 3.12, Django 5.2 and SQLite: **134 tests passed**. Earlier sections record the state of the earlier stages; the first-stage list and the browser evidence below date from 18 September 2026 and were not rerun for this update.
+The automated suite was last run on 29 October 2026 against the merged master branch using Python 3.12, Django 5.2 and SQLite: **255 tests passed**. Earlier sections record the state of the earlier stages; the first-stage list and the browser evidence below date from 18 September 2026 and were not rerun for this update.
 
 ## Automated results
 
-**134 tests pass** with a freshly migrated temporary database: 49 application and algorithm tests, 37 core MFA tests, 14 MFA login reminder tests, 29 recovery code tests and 5 startup tests. The 49 application tests include account role switching. The behaviors below were the first 40:
+**255 tests pass** with a freshly migrated temporary database: 49 application and algorithm tests, 37 core MFA tests, 14 MFA login reminder tests, 29 recovery code tests, 5 startup tests, 65 provider sign-in tests, 45 dashboard, profile editor and saved item tests and 11 environment tests. The 49 application tests include account role switching. The behaviors below were the first 40:
 
 - Exact certification and experience constants, weighted formula and ranking for equal-text profiles.
 - Term-frequency saturation at 2 before TF-IDF; repeated text cannot keep increasing its term count.
@@ -66,3 +66,7 @@ Manual study labels, participant SUS responses and user acceptance observations 
 ## Current status (23 October 2026)
 
 All 134 tests pass on master after merging 2FA, recovery codes and dual-role support (PRs #18, #19, #20, #22, #24, #25). The startup test `test_migration_failure_prevents_server_start` needs the project virtual environment in `.venv` at the repository root; with another interpreter layout it fails because the launcher cannot find that environment. Browser checks, manual study labels, participant SUS responses and user acceptance observations remain outstanding, and no external deployment has been made.
+
+## Current status (29 October 2026)
+
+The suite has grown to 255 tests after provider sign-in (65 tests), dashboards, the profile editor, saved jobs and saved candidates (45 tests) and environment checks (11 tests) were merged. All 255 pass on Python 3.12 and migrations match the models. The browser checks listed above predate these screens and have not been rerun against them.
