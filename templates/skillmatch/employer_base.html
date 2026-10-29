@@ -1,0 +1,27 @@
+{% extends "skillmatch/dashboard_base.html" %}
+{% load static %}
+{% block body_class %}seeker-dashboard employer-dashboard{% endblock %}
+{% block extra_head %}
+  {{ block.super }}
+  <link rel="stylesheet"
+        href="{% static 'css/employer-dashboard.css' %}?v=employer-home-4">
+  <link rel="stylesheet" href="{% static 'css/candidate-bookmarks.css' %}">
+{% endblock %}
+{% block workspace_caption %}<span class="visually-hidden">Employer workspace</span>{% endblock %}
+{% block sidebar_navigation %}
+  <a class="{% if active == 'employer_home' %}active{% endif %}"
+     href="{% url 'employer_jobs' %}"
+     {% if active == 'employer_home' %}aria-current="page"{% endif %}>
+    {% include "skillmatch/includes/brand_icon.html" with icon="home" %}Home
+  </a>
+  <a href="{% url 'employer_jobs' %}?view=all">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}My job posts</a>
+  <a href="{% url 'candidates' %}">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}Find candidates</a>
+  <a href="{% url 'profile_edit' %}">{% include "skillmatch/includes/brand_icon.html" with icon="building" %}Company profile</a>
+  <a class="{% if active == 'saved_candidates' %}active{% endif %}"
+     href="{% url 'saved_candidates' %}"
+     {% if active == 'saved_candidates' %}aria-current="page"{% endif %}>
+    {% include "skillmatch/includes/brand_icon.html" with icon="bookmark" %}Saved candidates
+  </a>
+  <a href="{% url 'methodology' %}">{% include "skillmatch/includes/brand_icon.html" with icon="lightbulb" %}How it works</a>
+  {% if user.is_staff %}<a href="{% url 'admin:index' %}">Administration →</a>{% endif %}
+{% endblock %}

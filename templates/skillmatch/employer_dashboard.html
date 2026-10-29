@@ -1,0 +1,110 @@
+{% extends "skillmatch/employer_base.html" %}
+{% load static %}
+{% block title %}Hiring home · SkillMatch{% endblock %}
+{% block content %}
+  <section class="sd-hero ed-hero" aria-labelledby="employer-heading">
+    <div class="sd-welcome ed-welcome">
+      <span class="sd-eyebrow">WELCOME BACK,</span>
+      <h1 id="employer-heading">{{ user.employer_profile.company_name }}.</h1>
+      <p>
+        Let’s keep building a stronger Kenya. Find the right talent,
+        <br class="sd-desktop-break">
+        grow your team, and create real opportunities.
+      </p>
+    </div>
+    <div class="sd-skyline ed-skyline" aria-hidden="true">
+      <img src="{% static 'images/landing-nairobi.jpg' %}"
+           width="1024"
+           height="410"
+           alt="">
+      <div class="sd-skyline-leaves">{% include "skillmatch/includes/dashboard_botanical.html" %}</div>
+      <span>Great people
+        <br>
+        build greater
+        <br>
+      Kenya.</span>
+    </div>
+    <a class="sd-button ed-post-job"
+       href="{% url 'job_create' %}"><span aria-hidden="true">＋</span>Post a job</a>
+  </section>
+  <section class="ed-metrics" aria-label="Your hiring overview">
+    <a class="sd-summary ed-metric"
+       href="{% url 'employer_jobs' %}?view=all">
+      <span class="sd-icon-circle">
+        {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}
+      </span>
+      <div>
+        <h2>Active job posts</h2>
+        <strong class="sd-summary-value">{{ active_job_count }}</strong>
+        <p>Open opportunities</p>
+      </div>
+    </a>
+    <a class="sd-summary ed-metric"
+       href="{% if match_job %}{% url 'job_candidates' match_job.pk %}{% else %}{% url 'candidates' %}{% endif %}">
+      <span class="sd-icon-circle">
+        {% include "skillmatch/includes/brand_icon.html" with icon="people" %}
+      </span>
+      <div><h2>Candidate matches</h2><strong class="sd-summary-value">{{ candidate_match_count }}</strong><p>{% if match_job %}For your latest active job{% else %}Post a job to get matches{% endif %}</p></div>
+    </a>
+    <a class="sd-summary ed-metric" href="#top-candidates">
+      <span class="sd-icon-circle">
+        {% include "skillmatch/includes/brand_icon.html" with icon="star" %}
+      </span>
+      <div><h2>Best match</h2><strong class="sd-summary-value">{% if best_match %}{{ best_match.similarity_percent }}%{% else %}—{% endif %}</strong><p>{% if best_match %}{{ best_match.item.display_name }}{% else %}Your next connection awaits{% endif %}</p></div>
+    </a>
+    <a class="sd-summary ed-metric" href="{% url 'saved_candidates' %}">
+      <span class="sd-icon-circle">
+        {% include "skillmatch/includes/brand_icon.html" with icon="bookmark" %}
+      </span>
+      <div>
+        <h2>Saved candidates</h2>
+        <strong class="sd-summary-value">{{ saved_candidate_count }}</strong>
+        <p>Profiles to revisit</p>
+      </div>
+    </a>
+  </section>
+  <div class="ed-panels">
+    <section class="ed-panel" aria-labelledby="recent-jobs-heading">
+      <div class="ed-panel-heading"><h2 id="recent-jobs-heading">Recent job posts</h2><a href="{% url 'employer_jobs' %}?view=all">View all job posts <span aria-hidden="true">→</span></a></div>
+      {% if recent_jobs %}
+        <div class="ed-job-table">
+          <div class="ed-job-head" aria-hidden="true"><span>Job title</span><span>Matches</span><span>Status</span><span>Posted</span><span></span></div>
+          {% for row in recent_jobs %}
+            {% with job=row.job %}
+              <article class="ed-job-row">
+                <div class="ed-job-title"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}</span><div><h3><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3><p>{{ job.get_certification_level_display }} · {{ job.get_experience_level_display }}</p></div></div>
+                <a class="ed-job-count"
+                   href="{% url 'job_candidates' job.pk %}"
+                   aria-label="View {{ row.match_count }} candidate matches for {{ job.title }}">{{ row.match_count }}<span class="ed-mobile-label"> matches</span></a>
+                <span class="ed-status{% if not job.is_active %} is-closed{% endif %}">{% if job.is_active %}Active{% else %}Closed{% endif %}</span>
+                <time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:'d M Y' }}</time>
+                <details class="ed-job-menu">
+                  <summary aria-label="Actions for {{ job.title }}">•••</summary>
+                  <div>
+                    <a href="{% url 'job_candidates' job.pk %}">View matches</a><a href="{% url 'job_edit' job.pk %}">Edit job</a><a href="{% url 'job_detail' job.pk %}">View job</a>
+                    <form method="post" action="{% url 'job_toggle' job.pk %}">{% csrf_token %}<button type="submit">{% if job.is_active %}Close job{% else %}Reopen job{% endif %}</button></form>
+                    <a href="{% url 'job_delete' job.pk %}">Delete job</a>
+                  </div>
+                </details>
+              </article>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="ed-empty"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}</span><h3>Your first great match starts with a job.</h3><p>Tell candidates what you’re looking for.</p><a class="sd-button" href="{% url 'job_create' %}">Post your first job →</a></div>
+      {% endif %}
+    </section>
+    <section class="ed-panel"
+             id="top-candidates"
+             aria-labelledby="top-candidates-heading">
+      <div class="ed-panel-heading"><h2 id="top-candidates-heading">Top candidate matches</h2><a href="{% if match_job %}{% url 'job_candidates' match_job.pk %}{% else %}{% url 'candidates' %}{% endif %}">View all matches <span aria-hidden="true">→</span></a></div>
+      {% if match_job %}<p class="ed-match-context">For <a href="{% url 'job_candidates' match_job.pk %}">{{ match_job.title }}</a> · Latest active job</p>{% endif %}
+      {% for match in top_matches %}
+        {% include "skillmatch/includes/employer_candidate_row.html" with candidate=match.item job=match_job %}
+      {% empty %}
+        <div class="ed-empty"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}</span><h3>{% if match_job %}Your next match is still ahead.{% else %}Start with an opportunity.{% endif %}</h3><p>{% if match_job %}Complete candidate profiles will appear here as they become available.{% else %}Post an active job to see its ranked candidate matches.{% endif %}</p><a class="ed-text-link" href="{% url 'candidates' %}">Find candidates →</a></div>
+      {% endfor %}
+      {% if top_matches %}<p class="ed-results-note">Ranked by weighted relevance. Percentages show text similarity; levels are self-reported.</p>{% endif %}
+    </section>
+  </div>
+{% endblock %}

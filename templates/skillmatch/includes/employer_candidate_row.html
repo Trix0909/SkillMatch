@@ -1,0 +1,29 @@
+<article class="ed-candidate" id="candidate-{{ candidate.pk }}">
+  <span class="avatar ed-candidate-avatar"
+        aria-hidden="true">{{ candidate.display_name|first|upper }}</span>
+  <div class="ed-candidate-info">
+    <h3><a href="{% url 'profile_detail' candidate.pk %}">{{ candidate.display_name }}</a></h3>
+    <p class="ed-candidate-bio">{{ candidate.bio|truncatechars:90 }}</p>
+    <p class="ed-candidate-levels">{{ candidate.get_experience_level_display }} experience · {{ candidate.get_certification_level_display }} certification</p>
+    <ul class="sd-skills" aria-label="Candidate skills">
+      {% for skill in candidate.skills.all|slice:':3' %}<li>{{ skill.name }}</li>{% endfor %}
+    </ul>
+    {% if saved %}
+      <p class="ed-saved-context">Saved {{ saved.created_at|date:'d M Y' }}{% if saved.job %} · Saved from: <a href="{% url 'job_candidates' saved.job.pk %}">{{ saved.job.title }}</a>{% endif %}</p>
+    {% endif %}
+  </div>
+  <div class="ed-candidate-actions">
+    {% include "skillmatch/includes/save_candidate_button.html" %}
+    {% if match %}
+      <div class="ed-match">
+        <span>{{ match.similarity_percent }}% match</span>
+        <meter min="0"
+               max="100"
+               value="{{ match.similarity_percent }}"
+               aria-label="Profile text match">{{ match.similarity_percent }}%</meter>
+      </div>
+    {% endif %}
+    <a class="ed-profile-link"
+       href="{% url 'profile_detail' candidate.pk %}">View profile</a>
+  </div>
+</article>

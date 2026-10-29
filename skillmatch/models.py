@@ -232,3 +232,44 @@ class JobPost(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class SavedJob(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_jobs"
+    )
+    job = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="saved_by")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        constraints = [
+            models.UniqueConstraint(fields=["user", "job"], name="unique_user_saved_job")
+        ]
+
+    def __str__(self):
+        return f"{self.user} — {self.job}"
+
+
+class SavedCandidate(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_candidates"
+    )
+    candidate = models.ForeignKey(
+        JobSeekerProfile, on_delete=models.CASCADE, related_name="saved_by"
+    )
+    job = models.ForeignKey(
+        JobPost, null=True, blank=True, on_delete=models.SET_NULL, related_name="saved_candidates"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "candidate"], name="unique_user_saved_candidate"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.user} — {self.candidate}"

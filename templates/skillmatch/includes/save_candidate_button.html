@@ -1,0 +1,17 @@
+<form class="sc-save-form"
+      method="post"
+      action="{% if is_saved or candidate.pk in saved_candidate_ids %}{% url 'candidate_unsave' candidate.pk %}{% else %}{% url 'candidate_save' candidate.pk %}{% endif %}">
+  {% csrf_token %}
+  <input type="hidden"
+         name="next"
+         value="{{ request.get_full_path }}{% if active != 'saved_candidates' %}#candidate-{{ candidate.pk }}{% endif %}">
+  {% if job %}<input type="hidden" name="job" value="{{ job.pk }}">{% endif %}
+  <button type="submit"
+          class="sc-save-button{% if is_saved or candidate.pk in saved_candidate_ids %} is-saved{% endif %}"
+          aria-pressed="{% if is_saved or candidate.pk in saved_candidate_ids %}true{% else %}false{% endif %}"
+          aria-label="{% if is_saved or candidate.pk in saved_candidate_ids %}Remove saved candidate{% else %}Save candidate{% endif %}{% if candidate.user.is_active and candidate.is_complete %}: {{ candidate.display_name }}{% endif %}"
+          title="{% if candidate.user_id == user.pk %}Your own profile{% elif is_saved or candidate.pk in saved_candidate_ids %}Remove saved candidate{% else %}Save candidate{% endif %}"
+          {% if candidate.user_id == user.pk %}disabled{% endif %}>
+    {% include "skillmatch/includes/brand_icon.html" with icon="bookmark" %}
+  </button>
+</form>

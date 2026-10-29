@@ -1,9 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+  {% if account_role == "employer" %}
+    <link rel="stylesheet" href="{% static 'css/candidate-bookmarks.css' %}">
+  {% endif %}
+{% endblock %}
 {% block title %}{{ profile.display_name }} · SkillMatch{% endblock %}
 {% block content %}
   <div class="breadcrumb-line">
     <a href="{% url 'home' %}">Workspace</a> / Professional profile</div>
-  <div class="panel profile-header">
+  <div class="panel profile-header" id="candidate-{{ profile.pk }}">
     <span class="avatar large">{{ profile.display_name|first|upper }}</span>
     <div>
       <span class="eyebrow">PROFESSIONAL PROFILE</span>
@@ -16,6 +22,8 @@
     {% if user.id == profile.user_id %}
       <a class="btn btn-outline-secondary ms-auto"
          href="{% url 'profile_edit' %}">Edit profile ↗</a>
+    {% elif account_role == "employer" and profile.is_complete %}
+      {% include "skillmatch/includes/save_candidate_button.html" with candidate=profile is_saved=candidate_is_saved %}
     {% endif %}
   </div>
   {% if not profile.is_complete %}

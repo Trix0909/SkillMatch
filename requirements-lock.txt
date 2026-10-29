@@ -13,6 +13,7 @@ numpy==2.5.3
 oauthlib==4.0.0
 pycparser==3.12
 PyJWT==2.15.1
+python-dotenv==1.2.4
 requests==2.34.2
 scikit-learn==1.7.2
 scipy==1.18.1
