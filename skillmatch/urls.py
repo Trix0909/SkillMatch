@@ -36,6 +36,9 @@ urlpatterns = [
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("profiles/<int:pk>/", views.profile_detail, name="profile_detail"),
     path("recommendations/", views.recommendations, name="recommendations"),
+    path("saved-jobs/", views.saved_jobs, name="saved_jobs"),
+    path("jobs/<int:pk>/save/", views.job_save, name="job_save"),
+    path("jobs/<int:pk>/unsave/", views.job_unsave, name="job_unsave"),
     path("jobs/", views.jobs, name="jobs"),
     path("jobs/<int:pk>/", views.job_detail, name="job_detail"),
     path("employer/jobs/", views.employer_jobs, name="employer_jobs"),
@@ -45,6 +48,9 @@ urlpatterns = [
     path("employer/jobs/<int:pk>/delete/", views.job_delete, name="job_delete"),
     path("employer/jobs/<int:pk>/candidates/", views.candidates, name="job_candidates"),
     path("employer/candidates/", views.candidates, name="candidates"),
+    path("employer/saved-candidates/", views.saved_candidates, name="saved_candidates"),
+    path("employer/candidates/<int:pk>/save/", views.candidate_save, name="candidate_save"),
+    path("employer/candidates/<int:pk>/unsave/", views.candidate_unsave, name="candidate_unsave"),
     path("how-matching-works/", views.methodology, name="methodology"),
 ]
 

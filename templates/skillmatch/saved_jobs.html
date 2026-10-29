@@ -1,0 +1,55 @@
+{% extends "skillmatch/recommendations.html" %}
+{% block title %}Saved jobs · SkillMatch{% endblock %}
+{% block content %}
+  <section class="sd-saved-page" aria-labelledby="saved-heading">
+    <div class="sd-section-heading">
+      <div>
+        <h1 id="saved-heading">Saved jobs</h1>
+        <p>Your saved opportunities, ready when you are. {{ page_obj.paginator.count }} saved.</p>
+      </div>
+      <a href="{% url 'recommendations' %}">My matches <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="sd-results">
+      {% for saved in page_obj %}
+        {% with job=saved.job %}
+          <article class="sd-job sd-saved-job">
+            <div class="sd-company-icon"
+                 aria-hidden="true">{{ job.employer.company_name|first|upper }}</div>
+            <div class="sd-job-main">
+              <p class="sd-company">{{ job.employer.company_name }}</p>
+              <h3>{% if job.is_active and job.employer.user.is_active %}<a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a>{% else %}{{ job.title }}{% endif %}</h3>
+              <div class="sd-job-meta">
+                <span>{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}{{ job.get_certification_level_display }} certification</span>
+                <span>{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}{{ job.get_experience_level_display }} experience</span>
+              </div>
+              <ul class="sd-skills" aria-label="Required skills">
+                {% for skill in job.required_skills|slice:':6' %}<li>{{ skill }}</li>{% endfor %}
+              </ul>
+              <p class="sd-saved-date">Saved {{ saved.created_at|date:'d M Y' }}</p>
+            </div>
+            <div class="sd-saved-actions">
+              {% include "skillmatch/includes/save_job_button.html" with job=job is_saved=True %}
+              {% if job.is_active and job.employer.user.is_active %}
+                <a class="sd-button"
+                   href="{% url 'job_detail' job.pk %}">View opportunity <span aria-hidden="true">→</span></a>
+              {% else %}
+                <span class="sd-saved-unavailable">No longer available</span>
+              {% endif %}
+            </div>
+          </article>
+        {% endwith %}
+      {% empty %}
+        <div class="sd-empty">
+          <span class="sd-icon-circle">
+            {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}
+          </span>
+          <h2>No saved jobs yet</h2>
+          <p>Use the bookmark on a recommended opportunity to keep it here for later.</p>
+          <a class="sd-button"
+             href="{% url 'recommendations' %}">Explore my matches <span aria-hidden="true">→</span></a>
+        </div>
+      {% endfor %}
+    </div>
+    {% include "partials/pagination.html" %}
+  </section>
+{% endblock %}

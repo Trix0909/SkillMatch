@@ -1,0 +1,20 @@
+{% extends "skillmatch/employer_base.html" %}
+{% block title %}Saved candidates · SkillMatch{% endblock %}
+{% block content %}
+  <section class="sd-saved-page ed-saved-page"
+           aria-labelledby="saved-candidates-heading">
+    <div class="sd-section-heading"><div><h1 id="saved-candidates-heading">Saved candidates</h1><p>Keep track of strong matches you may want to revisit.</p></div><a href="{% url 'candidates' %}">Find candidates →</a></div>
+    <div class="ed-saved-list">
+      {% for saved in page_obj %}
+        {% if saved.candidate.user.is_active and saved.candidate.is_complete %}
+          {% include "skillmatch/includes/employer_candidate_row.html" with candidate=saved.candidate is_saved=True %}
+        {% else %}
+          <article class="ed-candidate ed-unavailable"><div><h2>Candidate unavailable</h2><p>This profile is no longer available to view.</p></div>{% include "skillmatch/includes/save_candidate_button.html" with candidate=saved.candidate is_saved=True %}</article>
+        {% endif %}
+      {% empty %}
+        <div class="sd-empty"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="bookmark" %}</span><h2>No saved candidates yet</h2><p>Save promising candidates from your match results and they’ll appear here.</p><a class="sd-button" href="{% url 'candidates' %}">Find candidates →</a></div>
+      {% endfor %}
+    </div>
+    {% include "partials/pagination.html" %}
+  </section>
+{% endblock %}

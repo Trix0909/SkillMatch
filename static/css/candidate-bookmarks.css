@@ -1,0 +1,54 @@
+.sc-save-form {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.sc-save-button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #dfe7df;
+  border-radius: 9px;
+  color: #0f6b5b;
+  background: #fffefa;
+  cursor: pointer;
+}
+
+.sc-save-button .sm-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.sc-save-button:hover,
+.sc-save-button.is-saved {
+  background: #eaf3ec;
+  border-color: #a7c1b3;
+}
+
+.sc-save-button.is-saved .sm-icon {
+  fill: currentColor;
+}
+
+.sc-save-button:focus-visible {
+  outline: 2px solid #0f6b5b;
+  outline-offset: 3px;
+}
+
+.sc-save-button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.profile-header>.sc-save-form {
+  margin-left: auto;
+}
+
+@media (max-width: 767px) {
+  .sc-save-button {
+    width: 40px;
+    height: 40px;
+  }
+}
