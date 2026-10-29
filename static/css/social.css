@@ -1,0 +1,56 @@
+.sm-social-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.25rem 0;
+  color: #627178;
+  font-size: 0.875rem;
+}
+
+.sm-social-divider::before,
+.sm-social-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #deded5;
+}
+
+.sm-social-buttons {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.sm-social-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d8ddd6;
+  border-radius: 12px;
+  background: #fffdf8;
+  color: #0b2d3b;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sm-social-button:hover {
+  background: #eff3ed;
+}
+
+.sm-social-button:focus-visible {
+  outline: 2px solid #0f6b5b;
+  outline-offset: 3px;
+}
+
+.sm-connection-row {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #e1e5e8;
+}
+
+.sm-connection-row h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}

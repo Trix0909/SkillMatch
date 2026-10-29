@@ -19,18 +19,33 @@
           <p>Available recovery codes: {{ remaining_codes }} of {{ total_codes }}</p>
           <p>Use a saved recovery code if you lose access to your authenticator app. Each code works once. Existing codes cannot be viewed again.</p>
           <p>If you no longer have your authenticator, you can keep using unused recovery codes and generate a replacement set after confirming your password. Replacing the authenticator itself is not available yet.</p>
-          <a class="btn btn-primary"
-             href="{% url 'mfa_recovery_generate' %}">Generate new recovery codes</a>
+          {% if user.has_usable_password %}
+            <a class="btn btn-primary"
+               href="{% url 'mfa_recovery_generate' %}">Generate new recovery codes</a>
+          {% else %}
+            <p>To generate a replacement set, <a href="{% url 'first_password' %}">set a SkillMatch password</a> after confirming your connected provider. Your saved recovery codes already work for sign-in.</p>
+          {% endif %}
         {% else %}
           <p>2FA is optional for job seekers and employers. You can continue using all your usual features without enabling it.</p>
-          <p>When enabled, you’ll need your password and authenticator app each time you sign in. After setup, save the one-time recovery codes in case you lose access to your app.</p>
-          <form method="post">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            {% include "partials/field.html" with field=form.password %}
-            <button class="btn btn-primary" type="submit">Enable Two-Factor Authentication</button>
-          </form>
+          <p>When enabled, you’ll need your password or connected provider, followed by your authenticator app each time you sign in. After setup, save the one-time recovery codes in case you lose access to your app.</p>
+          {% if user.has_usable_password %}
+            <form method="post">
+              {% csrf_token %}
+              {{ form.non_field_errors }}
+              {% include "partials/field.html" with field=form.password %}
+              <button class="btn btn-primary"
+                      type="submit">Enable Two-Factor Authentication</button>
+            </form>
+          {% else %}
+            <p>Confirm your identity from Connected accounts before starting setup.</p>
+            <form method="post" action="{% url 'social_enable_mfa' %}">
+              {% csrf_token %}
+              <button class="btn btn-primary"
+                      type="submit">Enable Two-Factor Authentication</button>
+            </form>
+          {% endif %}
         {% endif %}
+        <p class="mt-4"><a href="{% url 'social_connections' %}">Connected accounts →</a></p>
         <p class="mt-4 mb-0"><a href="{% url 'home' %}">Back to your workspace →</a></p>
       </section>
     </div>
