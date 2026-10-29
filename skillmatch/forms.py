@@ -50,14 +50,35 @@ class StyledForm:
                     field.widget.attrs["rows"] = 4
 
 
-class RegistrationForm(StyledForm, UserCreationForm):
-    first_name = forms.CharField(max_length=150, label="First name")
-    last_name = forms.CharField(max_length=150, label="Last name")
-    email = forms.EmailField()
+class RoleSetupForm(forms.Form):
     role = forms.ChoiceField(
         choices=[("seeker", "I’m looking for work"), ("employer", "I’m hiring")]
     )
     company_name = forms.CharField(max_length=150, required=False, label="Company name (employers)")
+
+    def clean(self):
+        data = super().clean()
+        self.validate_role(data)
+        return data
+
+    def validate_role(self, data):
+        if data.get("role") == "employer" and not data.get("company_name", "").strip():
+            self.add_error("company_name", "Enter your company name.")
+
+    def create_profile(self, user):
+        Account.objects.create(user=user, active_role=self.cleaned_data["role"])
+        if self.cleaned_data["role"] == "seeker":
+            JobSeekerProfile.objects.create(user=user)
+        else:
+            EmployerProfile.objects.create(
+                user=user, company_name=self.cleaned_data["company_name"]
+            )
+
+
+class RegistrationForm(StyledForm, UserCreationForm, RoleSetupForm):
+    first_name = forms.CharField(max_length=150, label="First name")
+    last_name = forms.CharField(max_length=150, label="Last name")
+    email = forms.EmailField()
 
     class Meta(UserCreationForm.Meta):
         fields = [
@@ -83,20 +104,13 @@ class RegistrationForm(StyledForm, UserCreationForm):
 
     def clean(self):
         data = super().clean()
-        if data.get("role") == "employer" and not data.get("company_name", "").strip():
-            self.add_error("company_name", "Enter your company name.")
+        self.validate_role(data)
         return data
 
     @transaction.atomic
     def save(self, commit=True):
         user = super().save(commit=True)
-        Account.objects.create(user=user, active_role=self.cleaned_data["role"])
-        if self.cleaned_data["role"] == "seeker":
-            JobSeekerProfile.objects.create(user=user)
-        else:
-            EmployerProfile.objects.create(
-                user=user, company_name=self.cleaned_data["company_name"]
-            )
+        self.create_profile(user)
         return user
 
 

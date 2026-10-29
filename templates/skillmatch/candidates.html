@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/candidate-bookmarks.css' %}">
+{% endblock %}
 {% block title %}Candidate matches · SkillMatch{% endblock %}
 {% block content %}
   <div class="page-heading">
@@ -43,12 +47,13 @@
       <span>Sorted by weighted relevance</span>
     </div>
     {% for match in page_obj %}
-      <article class="panel result-card">
+      <article class="panel result-card" id="candidate-{{ match.item.pk }}">
         <div class="result-main">
           <div class="result-meta">
             <span class="avatar small">{{ match.item.display_name|first|upper }}</span>
             <span>PROFESSIONAL PROFILE</span>
             <span class="result-rank">#{{ forloop.counter|add:page_obj.start_index|add:'-1' }}</span>
+            {% include "skillmatch/includes/save_candidate_button.html" with candidate=match.item %}
           </div>
           <h3>
             <a href="{% url 'profile_detail' match.item.pk %}">{{ match.item.display_name }}</a>

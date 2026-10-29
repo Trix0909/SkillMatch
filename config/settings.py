@@ -3,8 +3,12 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Hosting configuration takes precedence; production never reads the local file.
+if os.environ.get("DJANGO_DEBUG", "1") == "1":
+    load_dotenv(BASE_DIR / ".env", override=False, encoding="utf-8-sig")
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
@@ -28,6 +32,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_otp",
     "django_otp.plugins.otp_totp",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.github",
     "skillmatch.apps.SkillmatchConfig",
 ]
 MIDDLEWARE = [
@@ -39,6 +48,7 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
     "skillmatch.mfa.MFAEnforcementMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 ROOT_URLCONF = "config.urls"
@@ -53,6 +63,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "skillmatch.context.navigation",
+                "skillmatch.social.provider_buttons",
             ]
         },
     }
@@ -85,6 +96,34 @@ LOGOUT_REDIRECT_URL = "landing"
 OTP_TOTP_ISSUER = "SkillMatch"
 OTP_TOTP_THROTTLE_FACTOR = 1
 MFA_PENDING_SECONDS = 300
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+ACCOUNT_ADAPTER = "skillmatch.social.AccountAdapter"
+SOCIALACCOUNT_ADAPTER = "skillmatch.social.SocialAdapter"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_UNIQUE_EMAIL = False
+ACCOUNT_EMAIL_NOTIFICATIONS = False
+SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
+SOCIALACCOUNT_STORE_TOKENS = False
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_QUERY_EMAIL = True
+SSO_RECENT_AUTH_SECONDS = 300
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {"SCOPE": ["openid", "email", "profile"], "OAUTH_PKCE_ENABLED": True},
+    "github": {"SCOPE": ["read:user", "user:email"], "OAUTH_PKCE_ENABLED": True},
+}
+for provider_id, provider_settings in SOCIALACCOUNT_PROVIDERS.items():
+    client_id = os.environ.get(f"{provider_id.upper()}_CLIENT_ID", "").strip()
+    client_secret = os.environ.get(f"{provider_id.upper()}_CLIENT_SECRET", "").strip()
+    provider_settings["APPS"] = (
+        [{"client_id": client_id, "secret": client_secret, "key": ""}]
+        if client_id and client_secret
+        else []
+    )
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"

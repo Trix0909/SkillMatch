@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static %}
+{% block body_class %}seeker-dashboard{% endblock %}
+{% block main_class %}sd-content{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet"
+        href="{% static 'css/seeker-dashboard.css' %}?v=shared-dashboard-2">
+  <script src="{% static 'js/seeker-dashboard.js' %}" defer></script>
+{% endblock %}
+{% block sidebar_brand %}
+  <a class="sd-brand" href="{% url 'home' %}" aria-label="SkillMatch home">
+    <img src="{% static 'images/brand/match-point.svg' %}"
+         width="32"
+         height="39"
+         alt="">
+    <span>SkillMatch</span>
+  </a>
+{% endblock %}
+{% block workspace_caption %}<span class="visually-hidden">Job seeker workspace</span>{% endblock %}
+{% block sidebar_navigation %}
+  <a class="{% if active == 'recommendations' %}active{% endif %}"
+     href="{% url 'home' %}"
+     {% if active == 'recommendations' %}aria-current="page"{% endif %}>
+    <svg class="sm-icon"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="1.6"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+      <path d="m3 10 9-8 9 8v11h-6v-8H9v8H3z" />
+    </svg>Home
+  </a>
+  <a href="{% url 'recommendations' %}#recommended">
+    {% include "skillmatch/includes/brand_icon.html" with icon="people" %}My matches
+  </a>
+  <a href="{% url 'jobs' %}">
+    {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}Browse jobs
+  </a>
+  <a class="{% if active == 'profile' %}active{% endif %}"
+     href="{% url 'profile_edit' %}"
+     {% if active == 'profile' %}aria-current="page"{% endif %}>
+    {% include "skillmatch/includes/brand_icon.html" with icon="document" %}My profile
+  </a>
+  <a class="{% if active == 'saved_jobs' %}active{% endif %}"
+     href="{% url 'saved_jobs' %}"
+     {% if active == 'saved_jobs' %}aria-current="page"{% endif %}>
+    <svg class="sm-icon"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="1.6"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+      <path d="M6 3h12v19l-6-5-6 5z" />
+    </svg>Saved jobs
+  </a>
+  <a href="{% url 'methodology' %}">
+    <svg class="sm-icon"
+         width="24"
+         height="24"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="1.6"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+      <path d="M8 17c0-4-3-4-3-9a7 7 0 0 1 14 0c0 5-3 5-3 9M8 17h8v3H8zM10 23h4" />
+    </svg>How matching works
+  </a>
+  {% if user.is_staff %}<a href="{% url 'admin:index' %}">Administration →</a>{% endif %}
+{% endblock %}
+{% block sidebar_footer %}
+  <div class="sd-sidebar-footer">
+    {% include "skillmatch/includes/dashboard_botanical.html" %}
+    <p>
+      Real people.
+      <br>
+      Real skills.
+      <br>
+      A stronger Kenya.
+    </p>
+  </div>
+{% endblock %}
+{% block authenticated_topbar %}
+  <header class="sd-topbar">
+    {% if account_role != "employer" %}
+      <form class="sd-search"
+            method="get"
+            action="{% url 'jobs' %}"
+            role="search">
+        <label class="visually-hidden"
+               for="dashboard-search">Search jobs by title, description or skills</label>
+        <input id="dashboard-search"
+               type="search"
+               name="q"
+               maxlength="150"
+               placeholder="Search jobs or skills…">
+        <button type="submit" aria-label="Search jobs">
+          {% include "skillmatch/includes/brand_icon.html" with icon="search" %}
+        </button>
+      </form>
+    {% endif %}
+    {# TODO: Connect when notifications exist. The employer dot is decorative, not an unread count. #}
+    <button class="sd-notifications"
+            type="button"
+            disabled
+            aria-label="Notifications (not yet available)"
+            title="Notifications are not yet available">
+      <svg width="24"
+           height="24"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="1.6"
+           stroke-linecap="round"
+           stroke-linejoin="round"
+           aria-hidden="true">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4M12 2V1" />
+      </svg>
+      {% if account_role == "employer" %}
+        <span class="sd-notification-dot" aria-hidden="true"></span>
+      {% endif %}
+    </button>
+    <details class="sd-account" data-account-menu>
+      <summary class="sd-user" aria-expanded="false" aria-controls="account-options">
+        <span class="avatar small" aria-hidden="true">{% if account_role == "employer" %}{{ user.employer_profile.company_name|first|upper }}{% else %}{{ user.first_name|first|default:user.username|first|upper }}{% endif %}</span>
+        <span class="sd-account-name">{% if account_role == "employer" %}{{ user.employer_profile.company_name }}<small>Employer account</small>{% else %}{{ user.get_full_name|default:user.username }}{% endif %}</span>
+        <svg class="sd-account-chevron"
+             width="16"
+             height="16"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.8"
+             aria-hidden="true">
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </summary>
+      <div class="sd-account-options" id="account-options">
+        <a href="{% if account_role == 'employer' %}{% url 'profile_edit' %}{% else %}{% url 'profile_detail' profile.pk %}{% endif %}">{% include "skillmatch/includes/brand_icon.html" with icon="person" %}View profile</a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}Log out</button>
+        </form>
+      </div>
+    </details>
+  </header>
+{% endblock %}

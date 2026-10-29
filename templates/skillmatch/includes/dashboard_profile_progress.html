@@ -1,0 +1,36 @@
+{# Display-only progress across the same three essentials used by profile.is_complete. #}
+{% with skills=profile.skills.all|yesno:"1,0" summary=profile.bio.strip|yesno:"1,0" portfolio=profile.portfolio.strip|yesno:"1,0" %}
+  {% with completed=skills|add:summary|add:portfolio %}
+    {% widthratio completed 3 100 as percent %}
+    <section class="sd-support-card sd-profile">
+      <h2>Your profile progress</h2>
+      <div class="sd-profile-state">
+        <div class="sd-progress-ring"
+             role="progressbar"
+             aria-label="Profile essentials completed"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="{{ percent }}"
+             aria-valuetext="{{ completed }} of 3 profile essentials added">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="sd-ring-track" cx="50" cy="50" r="42" />
+            <circle class="sd-ring-fill" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="{{ percent }} 100" {% if not completed %}visibility="hidden"{% endif %} />
+          </svg>
+          <strong>{{ percent }}%</strong>
+        </div>
+        <div>
+          <h3>{% if completed == 3 %}Ready for opportunities{% elif completed %}Almost there!{% else %}Let’s get started{% endif %}</h3>
+          <p>{% if skills == "0" %}Add your skills to help find relevant opportunities.{% elif summary == "0" %}Add a professional summary to help employers understand your strengths.{% elif portfolio == "0" %}Add your project portfolio to show employers your experience.{% else %}Your profile essentials are complete. Keep them up to date as you grow.{% endif %}</p>
+        </div>
+      </div>
+      <p class="sd-progress-caption">{{ completed }} of 3 profile essentials added</p>
+      <ul class="sd-checklist">
+        <li><span>Skills</span><strong>{% if skills == "1" %}Added{% else %}To add{% endif %}</strong></li>
+        <li><span>Professional summary</span><strong>{% if summary == "1" %}Added{% else %}To add{% endif %}</strong></li>
+        <li><span>Project portfolio</span><strong>{% if portfolio == "1" %}Added{% else %}To add{% endif %}</strong></li>
+      </ul>
+      <a class="sd-button"
+         href="{% url 'profile_edit' %}">Edit my profile <span aria-hidden="true">→</span></a>
+    </section>
+  {% endwith %}
+{% endwith %}

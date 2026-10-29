@@ -1,0 +1,185 @@
+{% load static %}
+<div class="sp-layout">
+  <div class="sp-main">
+    <header class="sp-intro">
+      <h1>Build your <em>professional profile</em></h1>
+      <p>Showcase your skills, experience and unique value. A complete profile helps you get matched with the right opportunities.</p>
+    </header>
+    <nav class="sp-steps" aria-label="Profile sections">
+      <a href="#profile-basic"
+         aria-current="step"
+         data-profile-step="profile-basic">
+        <span>1</span>Basic information
+      </a>
+      <a href="#profile-skills" data-profile-step="profile-skills">
+        <span>2</span>Skills &amp; experience
+      </a>
+      <a href="#profile-portfolio" data-profile-step="profile-portfolio">
+        <span>3</span>Portfolio &amp; links
+      </a>
+      <a href="{% url 'profile_detail' profile.pk %}"
+         title="Preview your last saved profile">
+        <span>4</span>Preview
+      </a>
+    </nav>
+    <form class="sp-form" method="post" id="seeker-profile-form">
+      {% csrf_token %}
+      {% if form.errors %}
+        <div class="sp-form-errors" role="alert">
+          <strong>Please check the highlighted fields.</strong>
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+      <section class="sp-section"
+               id="profile-basic"
+               aria-labelledby="profile-basic-heading">
+        <div class="sp-section-label">
+          <span class="sp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="person" %}</span>
+          <div>
+            <h2 id="profile-basic-heading">Basic information</h2>
+            <p>Tell us about yourself and what you do.</p>
+          </div>
+        </div>
+        <div class="sp-section-fields">
+          <div class="sp-field-pair">
+            {% include "skillmatch/includes/profile_field.html" with field=form.first_name %}
+            {% include "skillmatch/includes/profile_field.html" with field=form.last_name %}
+          </div>
+          {% include "skillmatch/includes/profile_field.html" with field=form.bio %}
+        </div>
+      </section>
+      <section class="sp-section"
+               id="profile-skills"
+               aria-labelledby="profile-skills-heading">
+        <div class="sp-section-label">
+          <span class="sp-icon">
+            {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}
+          </span>
+          <div>
+            <h2 id="profile-skills-heading">Skills &amp; experience</h2>
+            <p>Add your key skills, certifications and experience level.</p>
+          </div>
+        </div>
+        <div class="sp-section-fields">
+          {% include "partials/skills.html" %}
+          <div class="sp-field-pair">
+            {% include "skillmatch/includes/profile_field.html" with field=form.certification_level %}
+            {% include "skillmatch/includes/profile_field.html" with field=form.experience_level %}
+          </div>
+        </div>
+      </section>
+      <section class="sp-section"
+               id="profile-portfolio"
+               aria-labelledby="profile-portfolio-heading">
+        <div class="sp-section-label">
+          <span class="sp-icon">
+            {% include "skillmatch/includes/brand_icon.html" with icon="document" %}
+          </span>
+          <div>
+            <h2 id="profile-portfolio-heading">Project portfolio</h2>
+            <p>Tell us about a project you’re proud of. Help employers understand your practical experience.</p>
+          </div>
+        </div>
+        <div class="sp-section-fields">
+          {% include "skillmatch/includes/profile_field.html" with field=form.portfolio %}
+        </div>
+      </section>
+      <section class="sp-section"
+               id="profile-links"
+               aria-labelledby="profile-links-heading">
+        <div class="sp-section-label">
+          <span class="sp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="link" %}</span>
+          <div>
+            <h2 id="profile-links-heading">Links <span>(optional)</span></h2>
+            <p>Add links to your work, profiles or portfolio.</p>
+          </div>
+        </div>
+        <div class="sp-section-fields">
+          {% include "skillmatch/includes/profile_field.html" with field=form.links %}
+        </div>
+      </section>
+      <div class="sp-actions">
+        <div>
+          <a href="{% url 'profile_detail' profile.pk %}">Preview saved profile ↗</a>
+          <p>Save your changes before previewing.</p>
+        </div>
+        <div class="sp-action-buttons">
+          <a href="{% url 'home' %}" class="sp-cancel">Cancel</a>
+          <button type="submit" class="sd-button">
+            Save profile {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <aside class="sp-support" aria-labelledby="profile-tips-heading">
+    <div class="sp-tips">
+      <header class="sp-tips-heading">
+        <span class="sp-icon">
+          {% include "skillmatch/includes/brand_icon.html" with icon="lightbulb" %}
+        </span>
+        <div>
+          <h2 id="profile-tips-heading">Tips for a stronger profile</h2>
+          <p>A few tips to help you stand out and get better opportunities.</p>
+        </div>
+      </header>
+      <div class="sp-tip">
+        <span class="sp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="target" %}</span>
+        <div>
+          <h3>Be specific about your skills</h3>
+          <p>Use clear, relevant skills that match the type of work you’re looking for.</p>
+        </div>
+      </div>
+      <div class="sp-tip">
+        <span class="sp-icon">
+          {% include "skillmatch/includes/brand_icon.html" with icon="document" %}
+        </span>
+        <div>
+          <h3>Show real-world experience</h3>
+          <p>Include projects, achievements and the impact you made. Focus on what you built and the problems you solved.</p>
+        </div>
+      </div>
+      <div class="sp-tip">
+        <span class="sp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="star" %}</span>
+        <div>
+          <h3>Quality over repetition</h3>
+          <p>Highlight your strongest skills and most relevant experience. Repeating keywords won’t keep increasing their influence.</p>
+        </div>
+      </div>
+      <div class="sp-tip">
+        <span class="sp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="link" %}</span>
+        <div>
+          <h3>Add links to your work</h3>
+          <p>Include your GitHub, LinkedIn or portfolio links so employers can see examples of your work.</p>
+        </div>
+      </div>
+      <div class="sp-benefits">
+        <h3>Your profile helps you get matched</h3>
+        <ul>
+          <li><span aria-hidden="true">✓</span>Appear in relevant candidate searches</li>
+          <li><span aria-hidden="true">✓</span>Help employers understand your strengths</li>
+          <li><span aria-hidden="true">✓</span>Give matching more relevant information</li>
+        </ul>
+        <a href="{% url 'methodology' %}">How matching works →</a>
+      </div>
+      <div class="sp-art" aria-hidden="true">
+        <img src="{% static 'images/landing-professional.jpg' %}"
+             alt=""
+             width="1536"
+             height="1024"
+             loading="lazy">
+        {% include "skillmatch/includes/dashboard_botanical.html" %}
+        <p>
+          Skills today.
+          <br>
+          Greater tomorrow.
+        </p>
+      </div>
+    </div>
+    <div class="sp-security">
+      <h2>Account security</h2>
+      <a href="{% url 'account_security' %}">Two-factor authentication settings <span aria-hidden="true">→</span></a>
+      <a href="{% url 'social_connections' %}">Connected accounts <span aria-hidden="true">→</span></a>
+    </div>
+  </aside>
+</div>

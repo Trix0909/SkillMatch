@@ -1,77 +1,221 @@
-{% extends "base.html" %}
+{% extends "skillmatch/dashboard_base.html" %}
+{% load static %}
 {% block title %}My matches · SkillMatch{% endblock %}
 {% block content %}
-  <div class="page-heading">
-    <div>
-      <span class="eyebrow">YOUR NEXT CHAPTER</span>
-      <h1>
-        Opportunities for you<span class="blue">.</span>
-      </h1>
-      <p>Discover work that connects with your skills and experience.</p>
+  <section class="sd-hero" aria-labelledby="welcome-heading">
+    <div class="sd-welcome">
+      <span class="sd-eyebrow">WELCOME BACK</span>
+      <h1 id="welcome-heading">{{ greeting }}, <span>{{ user.first_name|default:user.username }}</span></h1>
+      <p>
+        Here are your latest matches and opportunities
+        <br class="sd-desktop-break">
+        based on your skills and experience.
+      </p>
     </div>
-    <a class="btn btn-outline-secondary" href="{% url 'profile_edit' %}">Edit my profile ↗</a>
-  </div>
-  <div class="match-banner">
-    <div>
-      <span class="eyebrow">MATCHED TO YOUR PROFILE</span>
-      <h2>Your skills are the starting point.</h2>
-      <p>Recommendations consider your skills, summary and project portfolio.</p>
-      <div class="d-flex gap-2 flex-wrap">
-        {% for skill in profile.skills.all|slice:':6' %}
-          <span class="banner-tag">{{ skill.name }}</span>
-        {% endfor %}
-      </div>
+    <div class="sd-skyline" aria-hidden="true">
+      <img src="{% static 'images/landing-nairobi.jpg' %}"
+           width="1024"
+           height="410"
+           alt="">
+      <div class="sd-skyline-leaves">{% include "skillmatch/includes/dashboard_botanical.html" %}</div>
+      <span>Real skills.
+        <br>
+      Real opportunities.</span>
     </div>
-    <span class="banner-art" aria-hidden="true">✧</span>
-  </div>
-  <div class="results-heading">
-    <h2>
-      Your job matches <span class="count">{{ page_obj.paginator.count }}</span>
-    </h2>
-    <span>Sorted by weighted relevance</span>
-  </div>
-  {% if not profile.is_complete %}
-    <div class="empty-state panel">
-      <span class="empty-icon">◎</span>
-      <h2>Let’s get to know your skills.</h2>
-      <p>Add your skills, professional summary and portfolio to start receiving job matches.</p>
-      <a class="btn btn-primary" href="{% url 'profile_edit' %}">Complete my profile →</a>
-    </div>
-  {% else %}
-    {% for match in page_obj %}
-      <article class="panel result-card">
-        <div class="result-main">
-          <div class="result-meta">
-            <span class="company-monogram">{{ match.item.employer.company_name|first|upper }}</span>
-            <span>{{ match.item.employer.company_name }}</span>
-            <span class="result-rank">#{{ forloop.counter|add:page_obj.start_index|add:'-1' }}</span>
+  </section>
+  <div class="sd-dashboard-grid">
+    <div class="sd-main">
+      <section class="sd-summaries" aria-label="Your matching overview">
+        <a class="sd-summary" href="{% url 'recommendations' %}#recommended">
+          <span class="sd-icon-circle">
+            {% include "skillmatch/includes/brand_icon.html" with icon="people" %}
+          </span>
+          <div>
+            <strong class="sd-summary-value">{{ page_obj.paginator.count }}</strong>
+            <h2>Job matches</h2>
+            <p>Based on your skills &amp; profile</p>
           </div>
-          <h3>
-            <a href="{% url 'job_detail' match.item.pk %}">{{ match.item.title }}</a>
-          </h3>
-          <p class="result-description">{{ match.item.description|truncatechars:180 }}</p>
-          <div class="skill-tags">
-            {% for skill in match.matched_skills %}
-              <span class="skill-tag matched">✓ {{ skill }}</span>
+          <svg class="sd-chevron"
+               width="16"
+               height="16"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="1.8"
+               aria-hidden="true">
+            <path d="m9 6 6 6-6 6" />
+          </svg>
+        </a>
+        {% with best=page_obj.paginator.object_list.0 %}
+          <a class="sd-summary"
+             href="{% if best %}{% url 'job_detail' best.item.pk %}{% else %}#recommended{% endif %}">
+            <span class="sd-icon-circle">
+              <svg class="sm-icon"
+                   width="24"
+                   height="24"
+                   viewBox="0 0 24 24"
+                   fill="none"
+                   stroke="currentColor"
+                   stroke-width="1.6"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   aria-hidden="true">
+                <path d="m12 2 3 6.5 7 1-5 5 1 7-6-3.5L6 21l1-6.5-5-5 7-1z" />
+              </svg>
+            </span>
+            <div>
+              <strong class="sd-summary-value">{% if best %}{{ best.similarity_percent }}%{% else %}—{% endif %}</strong>
+              <h2>Best match</h2>
+              {% if best %}<p>{{ best.item.title }}<br>at {{ best.item.employer.company_name }}</p>{% else %}<p>Your next opportunity awaits</p>{% endif %}
+            </div>
+            <svg class="sd-chevron"
+                 width="16"
+                 height="16"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="1.8"
+                 aria-hidden="true">
+              <path d="m9 6 6 6-6 6" />
+            </svg>
+          </a>
+        {% endwith %}
+      </section>
+      <section id="recommended" aria-labelledby="recommended-heading">
+        <div class="sd-section-heading">
+          <div>
+            <h2 id="recommended-heading">Recommended for you</h2>
+            <p>Opportunities that match your skills, experience and career goals.</p>
+          </div>
+          <a href="{% url 'jobs' %}">Browse jobs <span aria-hidden="true">→</span></a>
+        </div>
+        {% if not profile.is_complete %}
+          <div class="sd-empty">
+            <span class="sd-icon-circle">
+              {% include "skillmatch/includes/brand_icon.html" with icon="person" %}
+            </span>
+            <h3>Let’s get to know your skills.</h3>
+            <p>Add your skills, professional summary and portfolio to start receiving job matches.</p>
+            <a class="sd-button"
+               href="{% url 'profile_edit' %}">Complete my profile <span aria-hidden="true">→</span></a>
+          </div>
+        {% else %}
+          <div class="sd-results">
+            {% for match in page_obj %}
+              <article class="sd-job" id="job-{{ match.item.pk }}">
+                <div class="sd-company-icon"
+                     aria-hidden="true">{{ match.item.employer.company_name|first|upper }}</div>
+                <div class="sd-job-main">
+                  <p class="sd-company">{{ match.item.employer.company_name }}</p>
+                  <h3><a href="{% url 'job_detail' match.item.pk %}">{{ match.item.title }}</a></h3>
+                  <div class="sd-job-meta">
+                    <span>{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}{{ match.item.get_certification_level_display }} certification</span>
+                    <span>{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}{{ match.item.get_experience_level_display }} experience</span>
+                  </div>
+                  <ul class="sd-skills" aria-label="Required skills">
+                    {% for skill in match.item.required_skills|slice:':6' %}<li>{{ skill }}</li>{% endfor %}
+                  </ul>
+                </div>
+                <div class="sd-match">
+                  <span class="sd-match-badge">{{ match.similarity_percent }}% Match</span>
+                  {% if match.item.pk in saved_job_ids %}
+                    {% include "skillmatch/includes/save_job_button.html" with job=match.item is_saved=True %}
+                  {% else %}
+                    {% include "skillmatch/includes/save_job_button.html" with job=match.item is_saved=False %}
+                  {% endif %}
+                  <div class="sd-factors">
+                    {# These bars show existing weighting factors, not invented fit percentages. #}
+                    <div class="sd-factor">
+                      <span>{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}Certification match</span>
+                      <meter min="0"
+                             max="2"
+                             value="{{ match.cert }}"
+                             aria-label="Certification weighting"
+                             title="Certification weighting, out of 2×">{{ match.cert|floatformat:1 }}×</meter>
+                      <strong>{{ match.cert|floatformat:1 }}×</strong>
+                    </div>
+                    <div class="sd-factor">
+                      <span>{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}Experience match</span>
+                      <meter min="0"
+                             max="1.8"
+                             value="{{ match.experience }}"
+                             aria-label="Experience weighting"
+                             title="Experience weighting, out of 1.8×">{{ match.experience|floatformat:1 }}×</meter>
+                      <strong>{{ match.experience|floatformat:1 }}×</strong>
+                    </div>
+                  </div>
+                  <a class="sd-button sd-button-small"
+                     href="{% url 'job_detail' match.item.pk %}">View opportunity <span aria-hidden="true">→</span></a>
+                  <details class="sd-explanation">
+                    <summary>Why this match?</summary>
+                    <div>
+                      <p>The Match percentage is the existing text-similarity result: your skills, summary and portfolio are compared with this job’s text. Certification and experience are weighting factors, not percentages of fit.</p>
+                      <dl>
+                        <dt>Text similarity</dt>
+                        <dd>
+                          {{ match.similarity_percent }}%
+                        </dd>
+                        <dt>Certification multiplier</dt>
+                        <dd>
+                          × {{ match.cert|floatformat:1 }}
+                        </dd>
+                        <dt>Experience multiplier</dt>
+                        <dd>
+                          × {{ match.experience|floatformat:1 }}
+                        </dd>
+                        <dt>Weighted score</dt>
+                        <dd>
+                          {{ match.score|floatformat:3 }}
+                        </dd>
+                      </dl>
+                      <p><strong>Matching skills:</strong> {% for skill in match.matched_skills %}{{ skill }}{% if not forloop.last %}, {% endif %}{% empty %}No exact skill tags overlap. Your summary or portfolio may still match.{% endfor %}</p>
+                      <small>Weighted scores range from 0 to 3.6. This is a relevance score, not a probability or verified qualification.</small>
+                    </div>
+                  </details>
+                </div>
+              </article>
             {% empty %}
-              <span class="muted small">No exact skill tags overlap. Text in your summary or portfolio may still match.</span>
+              <div class="sd-empty"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="search" %}</span><h3>Your next match is still ahead.</h3><p>There are no open jobs yet. Recommendations will appear when employers post opportunities.</p></div>
             {% endfor %}
           </div>
-          <div class="card-bottom">
-            <span>{{ match.item.get_certification_level_display }} · {{ match.item.get_experience_level_display }}</span>
-            <a href="{% url 'job_detail' match.item.pk %}">View opportunity ↗</a>
-          </div>
+          {% include "partials/pagination.html" %}
+        {% endif %}
+        <p class="sd-results-note">Sorted by weighted relevance. Rankings use text similarity and self-reported levels; a score does not guarantee suitability.</p>
+      </section>
+    </div>
+    <aside class="sd-support" aria-label="Your profile and matching guidance">
+      {% include "skillmatch/includes/dashboard_profile_progress.html" %}
+      <a class="sd-improve" href="{% url 'profile_edit' %}">
+        <span class="sd-icon-circle">
+          {% include "skillmatch/includes/brand_icon.html" with icon="shield" %}
+        </span>
+        <div>
+          <h3>Put your skills in focus</h3>
+          <p>Keep your skills, certification level and experience up to date.</p>
         </div>
-        <div class="result-score">{% include "partials/score.html" %}</div>
-      </article>
-    {% empty %}
-      <div class="empty-state panel">
-        <span class="empty-icon">✧</span>
-        <h2>Your next match is still ahead.</h2>
-        <p>There are no open jobs yet. Recommendations will appear when employers post opportunities.</p>
+        <span aria-hidden="true">›</span>
+      </a>
+      <section class="sd-support-card sd-how">
+        <h2>{% include "skillmatch/includes/brand_icon.html" with icon="target" %}Understand your matches</h2>
+        <p>Text similarity shows how closely your profile relates to a job. Certification and experience multipliers determine the final ranking.</p>
+        <a href="{% url 'methodology' %}">How matching works <span aria-hidden="true">→</span></a>
+      </section>
+      <div class="sd-brand-card">
+        <img src="{% static 'images/landing-professional.jpg' %}"
+             width="1024"
+             height="1024"
+             alt=""
+             loading="lazy">
+        <p>
+          Match with
+          <br>
+          opportunities
+          <br>
+          that move you
+          <br>
+          <em>forward.</em>
+        </p>
       </div>
-    {% endfor %}
-    {% include "partials/pagination.html" %}
-  {% endif %}
-  <p class="results-note">Rankings are based on text relevance and self-reported levels. A score does not guarantee suitability.</p>
+    </aside>
+  </div>
 {% endblock %}

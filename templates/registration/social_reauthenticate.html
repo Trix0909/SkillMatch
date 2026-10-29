@@ -1,0 +1,18 @@
+{% extends "registration/mfa_base.html" %}
+{% block title %}Confirm your identity · SkillMatch{% endblock %}
+{% block mfa_content %}
+  <h1 id="mfa-title">Confirm it’s you</h1>
+  <p class="sm-auth-intro">Confirm your identity to manage connected accounts or set your first password. This confirmation lasts five minutes.</p>
+  {% if user.has_usable_password %}
+    <form method="post">
+      {% csrf_token %}{{ form.non_field_errors }}
+      {% include "registration/field.html" with field=form.password %}
+      <button class="sm-button sm-button-primary sm-auth-submit"
+              type="submit">Confirm identity</button>
+    </form>
+  {% else %}
+    <p>Sign in again using a provider already connected to your account.</p>
+    <div class="sm-social-buttons">{% for provider in providers %}{% include "registration/provider_button.html" with purpose="reauthenticate" %}{% empty %}<p>No connected sign-in provider is currently configured. Contact the site administrator.</p>{% endfor %}</div>
+  {% endif %}
+{% endblock %}
+{% block mfa_footer %}<p class="sm-auth-switch"><a href="{% url 'social_connections' %}">Back to Connected accounts</a></p>{% endblock %}

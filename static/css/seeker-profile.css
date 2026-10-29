@@ -1,0 +1,682 @@
+/* Profile presentation only; fields and skills use the existing Django form. */
+.sp-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 24px;
+  align-items: start;
+  padding-top: 26px;
+}
+
+.sp-main,
+.sp-support,
+.sp-section-fields,
+.sp-field {
+  min-width: 0;
+}
+
+.seeker-profile .side-nav>a.active .sm-icon {
+  fill: none;
+}
+
+.sp-intro {
+  padding: 0 8px;
+}
+
+.sp-intro h1 {
+  margin: 0 0 8px;
+  font: 600 clamp(29px, 2.45vw, 41px)/1.2 'Playfair Display', Georgia, serif;
+  letter-spacing: -1px;
+}
+
+.sp-intro h1 em {
+  color: #0f6b5b;
+}
+
+.sp-intro p {
+  max-width: 700px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sp-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 23px 0 20px;
+}
+
+.sp-steps a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.sp-steps a:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: calc(50% + 26px);
+  width: calc(100% - 52px);
+  height: 1px;
+  background: #dce3dd;
+}
+
+.sp-steps a>span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e8ebe5;
+  border-radius: 50%;
+  background: #f0f1ec;
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.sp-steps a[aria-current] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.sp-steps a[aria-current]>span {
+  color: #fffefa;
+  background: linear-gradient(135deg, #0b4c49, #0b2d3b);
+  border-color: #0b2d3b;
+  box-shadow: 0 3px 9px #0b2d3b12;
+}
+
+.sp-steps a:hover {
+  color: #0f6b5b;
+}
+
+.sp-form {
+  margin: 0;
+  padding: 0 22px;
+  border: 1px solid #eeeee6;
+  border-radius: 19px;
+  background: #fffefc;
+  box-shadow: 0 6px 28px #0b2d3b04;
+}
+
+.sp-section {
+  display: grid;
+  grid-template-columns: minmax(175px, 29%) minmax(0, 1fr);
+  gap: 22px;
+  padding: 21px 0;
+  border-bottom: 1px solid #e9ece5;
+  scroll-margin-top: 20px;
+}
+
+.sp-section-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+}
+
+.sp-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #0f6b5b;
+  background: linear-gradient(140deg, #f2f6ef, #e8f0e6);
+}
+
+.sp-icon .sm-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.sp-section-label h2 {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -.2px;
+  line-height: 1.4;
+  margin: 2px 0 4px;
+}
+
+.sp-section-label h2 span {
+  font-weight: 400;
+}
+
+.sp-section-label p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.sp-section-fields {
+  display: grid;
+  gap: 14px;
+}
+
+.sp-field-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.sp-form .form-label {
+  display: block;
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.sp-form .required-mark {
+  color: #a54b41;
+  margin-left: 3px;
+}
+
+.sp-form .form-control,
+.sp-form .form-select {
+  min-height: 38px;
+  border: 1px solid #d8dfd8;
+  border-radius: 8px;
+  background-color: #fffefb;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 8px 10px;
+}
+
+.sp-form .form-select {
+  padding-right: 30px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230b2d3b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right 10px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
+.sp-form textarea.form-control {
+  height: 90px;
+  min-height: 90px;
+  resize: vertical;
+}
+
+.sp-form #id_links {
+  height: 76px;
+  min-height: 76px;
+}
+
+.sp-form .form-control:focus,
+.sp-form .form-select:focus {
+  background-color: #fffefb;
+  border-color: #4d8c75;
+  box-shadow: 0 0 0 3px #0f6b5b12;
+}
+
+.sp-form .form-control:autofill {
+  box-shadow: 0 0 0 1000px #fffefb inset;
+  -webkit-text-fill-color: #0b2d3b;
+}
+
+.sp-form .form-control::placeholder {
+  font-size: 12px;
+  color: #71818a;
+}
+
+.sp-form .form-text {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+  margin-top: 5px;
+}
+
+.sp-form .field-group {
+  margin: 0;
+}
+
+.sp-form .skill-editor>.form-text {
+  margin-bottom: 8px;
+}
+
+.sp-form .skill-entry {
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sp-form .skill-entry .btn {
+  background: #edf3eb;
+  color: #0f6b5b;
+  border: 1px solid #d8e3d7;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sp-form .skill-entry .btn:hover {
+  background: #e2eddf;
+}
+
+.sp-form .skill-tags {
+  gap: 6px;
+}
+
+.sp-form .skill-tag.editable {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eef3eb;
+  border-color: transparent;
+  border-radius: 20px;
+  color: var(--ink);
+  font-size: 11px;
+  padding: 2px 5px 2px 10px;
+}
+
+.sp-form .skill-tag button {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  padding: 0;
+  color: #49625c;
+  font-size: 17px;
+}
+
+.sp-form .skill-tag button:hover {
+  background: #dbe8d8;
+}
+
+.sp-form .field-error:empty {
+  margin: 0;
+}
+
+.sp-form .errorlist,
+.sp-form .field-error {
+  color: #a3443d;
+  font-size: 11px;
+}
+
+.sp-form .errorlist {
+  margin: 6px 0 0;
+  padding-left: 17px;
+}
+
+.sp-field-invalid .form-control,
+.sp-field-invalid .form-select {
+  border-color: #bd7a70;
+}
+
+.sp-form-errors {
+  margin: 20px 0 0;
+  padding: 12px 15px;
+  border: 1px solid #ecd8d1;
+  border-radius: 10px;
+  background: #fcf4ef;
+  color: #943e36;
+  font-size: 12px;
+}
+
+.sp-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+}
+
+.sp-actions a {
+  color: #0f6b5b;
+  font-size: 11px;
+}
+
+.sp-actions p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.sp-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.sp-action-buttons .sd-button {
+  padding: 11px 18px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.sp-action-buttons .sm-icon {
+  width: 17px;
+  height: 17px;
+}
+
+.sp-tips {
+  background: linear-gradient(150deg, #f1f5ed, #edf1e7);
+  border-radius: 18px;
+  padding: 21px 20px 0;
+  overflow: hidden;
+}
+
+.sp-tips-heading {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 19px;
+}
+
+.sp-tips h2,
+.sp-security h2 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.25px;
+  line-height: 1.4;
+  margin: 0 0 7px;
+}
+
+.sp-tips p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sp-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 14px;
+  margin-bottom: 12px;
+  background: #fffefb;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px #0b2d3b02;
+}
+
+.sp-tip .sp-icon {
+  flex-basis: 36px;
+  width: 36px;
+  height: 36px;
+}
+
+.sp-tip h3,
+.sp-benefits h3 {
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 600;
+  letter-spacing: -.1px;
+  margin: 0 0 5px;
+}
+
+.sp-tip p {
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.sp-benefits {
+  margin-top: 20px;
+  border-top: 1px solid #cfdccd;
+  padding: 14px 0 0;
+}
+
+.sp-benefits ul {
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+}
+
+.sp-benefits li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 7px 0;
+  font-size: 10px;
+  color: #435c60;
+}
+
+.sp-benefits li span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #438674;
+  color: white;
+  font-size: 10px;
+}
+
+.sp-benefits>a {
+  font-size: 11px;
+  color: #0f6b5b;
+}
+
+.sp-art {
+  position: relative;
+  height: 200px;
+  margin: 16px -20px 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.sp-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 65% 35%;
+  border-radius: 50% 0 0 0;
+}
+
+.sp-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, #edf1e7 5%, #edf1e7e0 22%, transparent 62%);
+}
+
+.sp-art .sd-botanical {
+  z-index: 1;
+  width: 165px;
+  height: 170px;
+  left: -30px;
+  opacity: .65;
+}
+
+.sp-art p {
+  position: absolute;
+  top: 25px;
+  left: 20px;
+  z-index: 2;
+  max-width: 150px;
+  color: var(--ink);
+  font: 400 24px/1.15 'Freestyle Script', 'Ink Free', 'Segoe Print', cursive;
+  transform: rotate(-9deg);
+}
+
+.sp-security {
+  padding: 18px 8px 0;
+}
+
+.sp-security h2 {
+  font-size: 12px;
+}
+
+.sp-security a {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  color: #0f6b5b;
+  font-size: 11px;
+}
+
+@media (max-width: 1399px) {
+  .sp-layout {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 20px;
+  }
+
+  .sp-form {
+    padding: 0 18px;
+  }
+
+  .sp-section {
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .sp-section-label {
+    gap: 9px;
+  }
+
+  .sp-section-label .sp-icon {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+  .sp-section-label .sm-icon {
+    width: 21px;
+    height: 21px;
+  }
+
+  .sp-tips {
+    padding: 18px 14px 0;
+  }
+
+  .sp-tip {
+    padding: 13px 11px;
+    gap: 9px;
+  }
+
+  .sp-art {
+    margin-right: -14px;
+    margin-left: -14px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .sp-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sp-section {
+    grid-template-columns: minmax(175px, 28%) minmax(0, 1fr);
+  }
+
+  .sp-tips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 20px;
+  }
+
+  .sp-tips-heading {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  .sp-tip {
+    margin: 0;
+  }
+
+  .sp-benefits {
+    grid-column: 1 / -1;
+    margin-top: 0;
+  }
+
+  .sp-art {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .sp-layout {
+    padding-top: 24px;
+  }
+
+  .sp-intro {
+    padding: 0;
+  }
+
+  .sp-intro h1 {
+    font-size: 31px;
+  }
+
+  .sp-steps {
+    display: flex;
+    overflow-x: auto;
+    padding: 4px 4px 10px;
+    margin: 18px -4px 8px;
+  }
+
+  .sp-steps a {
+    flex: 0 0 110px;
+  }
+
+  .sp-section {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+    padding: 20px 0;
+  }
+
+  .sp-section-label {
+    gap: 12px;
+  }
+
+  .sp-section-label h2 {
+    font-size: 14px;
+  }
+
+  .sp-field-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .sp-form .form-control,
+  .sp-form .form-select {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .sp-form .form-label {
+    font-size: 12px;
+  }
+
+  .sp-form .form-text {
+    font-size: 11px;
+  }
+
+  .sp-form .skill-tag.editable {
+    font-size: 12px;
+  }
+
+  .sp-form .skill-tag button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .sp-actions {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+
+  .sp-action-buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sp-tips {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sp-tip p {
+    font-size: 12px;
+  }
+}

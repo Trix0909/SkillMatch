@@ -742,4 +742,5 @@ class ActiveRoleMigrationTests(TransactionTestCase):
                 2,
             )
         finally:
-            MigrationExecutor(connection).migrate([current])
+            executor = MigrationExecutor(connection)
+            executor.migrate(executor.loader.graph.leaf_nodes())

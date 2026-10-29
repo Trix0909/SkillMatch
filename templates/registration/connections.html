@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Connected accounts · SkillMatch{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet"
+      href="{% static 'css/social.css' %}">{% endblock %}
+{% block content %}
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow">YOUR ACCOUNT</span>
+      <h1>Connected accounts</h1>
+      <p>Choose how you sign in to your SkillMatch account.</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-8">
+      <section class="panel form-panel">
+        <p>SkillMatch username: <strong>{{ user.username }}</strong></p>
+        {% if recent %}<p>Your identity was recently confirmed.</p>{% else %}<p>Confirm your identity before connecting or disconnecting an account or adding a password.</p><a href="{% url 'social_reauthenticate' %}"
+   class="btn btn-outline-primary mb-4">Confirm identity</a>{% endif %}
+        {% for provider in providers %}
+          <div class="sm-connection-row">
+            <h2>{% include "registration/provider_icon.html" %} {{ provider.name }}</h2>
+            {% for account in provider.accounts %}
+              <p>Connected{% if account.extra_data.email %} as {{ account.extra_data.email }}{% endif %}</p>
+              <form method="post" action="{% url 'social_disconnect' account.pk %}">
+                {% csrf_token %}<button class="btn btn-outline-primary"
+        type="submit">Disconnect {{ provider.name }}</button>
+              </form>
+        {% empty %}<p>Not connected</p>{% endfor %}
+        {% if not provider.configured %}<p class="text-muted">Not configured on this site yet.</p>
+        {% elif not provider.accounts %}
+          {% include "registration/provider_button.html" with purpose="connect" %}
+        {% endif %}
+      </div>
+{% endfor %}
+{% if not user.has_usable_password %}
+  <h2 class="mt-4">SkillMatch password</h2><p>You currently sign in with a connected provider.</p><a class="btn btn-primary" href="{% url 'first_password' %}">Set your first password</a>
+{% endif %}
+<p class="mt-4 mb-0"><a href="{% url 'account_security' %}">Two-factor authentication settings →</a></p>
+<p class="mt-3 mb-0"><a href="{% url 'profile_edit' %}">Back to my profile →</a></p>
+</section>
+</div>
+</div>
+{% endblock %}
