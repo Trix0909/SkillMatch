@@ -1,0 +1,10 @@
+<span class="cp-monogram" aria-hidden="true">
+  <img data-image-preview="logo"
+       {% if profile.logo %}src="{{ profile.logo.url }}"{% else %}hidden{% endif %}
+       alt=""
+       width="76"
+       height="76">
+  <span data-image-fallback="logo"
+        data-cp-initial
+        {% if profile.logo %}hidden{% endif %}>{{ preview.company_name|first|upper|default:'Y' }}</span>
+</span>

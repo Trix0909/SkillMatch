@@ -1,0 +1,207 @@
+{% load static %}
+{% with preview=form.preview %}
+  <div data-company-editor>
+    <div class="cp-layout">
+      <div class="cp-main">
+        <header class="cp-intro">
+          <h1>Shape your <em>company story</em></h1>
+          <p>Help candidates understand the business behind the opportunities. A clear and authentic company profile builds trust and attracts the right talent.</p>
+        </header>
+        <section class="cp-preview-strip" aria-labelledby="company-preview-label">
+          <h2 id="company-preview-label"><span aria-hidden="true">▸</span> Preview <span>how your company may appear to candidates</span></h2>
+          <div class="cp-summary">
+            {% include "skillmatch/includes/company_logo.html" %}
+            <div class="cp-summary-copy">
+              <h3 data-cp-text="company_name">{{ preview.company_name|default:"Your company" }}</h3>
+              <p data-cp-section="tagline"
+                 {% if not preview.tagline %}hidden{% endif %}
+                 data-cp-text="tagline">{{ preview.tagline }}</p>
+              {% include "skillmatch/includes/company_preview_prompt.html" with name="tagline" value=preview.tagline label="Add a company tagline" %}
+              <div class="cp-meta">
+                <span data-cp-section="location"
+                      {% if not preview.location %}hidden{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="pin" %}<span data-cp-text="location">{{ preview.location }}</span></span>
+                {% include "skillmatch/includes/company_preview_prompt.html" with name="location" value=preview.location label="Add location" icon="pin" %}
+                <span class="cp-pill cp-pill-warm"
+                      data-cp-section="company_size"
+                      {% if not preview.company_size %}hidden{% endif %}
+                      data-cp-text="company_size">{{ preview.company_size }}</span>
+                {% include "skillmatch/includes/company_preview_prompt.html" with name="company_size" value=preview.company_size label="Select company size" %}
+                {% if account_role == "employer" %}<span class="cp-pill cp-hiring-pill">Hiring</span>{% endif %}
+                <span class="cp-pill"
+                      data-cp-section="industry"
+                      {% if not preview.industry %}hidden{% endif %}
+                      data-cp-text="industry">{{ preview.industry }}</span>
+                {% include "skillmatch/includes/company_preview_prompt.html" with name="industry" value=preview.industry label="Select industry" %}
+              </div>
+            </div>
+            <button type="button" class="cp-live-button" data-open-preview hidden>
+              <svg class="sm-icon"
+                   viewBox="0 0 24 24"
+                   fill="none"
+                   stroke="currentColor"
+                   stroke-width="1.6"
+                   aria-hidden="true">
+                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              Live preview {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}
+            </button>
+          </div>
+        </section>
+        <form class="cp-form"
+              id="company-profile-form"
+              method="post"
+              enctype="multipart/form-data">
+          {% csrf_token %}
+          {% if form.errors %}
+            <div class="cp-form-errors" role="alert"><strong>Please check the highlighted fields.</strong>{{ form.non_field_errors }}</div>
+          {% endif %}
+          <section class="cp-section" aria-labelledby="company-images-heading">
+            <div class="cp-section-label"><span class="cp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="building" %}</span><div><h2 id="company-images-heading">Company images</h2><p>Make your company recognisable with a logo and cover image.</p></div></div>
+            <div class="cp-section-fields">
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.logo %}
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.cover_image %}
+              <p class="profile-image-notice">Preview your selection here. Save company profile to apply it. If another field has an error, select your new image again before saving.</p>
+            </div>
+          </section>
+          <section class="cp-section" aria-labelledby="company-basics-heading">
+            <div class="cp-section-label">
+              <span class="cp-icon">
+                {% include "skillmatch/includes/brand_icon.html" with icon="building" %}
+              </span>
+              <div>
+                <h2 id="company-basics-heading">Company basics</h2>
+                <p>Introduce the business behind your opportunities. This is the name candidates will see on your profile and job posts.</p>
+              </div>
+            </div>
+            <div class="cp-section-fields">
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.company_name %}
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.tagline %}
+              <div class="cp-field-grid">
+                {% include "skillmatch/includes/company_profile_field.html" with field=form.location %}
+                {% include "skillmatch/includes/company_profile_field.html" with field=form.company_size %}
+              </div>
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.industry %}
+            </div>
+          </section>
+          <section class="cp-section" aria-labelledby="company-story-heading">
+            <div class="cp-section-label">
+              <span class="cp-icon">
+                {% include "skillmatch/includes/brand_icon.html" with icon="document" %}
+              </span>
+              <div>
+                <h2 id="company-story-heading">Company story</h2>
+                <p>Help candidates understand what you do, what matters to you and what working together could look like.</p>
+              </div>
+            </div>
+            <div class="cp-section-fields">
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.summary %}
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.description %}
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.workplace_culture %}
+            </div>
+          </section>
+          <section class="cp-section" aria-labelledby="company-focus-heading">
+            <div class="cp-section-label">
+              <span class="cp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="target" %}</span>
+              <div>
+                <h2 id="company-focus-heading">Company focus</h2>
+                <p>Add up to 3 short words or phrases that describe your company’s focus or values.</p>
+              </div>
+            </div>
+            <div class="cp-section-fields" data-focus-editor>
+              {% include "skillmatch/includes/profile_field.html" with field=form.focus_areas %}
+              <div class="cp-focus-controls" hidden>
+                <div class="cp-focus-entry">
+                  <input type="text"
+                         id="company-focus-entry"
+                         maxlength="40"
+                         aria-describedby="id_focus_areas_helptext company-focus-error"
+                         placeholder="Add a focus area"><button type="button" data-add-focus>Add</button>
+                </div>
+                <div class="cp-focus-tags" data-focus-tags></div>
+                <p class="cp-focus-error"
+                   id="company-focus-error"
+                   role="status"
+                   aria-live="polite"></p>
+              </div>
+            </div>
+          </section>
+          <section class="cp-section" aria-labelledby="company-links-heading">
+            <div class="cp-section-label">
+              <span class="cp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="link" %}</span>
+              <div>
+                <h2 id="company-links-heading">Links <span>(optional)</span></h2>
+                <p>Add links to your website or company social profiles.</p>
+              </div>
+            </div>
+            <div class="cp-section-fields cp-link-grid">
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.website %}
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.linkedin %}
+              {% include "skillmatch/includes/company_profile_field.html" with field=form.twitter %}
+            </div>
+          </section>
+          <div class="cp-actions">
+            <p>Preview your changes. Save when you’re ready.</p>
+            <div><a href="{% url 'home' %}" class="cp-cancel">Cancel</a><button type="submit" class="sd-button">Save company profile {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button></div>
+          </div>
+        </form>
+      </div>
+      <aside class="cp-support" aria-labelledby="candidate-preview-heading">
+        <header class="cp-support-heading">
+          <h2 id="candidate-preview-heading">Candidate-facing preview</h2>
+          <p>A preview of how your company profile may appear to job seekers on SkillMatch.</p>
+        </header>
+        {% include "skillmatch/includes/company_preview_card.html" %}
+        <section class="cp-readiness" aria-labelledby="company-strength-heading">
+          <div class="cp-progress"
+               role="progressbar"
+               aria-label="Company profile completeness"
+               aria-valuemin="0"
+               aria-valuemax="100"
+               aria-valuenow="{{ preview.percent }}"
+               style="--progress: {{ preview.percent }}%"><span data-cp-percent>{{ preview.percent }}%</span></div>
+          <div>
+            <h3 id="company-strength-heading">Profile strength</h3>
+            <p>A clear company story helps candidates understand your business.</p>
+            <p class="cp-strength-note"><span data-cp-completed>{{ preview.completed }}</span> of 9 essentials added. Links are optional.</p>
+            <div class="cp-strength-track" aria-hidden="true">
+              <span style="width: {{ preview.percent }}%" data-cp-strength-bar></span>
+            </div>
+          </div>
+        </section>
+        <section class="cp-guidance" aria-labelledby="company-guidance-heading">
+          <span class="cp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}</span>
+          <div>
+            <h3 id="company-guidance-heading">What candidates will see</h3>
+            <p>Your company profile helps job seekers understand the business behind your opportunities.</p>
+            <ul>
+              {% for check in preview.checks %}
+                <li data-cp-check="{{ check.key }}"
+                    class="{% if check.complete %}is-complete{% endif %}"><span class="cp-check-mark" aria-hidden="true">{% if check.complete %}✓{% else %}+{% endif %}</span><span>{{ check.label }}<span class="visually-hidden" data-cp-check-status>{% if check.complete %} — Added{% else %} — Not added{% endif %}</span></span></li>
+              {% endfor %}
+              <li class="{% if active_job_count %}is-complete{% endif %}"><span class="cp-check-mark" aria-hidden="true">{% if active_job_count %}✓{% else %}+{% endif %}</span><span>{% if active_job_count %}Active job opportunities{% else %}Opportunities when you post them{% endif %}</span></li>
+            </ul>
+          </div>
+        </section>
+        <div class="cp-art" aria-hidden="true">{% include "skillmatch/includes/dashboard_botanical.html" %}<p>Great Kenyan talent<br>builds brighter tomorrows.</p></div>
+      </aside>
+    </div>
+    <dialog id="company-live-preview"
+            class="cp-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="company-live-preview-title">
+      <header class="cp-dialog-header">
+        <div>
+          <h2 id="company-live-preview-title">Company preview</h2>
+          <p>Your current edits. Changes are saved only when you select Save company profile.</p>
+        </div>
+        <button type="button"
+                data-close-preview
+                aria-label="Close company preview"
+                autofocus>×</button>
+      </header>
+      {% include "skillmatch/includes/company_preview_card.html" with expanded=True %}
+    </dialog>
+  </div>
+{% endwith %}
