@@ -3,6 +3,7 @@
 {% block body_class %}seeker-dashboard{% endblock %}
 {% block main_class %}sd-content{% endblock %}
 {% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/profile-images.css' %}">
   <link rel="stylesheet"
         href="{% static 'css/seeker-dashboard.css' %}?v=shared-dashboard-2">
   <script src="{% static 'js/seeker-dashboard.js' %}" defer></script>
@@ -108,12 +109,9 @@
         </button>
       </form>
     {% endif %}
-    {# TODO: Connect when notifications exist. The employer dot is decorative, not an unread count. #}
-    <button class="sd-notifications"
-            type="button"
-            disabled
-            aria-label="Notifications (not yet available)"
-            title="Notifications are not yet available">
+    <a class="sd-notifications"
+       href="{% url 'recruitment_connections' %}"
+       aria-label="Connections: {{ connection_counts.pending }} pending requests, {{ connection_counts.messages }} unread messages, {{ connection_counts.updates }} unread updates">
       <svg width="24"
            height="24"
            viewBox="0 0 24 24"
@@ -125,14 +123,21 @@
            aria-hidden="true">
         <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4M12 2V1" />
       </svg>
-      {% if account_role == "employer" %}
+      {% if connection_counts.messages or connection_counts.updates %}
         <span class="sd-notification-dot" aria-hidden="true"></span>
       {% endif %}
-    </button>
+    </a>
+    {% firstof form.initial.company_name user.employer_profile.company_name as company_name %}
     <details class="sd-account" data-account-menu>
       <summary class="sd-user" aria-expanded="false" aria-controls="account-options">
-        <span class="avatar small" aria-hidden="true">{% if account_role == "employer" %}{{ user.employer_profile.company_name|first|upper }}{% else %}{{ user.first_name|first|default:user.username|first|upper }}{% endif %}</span>
-        <span class="sd-account-name">{% if account_role == "employer" %}{{ user.employer_profile.company_name }}<small>Employer account</small>{% else %}{{ user.get_full_name|default:user.username }}{% endif %}</span>
+        <span class="avatar small" aria-hidden="true">{% if account_role == "employer" %}{% if user.employer_profile.logo %}<img src="{{ user.employer_profile.logo.url }}"
+     alt=""
+     width="40"
+     height="40">{% else %}{{ company_name|first|upper }}{% endif %}{% else %}{% if user.seeker_profile.photo %}<img src="{{ user.seeker_profile.photo.url }}"
+     alt=""
+     width="40"
+     height="40">{% else %}{{ user.first_name|first|default:user.username|first|upper }}{% endif %}{% endif %}</span>
+        <span class="sd-account-name">{% if account_role == "employer" %}{{ company_name }}<small>Employer account</small>{% else %}{{ user.get_full_name|default:user.username }}{% endif %}</span>
         <svg class="sd-account-chevron"
              width="16"
              height="16"
@@ -145,7 +150,14 @@
         </svg>
       </summary>
       <div class="sd-account-options" id="account-options">
-        <a href="{% if account_role == 'employer' %}{% url 'profile_edit' %}{% else %}{% url 'profile_detail' profile.pk %}{% endif %}">{% include "skillmatch/includes/brand_icon.html" with icon="person" %}View profile</a>
+        <p class="rc-account-hint">Signed in as <strong>@{{ user.username }}</strong></p>
+        {% if account_role == "employer" %}
+          <a href="{% url 'profile_edit' %}">{% include "skillmatch/includes/brand_icon.html" with icon="building" %}View company profile</a>
+          <a href="{% url 'account_security' %}">{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}Account security</a>
+          <a href="{% url 'social_connections' %}">{% include "skillmatch/includes/brand_icon.html" with icon="link" %}Connected accounts</a>
+        {% else %}
+          <a href="{% url 'profile_detail' profile.pk %}">{% include "skillmatch/includes/brand_icon.html" with icon="person" %}View profile</a>
+        {% endif %}
         <form method="post" action="{% url 'logout' %}">
           {% csrf_token %}
           <button type="submit">{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}Log out</button>

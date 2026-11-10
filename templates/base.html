@@ -17,8 +17,10 @@
           href="{% static 'css/app.css' %}?v=workspace-switch-2">
     <script src="{% static 'js/app.js' %}" defer></script>
     {% block extra_head %}{% endblock %}
+    <link rel="stylesheet"
+          href="{% static 'css/connections.css' %}?v=contacts-progress-1">
   </head>
-  <body class="{% if user.is_authenticated %}signed-in{% else %}public{% endif %} {% block body_class %}{% endblock %}">
+  <body class="{% if user.is_authenticated %}signed-in rc-workspace{% else %}public{% endif %} {% block body_class %}{% endblock %}">
     <a href="#main" class="skip-link">Skip to content</a>
     {% if user.is_authenticated %}
       <aside class="sidebar">
@@ -56,7 +58,7 @@
             {% endif %}
           </div>
         {% endif %}
-        <nav class="side-nav" aria-label="Main navigation">
+        <nav class="side-nav rc-navigation" aria-label="Main navigation">
           {% block sidebar_navigation %}
             {% if account_role == "seeker" %}
               <a class="{% if active == 'recommendations' %}active{% endif %}"
@@ -117,6 +119,7 @@
                 <button>Sign out ↪</button>
               </form>
           {% endblock %}
+          {% include "skillmatch/connections/navigation.html" %}
         </nav>
         {% block sidebar_footer %}
           <div class="sidebar-bottom">

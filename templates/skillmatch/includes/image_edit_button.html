@@ -1,0 +1,14 @@
+<button type="button"
+        class="profile-image-edit"
+        data-image-edit="{{ name }}"
+        aria-label="{{ label }}"
+        hidden>
+  <svg viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="1.7"
+       aria-hidden="true">
+    <path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15Z" />
+  </svg>
+  {% if text %}<span>{{ text }}</span>{% endif %}
+</button>

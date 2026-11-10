@@ -30,9 +30,13 @@
             <div class="sd-saved-actions">
               {% include "skillmatch/includes/save_job_button.html" with job=job is_saved=True %}
               {% if job.is_active and job.employer.user.is_active %}
-                <a class="sd-button"
-                   href="{% url 'job_detail' job.pk %}">View opportunity <span aria-hidden="true">→</span></a>
+                <div class="rc-job-actions">
+                  {% include "skillmatch/connections/job_action.html" %}
+                  <a class="sd-button"
+                     href="{% url 'job_detail' job.pk %}">View opportunity <span aria-hidden="true">→</span></a>
+                </div>
               {% else %}
+                {% include "skillmatch/connections/job_action.html" %}
                 <span class="sd-saved-unavailable">No longer available</span>
               {% endif %}
             </div>

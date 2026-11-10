@@ -1,0 +1,20 @@
+{% if widget.is_initial %}
+  <div class="profile-image-current">
+    <a href="{{ widget.value.url }}"
+       target="_blank"
+       rel="noopener noreferrer">View current image<span class="visually-hidden"> (opens in a new tab)</span></a>
+    {% if not widget.required %}
+      <label for="{{ widget.checkbox_id }}">
+        <input type="checkbox"
+               name="{{ widget.checkbox_name }}"
+               id="{{ widget.checkbox_id }}"
+               {% if widget.attrs.disabled %}disabled{% endif %}
+               {% if widget.attrs.checked %}checked{% endif %}>
+        Remove image
+      </label>
+    {% endif %}
+  </div>
+{% endif %}
+<input type="{{ widget.type }}"
+       name="{{ widget.name }}"
+       {% include "django/forms/widgets/attrs.html" %}>

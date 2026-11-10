@@ -1,0 +1,49 @@
+{% extends connection_base %}
+{% load static %}
+{% block extra_head %}
+  {{ block.super }}
+  <script src="{% static 'js/connection-detail.js' %}" defer></script>
+{% endblock %}
+{% block title %}{{ connection.job.title }} · Connection · SkillMatch{% endblock %}
+{% block content %}
+  <section class="rc-page" data-connection-detail>
+    <a href="{% url 'recruitment_connections' %}">← All connections</a>
+    <header class="rc-heading"><h1>{{ connection.job.title }}</h1><p>{{ connection.job.employer.company_name }} · {{ connection.seeker.display_name }}</p><p class="rc-status">{{ connection.get_status_display }}{% if connection.status == "accepted" %} · {{ stage_label }} · {{ connection.list_state }}{% endif %}</p>{% if connection.interview_at %}<p>Interview: {{ connection.interview_at|date:'j F Y' }} at {{ connection.interview_at|date:'g:i A' }} ({{ display_timezone }})</p>{% endif %}</header>
+    <div class="rc-card rc-parties">
+      <dl class="rc-contact-list">
+        <div class="rc-contact-row">
+          <dt>Employer:</dt>
+          <dd>
+            <strong>{{ connection.job.employer.company_name }}</strong>
+          </dd>
+        </div>
+        {% if show_employer_contact and connection.job.employer.user.email.strip %}
+          <div class="rc-contact-row"><dt>Email:</dt><dd>{% include "skillmatch/connections/contact_value.html" with contact_value=connection.job.employer.user.email.strip copy_label="Copy email address" %}</dd></div>
+        {% endif %}
+        <div class="rc-contact-row"><dt>Job seeker:</dt><dd><a href="{% url 'profile_detail' connection.seeker_id %}">{{ connection.seeker.display_name }}</a> <span class="rc-muted">(@{{ connection.seeker.user.username }})</span></dd></div>
+        {% if show_seeker_contact %}
+          {% if connection.seeker.user.email.strip %}
+            <div class="rc-contact-row"><dt>Email:</dt><dd>{% include "skillmatch/connections/contact_value.html" with contact_value=connection.seeker.user.email.strip copy_label="Copy email address" %}</dd></div>
+          {% endif %}
+          {% if connection.seeker.phone.strip %}
+            <div class="rc-contact-row"><dt>Contact:</dt><dd>{% include "skillmatch/connections/contact_value.html" with contact_value=connection.seeker.phone.strip copy_label="Copy phone number" %}</dd></div>
+          {% endif %}
+        {% endif %}
+      </dl>
+      <p class="rc-muted">Contact access is granted by acceptance. Closing the job or ending consideration does not revoke it. Withdrawal removes this connection's consent; another accepted connection may still grant access.</p>
+    </div>
+    {% if not connection.is_available %}<div class="rc-notice">This job is closed or a participant account is inactive. History is available; acceptance, messaging and stage changes are paused.</div>{% endif %}
+    {% if can_accept or can_decline or can_withdraw %}
+      <section class="rc-card"><h2>{% if connection.status == "pending" and connection.initiated_by == "employer" and participant_role == "seeker" %}Invitation from {{ connection.job.employer.company_name }}{% else %}Respond{% endif %}</h2>{% if can_accept %}<p class="rc-muted">{{ consent }}</p>{% endif %}<div class="rc-actions">{% if can_accept %}<form method="post" action="{% url 'connection_accept' connection.pk %}">{% csrf_token %}<button class="sd-button">{% if participant_role == "seeker" %}Accept invitation{% else %}Accept{% endif %}</button></form>{% endif %}{% if can_decline %}<form method="post" action="{% url 'connection_decline' connection.pk %}">{% csrf_token %}<button class="rc-secondary">Decline</button></form>{% endif %}{% if can_withdraw %}<form method="post" action="{% url 'connection_withdraw' connection.pk %}">{% csrf_token %}<button class="rc-secondary">Withdraw</button></form>{% endif %}</div></section>
+    {% endif %}
+    {% include "skillmatch/connections/progress.html" %}
+    <section class="rc-card rc-thread">
+      <h2>Conversation</h2>
+      {% if connection.note %}<article class="rc-introduction"><strong>Introduction · {{ intro_author }}</strong><time>{{ connection.created_at|date:'d M Y, H:i T' }}</time><div>{{ connection.note|linebreaksbr }}</div></article>{% endif %}
+      {% for message in page_obj %}<article class="rc-message{% if message.sender_id == user.pk %} rc-mine{% endif %}"><strong>{% if message.sender_id == connection.job.employer.user_id %}{{ connection.job.employer.company_name }}{% else %}{{ connection.seeker.display_name }}{% endif %}</strong><time>{{ message.created_at|date:'d M Y, H:i T' }}</time><div>{{ message.body|linebreaksbr }}</div></article>{% empty %}<p>No messages yet.</p>{% endfor %}
+      <nav class="rc-pagination" aria-label="Message pages">{% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&amp;activity_page={{ activity_page.number }}">← Older messages</a>{% endif %}<span>Messages page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&amp;activity_page={{ activity_page.number }}">Newer messages →</a>{% endif %}</nav>
+      {% if connection.allows_messages %}<form method="post" action="{% url 'connection_message' connection.pk %}">{% csrf_token %}{{ message_form.submission_key }}{% include "partials/field.html" with field=message_form.body %}<button class="sd-button">Send message →</button></form>{% else %}<p class="rc-muted">This conversation is read-only. Messaging requires an accepted connection, an active job and active accounts, and ends when consideration ends.</p>{% endif %}
+    </section>
+    <section class="rc-card rc-activity"><h2>Connection history</h2>{% for event in activity_page %}<p>{% include "skillmatch/connections/activity.html" %}</p>{% endfor %}<nav class="rc-pagination" aria-label="Activity pages">{% if activity_page.has_previous %}<a href="?activity_page={{ activity_page.previous_page_number }}&amp;page={{ page_obj.number }}">← Earlier updates</a>{% endif %}<span>Updates page {{ activity_page.number }} of {{ activity_page.paginator.num_pages }}</span>{% if activity_page.has_next %}<a href="?activity_page={{ activity_page.next_page_number }}&amp;page={{ page_obj.number }}">Later updates →</a>{% endif %}</nav></section>
+  </section>
+{% endblock %}

@@ -1,57 +1,24 @@
-{% extends seeker|yesno:"skillmatch/dashboard_base.html,base.html" %}
+{% extends seeker|yesno:"skillmatch/dashboard_base.html,skillmatch/employer_base.html" %}
 {% load static %}
-{% block title %}Edit profile · SkillMatch{% endblock %}
-{% block body_class %}{{ block.super }}{% if seeker %} seeker-profile{% endif %}{% endblock %}
+{% block title %}{% if seeker %}Edit profile{% else %}Company profile{% endif %} · SkillMatch{% endblock %}
+{% block body_class %}{{ block.super }}{% if seeker %} seeker-profile{% else %} company-profile{% endif %}{% endblock %}
 {% block extra_head %}
   {{ block.super }}
+  <script src="{% static 'js/profile-images.js' %}" defer></script>
   {% if seeker %}
     <link rel="stylesheet"
           href="{% static 'css/seeker-profile.css' %}?v=profile-1">
     <script src="{% static 'js/seeker-profile.js' %}" defer></script>
+  {% else %}
+    <link rel="stylesheet"
+          href="{% static 'css/company-profile.css' %}?v=company-profile-3">
+    <script src="{% static 'js/company-profile.js' %}?v=company-profile-3" defer></script>
   {% endif %}
 {% endblock %}
 {% block content %}
   {% if seeker %}
     {% include "skillmatch/includes/seeker_profile_editor.html" %}
   {% else %}
-    <div class="page-heading">
-      <div>
-        <span class="eyebrow">YOUR BUSINESS</span>
-        <h1>
-          Company profile
-          <span class="blue">.</span>
-        </h1>
-        <p>Introduce your company to potential candidates.</p>
-      </div>
-    </div>
-    <div class="row g-4">
-      <div class="col-xl-8">
-        <form class="panel form-panel" method="post">
-          {% csrf_token %}{{ form.non_field_errors }}
-          {% for field in form %}
-            {% include "partials/field.html" %}
-          {% endfor %}
-          <div class="form-actions">
-            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
-            <button class="btn btn-primary">
-              Save profile <span aria-hidden="true">✓</span>
-            </button>
-          </div>
-        </form>
-      </div>
-      <aside class="col-xl-4">
-        <div class="tip-panel">
-          <span class="tip-icon">✧</span>
-          <h3>Make a clear introduction</h3>
-          <p>A clear company name and description help job seekers understand who is hiring.</p>
-          <a href="{% url 'methodology' %}">How matching works ↗</a>
-          <hr>
-          <h3>Account security</h3>
-          <p>Manage optional authenticator-app protection for your account.</p>
-          <a href="{% url 'account_security' %}">Two-factor authentication settings →</a>
-          <a href="{% url 'social_connections' %}">Connected accounts →</a>
-        </div>
-      </aside>
-    </div>
+    {% include "skillmatch/includes/company_profile_editor.html" %}
   {% endif %}
 {% endblock %}

@@ -64,36 +64,39 @@
     </a>
   </section>
   <div class="ed-panels">
-    <section class="ed-panel" aria-labelledby="recent-jobs-heading">
-      <div class="ed-panel-heading"><h2 id="recent-jobs-heading">Recent job posts</h2><a href="{% url 'employer_jobs' %}?view=all">View all job posts <span aria-hidden="true">→</span></a></div>
-      {% if recent_jobs %}
-        <div class="ed-job-table">
-          <div class="ed-job-head" aria-hidden="true"><span>Job title</span><span>Matches</span><span>Status</span><span>Posted</span><span></span></div>
-          {% for row in recent_jobs %}
-            {% with job=row.job %}
-              <article class="ed-job-row">
-                <div class="ed-job-title"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}</span><div><h3><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3><p>{{ job.get_certification_level_display }} · {{ job.get_experience_level_display }}</p></div></div>
-                <a class="ed-job-count"
-                   href="{% url 'job_candidates' job.pk %}"
-                   aria-label="View {{ row.match_count }} candidate matches for {{ job.title }}">{{ row.match_count }}<span class="ed-mobile-label"> matches</span></a>
-                <span class="ed-status{% if not job.is_active %} is-closed{% endif %}">{% if job.is_active %}Active{% else %}Closed{% endif %}</span>
-                <time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:'d M Y' }}</time>
-                <details class="ed-job-menu">
-                  <summary aria-label="Actions for {{ job.title }}">•••</summary>
-                  <div>
-                    <a href="{% url 'job_candidates' job.pk %}">View matches</a><a href="{% url 'job_edit' job.pk %}">Edit job</a><a href="{% url 'job_detail' job.pk %}">View job</a>
-                    <form method="post" action="{% url 'job_toggle' job.pk %}">{% csrf_token %}<button type="submit">{% if job.is_active %}Close job{% else %}Reopen job{% endif %}</button></form>
-                    <a href="{% url 'job_delete' job.pk %}">Delete job</a>
-                  </div>
-                </details>
-              </article>
-            {% endwith %}
-          {% endfor %}
-        </div>
-      {% else %}
-        <div class="ed-empty"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}</span><h3>Your first great match starts with a job.</h3><p>Tell candidates what you’re looking for.</p><a class="sd-button" href="{% url 'job_create' %}">Post your first job →</a></div>
-      {% endif %}
-    </section>
+    <div class="rc-employer-stack">
+      <section class="ed-panel" aria-labelledby="recent-jobs-heading">
+        <div class="ed-panel-heading"><h2 id="recent-jobs-heading">Recent job posts</h2><a href="{% url 'employer_jobs' %}?view=all">View all job posts <span aria-hidden="true">→</span></a></div>
+        {% if recent_jobs %}
+          <div class="ed-job-table">
+            <div class="ed-job-head" aria-hidden="true"><span>Job title</span><span>Matches</span><span>Status</span><span>Posted</span><span></span></div>
+            {% for row in recent_jobs %}
+              {% with job=row.job %}
+                <article class="ed-job-row">
+                  <div class="ed-job-title"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}</span><div><h3><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3><p>{{ job.get_certification_level_display }} · {{ job.get_experience_level_display }}</p></div></div>
+                  <a class="ed-job-count"
+                     href="{% url 'job_candidates' job.pk %}"
+                     aria-label="View {{ row.match_count }} candidate matches for {{ job.title }}">{{ row.match_count }}<span class="ed-mobile-label"> matches</span></a>
+                  <span class="ed-status{% if not job.is_active %} is-closed{% endif %}">{% if job.is_active %}Active{% else %}Closed{% endif %}</span>
+                  <time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:'d M Y' }}</time>
+                  <details class="ed-job-menu">
+                    <summary aria-label="Actions for {{ job.title }}">•••</summary>
+                    <div>
+                      <a href="{% url 'job_candidates' job.pk %}">View matches</a><a href="{% url 'job_edit' job.pk %}">Edit job</a><a href="{% url 'job_detail' job.pk %}">View job</a>
+                      <form method="post" action="{% url 'job_toggle' job.pk %}">{% csrf_token %}<button type="submit">{% if job.is_active %}Close job{% else %}Reopen job{% endif %}</button></form>
+                      <a href="{% url 'job_delete' job.pk %}">Delete job</a>
+                    </div>
+                  </details>
+                </article>
+              {% endwith %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="ed-empty"><span class="sd-icon-circle">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}</span><h3>Your first great match starts with a job.</h3><p>Tell candidates what you’re looking for.</p><a class="sd-button" href="{% url 'job_create' %}">Post your first job →</a></div>
+        {% endif %}
+      </section>
+      {% include "skillmatch/connections/employer_panel.html" %}
+    </div>
     <section class="ed-panel"
              id="top-candidates"
              aria-labelledby="top-candidates-heading">

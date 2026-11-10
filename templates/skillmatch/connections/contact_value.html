@@ -1,0 +1,22 @@
+<span class="rc-contact-value">
+  <span data-copy-value>{{ contact_value }}</span>
+  <button type="button"
+          class="rc-copy"
+          data-copy-contact
+          aria-label="{{ copy_label }}">
+    <svg class="sm-icon"
+         width="18"
+         height="18"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="1.6"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+      <rect x="8" y="8" width="12" height="13" rx="2" />
+      <path d="M16 8V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h4" />
+    </svg>
+  </button>
+  <span class="rc-copy-feedback" role="status" aria-live="polite"></span>
+</span>

@@ -1,9 +1,44 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
-from . import mfa_views, social_views, views
+from . import connection_views, mfa_views, social_views, views
 
 urlpatterns = [
+    path("connections/", connection_views.connections, name="recruitment_connections"),
+    path("connections/<int:pk>/", connection_views.connection_detail, name="connection_detail"),
+    path("jobs/<int:pk>/apply/", connection_views.apply, name="job_apply"),
+    path(
+        "employer/candidates/<int:seeker_pk>/invite/",
+        connection_views.invite,
+        name="candidate_invite",
+    ),
+    path(
+        "employer/jobs/<int:job_pk>/candidates/<int:seeker_pk>/invite/",
+        connection_views.invite,
+        name="job_invite",
+    ),
+    path(
+        "connections/<int:pk>/accept/",
+        connection_views.response_action,
+        {"action": "accept"},
+        name="connection_accept",
+    ),
+    path(
+        "connections/<int:pk>/decline/",
+        connection_views.response_action,
+        {"action": "decline"},
+        name="connection_decline",
+    ),
+    path(
+        "connections/<int:pk>/withdraw/",
+        connection_views.response_action,
+        {"action": "withdraw"},
+        name="connection_withdraw",
+    ),
+    path("connections/<int:pk>/stage/", connection_views.stage_action, name="connection_stage"),
+    path(
+        "connections/<int:pk>/messages/", connection_views.message_action, name="connection_message"
+    ),
     path("accounts/social/onboarding/", social_views.onboarding, name="socialaccount_signup"),
     path("accounts/security/connections/", social_views.connections, name="social_connections"),
     path("accounts/security/confirm/", social_views.reauthenticate, name="social_reauthenticate"),

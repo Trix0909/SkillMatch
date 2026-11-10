@@ -1,0 +1,3 @@
+{% extends connection_base %}
+{% block title %}Request needs attention · SkillMatch{% endblock %}
+{% block content %}<section class="rc-page"><div class="rc-card"><h1>Please check your request</h1>{% if error %}<p role="alert">{{ error }}</p>{% endif %}{% if form %}<div role="alert">{{ form.errors }}</div>{% endif %}<p><a href="{% url 'recruitment_connections' %}">Connections →</a> · <a href="{% url 'home' %}">Back to workspace →</a></p></div></section>{% endblock %}

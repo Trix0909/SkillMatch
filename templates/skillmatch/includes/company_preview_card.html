@@ -1,0 +1,81 @@
+{% load static %}
+<div class="cp-candidate-preview{% if expanded %} cp-expanded-preview{% endif %}">
+  <div class="cp-skyline">
+    <img src="{% if profile.cover_image %}{{ profile.cover_image.url }}{% else %}{% static 'images/landing-nairobi.jpg' %}{% endif %}"
+         data-image-preview="cover_image"
+         data-default-src="{% static 'images/landing-nairobi.jpg' %}"
+         alt=""
+         width="1024"
+         height="410">
+    <span data-image-fallback="cover_image"
+          {% if profile.cover_image %}hidden{% endif %}>
+      {% include "skillmatch/includes/dashboard_botanical.html" %}
+    </span>
+    {% if not expanded %}
+      {% include "skillmatch/includes/image_edit_button.html" with name="cover_image" label="Edit company cover image" text="Edit image" %}
+    {% endif %}
+  </div>
+  <div class="cp-preview-body">
+    <div class="profile-image-wrap">
+      {% include "skillmatch/includes/company_logo.html" %}
+      {% if not expanded %}
+        {% include "skillmatch/includes/image_edit_button.html" with name="logo" label="Edit company logo" %}
+      {% endif %}
+    </div>
+    <h3 data-cp-text="company_name">{{ preview.company_name|default:"Your company" }}</h3>
+    <p class="cp-tagline"
+       data-cp-section="tagline"
+       {% if not preview.tagline %}hidden{% endif %}
+       data-cp-text="tagline">{{ preview.tagline }}</p>
+    {% if not expanded %}
+      {% include "skillmatch/includes/company_preview_prompt.html" with name="tagline" value=preview.tagline label="Add a company tagline" %}
+    {% endif %}
+    <div class="cp-meta">
+      <span data-cp-section="location"
+            {% if not preview.location %}hidden{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="pin" %}<span data-cp-text="location">{{ preview.location }}</span></span>
+      {% if not expanded %}
+        {% include "skillmatch/includes/company_preview_prompt.html" with name="location" value=preview.location label="Add location" icon="pin" %}
+      {% endif %}
+      <span data-cp-section="company_size"
+            {% if not preview.company_size %}hidden{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="building" %}<span data-cp-text="company_size">{{ preview.company_size }}</span></span>
+      {% if not expanded %}
+        {% include "skillmatch/includes/company_preview_prompt.html" with name="company_size" value=preview.company_size label="Select company size" icon="building" %}
+      {% endif %}
+      <span class="cp-role-count">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}{{ active_job_count }} active role{{ active_job_count|pluralize }}</span>
+    </div>
+    <div class="cp-narrative"
+         data-cp-section="summary"
+         {% if not preview.summary %}hidden{% endif %}>{% if expanded %}<h4>Company summary</h4>{% endif %}<p data-cp-text="summary">{{ preview.summary }}</p></div>
+    {% if not expanded %}
+      <div class="cp-narrative"
+           data-cp-empty="summary"
+           {% if preview.summary %}hidden{% endif %}>
+        {% include "skillmatch/includes/company_preview_prompt.html" with name="summary" value=preview.summary label="Add a short company summary" %}
+      </div>
+    {% endif %}
+    <div class="cp-preview-tags" {% if expanded %}data-cp-section="tags" {% if not preview.industry and not preview.focus_areas %}hidden{% endif %}{% endif %}>
+      <span class="cp-pill cp-industry-pill"
+            data-cp-section="industry"
+            {% if not preview.industry %}hidden{% endif %}
+            data-cp-text="industry">{{ preview.industry }}</span>
+      {% if not expanded %}
+        {% include "skillmatch/includes/company_preview_prompt.html" with name="industry" value=preview.industry label="Select industry" %}
+      {% endif %}
+      <span class="cp-focus-preview" data-cp-focus>{% for focus in preview.focus_areas %}<span class="cp-pill">{{ focus }}</span>{% endfor %}</span>
+      {% if not expanded %}
+        {% include "skillmatch/includes/company_preview_prompt.html" with name="focus_areas" value=preview.focus_areas label="Add focus areas" %}
+      {% endif %}
+    </div>
+    {% if expanded %}
+      <section class="cp-narrative"
+               data-cp-section="description"
+               {% if not preview.description %}hidden{% endif %}><h4>What your company does</h4><p data-cp-text="description">{{ preview.description }}</p></section>
+      <section class="cp-narrative"
+               data-cp-section="workplace_culture"
+               {% if not preview.workplace_culture %}hidden{% endif %}><h4>Workplace culture</h4><p data-cp-text="workplace_culture">{{ preview.workplace_culture }}</p></section>
+      <section class="cp-narrative"
+               data-cp-section="links"
+               {% if not preview.links %}hidden{% endif %}><h4>Company links</h4><div class="cp-preview-links" data-cp-links>{% for link in preview.links %}<a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }} <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>{% endfor %}</div></section>
+    {% endif %}
+  </div>
+</div>

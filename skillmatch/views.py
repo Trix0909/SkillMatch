@@ -6,11 +6,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
+from . import recruitment as workflow
+from .connection_forms import CONSENT, IntroductionForm
+from .connection_views import candidate_invitation_context
 from .forms import (
     EmployerForm,
     HiringSwitchForm,
@@ -121,7 +125,7 @@ def profile_edit(request):
     if profile is None:
         raise PermissionDenied
     form_class = ProfileForm if seeker else EmployerForm
-    form = form_class(request.POST or None, instance=profile)
+    form = form_class(request.POST or None, request.FILES or None, instance=profile)
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Your profile has been saved.")
@@ -129,7 +133,13 @@ def profile_edit(request):
     return render(
         request,
         "skillmatch/profile_form.html",
-        {"form": form, "seeker": seeker, "profile": profile, "active": "profile"},
+        {
+            "form": form,
+            "seeker": seeker,
+            "profile": profile,
+            "active": "profile",
+            "active_job_count": profile.jobs.filter(is_active=True).count() if not seeker else None,
+        },
     )
 
 
@@ -151,6 +161,7 @@ def profile_detail(request, pk):
         {
             "profile": profile,
             "active": "profile",
+            **candidate_invitation_context(request, profile),
             "candidate_is_saved": request.user.saved_candidates.filter(candidate=profile).exists()
             if account and account.active_role == "employer"
             else False,
@@ -178,6 +189,9 @@ def recommendations(request):
             "job_id", flat=True
         )
     )
+    states = workflow.job_states(request.user, [match.item for match in page])
+    for match in page:
+        match.item.recruitment_connection = states.get(match.item.pk)
     return render(
         request,
         "skillmatch/recommendations.html",
@@ -194,12 +208,16 @@ def recommendations(request):
 @role_required("seeker")
 def saved_jobs(request):
     queryset = request.user.saved_jobs.select_related("job__employer__user")
+    page = Paginator(queryset, 10).get_page(request.GET.get("page"))
+    states = workflow.job_states(request.user, [saved.job for saved in page])
+    for saved in page:
+        saved.job.recruitment_connection = states.get(saved.job.pk)
     return render(
         request,
         "skillmatch/saved_jobs.html",
         {
             "profile": request.user.seeker_profile,
-            "page_obj": Paginator(queryset, 10).get_page(request.GET.get("page")),
+            "page_obj": page,
             "active": "saved_jobs",
         },
     )
@@ -271,7 +289,19 @@ def job_detail(request, pk):
     ):
         raise PermissionDenied
     return render(
-        request, "skillmatch/job_detail.html", {"job": job, "owner": owner, "active": "jobs"}
+        request,
+        "skillmatch/job_detail.html",
+        {
+            "job": job,
+            "owner": owner,
+            "active": "jobs",
+            "apply_form": IntroductionForm(),
+            "consent": CONSENT,
+            "recruitment_connection": workflow.job_states(request.user, [job]).get(job.pk)
+            if not owner
+            and getattr(getattr(request.user, "account", None), "active_role", "") == "seeker"
+            else None,
+        },
     )
 
 
@@ -298,6 +328,11 @@ def employer_jobs(request):
             results[job.pk] = engine.rank_candidates(job.matching_text, candidate_pool)
     matches = results.get(match_job.pk, []) if match_job else []
     top_matches = matches[:3]
+    states = workflow.candidate_states(
+        request.user, match_job, [match.item for match in top_matches]
+    )
+    for match in top_matches:
+        match.item.recruitment_connection = states.get(match.item.pk)
     return render(
         request,
         "skillmatch/employer_dashboard.html",
@@ -324,13 +359,20 @@ def employer_jobs(request):
 @role_required("employer")
 def saved_candidates(request):
     queryset = request.user.saved_candidates.select_related(
-        "candidate__user", "job"
+        "candidate__user", "job__employer"
     ).prefetch_related("candidate__skills")
+    page = Paginator(queryset, 10).get_page(request.GET.get("page"))
+    connections = workflow.participants(request.user).filter(
+        seeker_id__in=[saved.candidate_id for saved in page]
+    )
+    states = {(connection.job_id, connection.seeker_id): connection for connection in connections}
+    for saved in page:
+        saved.candidate.recruitment_connection = states.get((saved.job_id, saved.candidate_id))
     return render(
         request,
         "skillmatch/saved_candidates.html",
         {
-            "page_obj": Paginator(queryset, 10).get_page(request.GET.get("page")),
+            "page_obj": page,
             "active": "saved_candidates",
         },
     )
@@ -390,8 +432,11 @@ def job_form(request, pk=None):
 @require_POST
 def job_toggle(request, pk):
     job = get_object_or_404(JobPost, pk=pk, employer=request.user.employer_profile)
-    job.is_active = not job.is_active
-    job.save(update_fields=["is_active"])
+    try:
+        job = workflow.toggle_job(request.user, pk)
+    except workflow.WorkflowError as error:
+        messages.error(request, " ".join(error.messages))
+        return redirect("employer_jobs")
     messages.success(
         request,
         "Job reopened." if job.is_active else "Job closed and removed from recommendations.",
@@ -403,7 +448,17 @@ def job_toggle(request, pk):
 def job_delete(request, pk):
     job = get_object_or_404(JobPost, pk=pk, employer=request.user.employer_profile)
     if request.method == "POST":
-        job.delete()
+        try:
+            workflow.delete_job(request.user, pk)
+        except ProtectedError:
+            messages.error(
+                request,
+                "This job has connection history and cannot be deleted. Close the job instead.",
+            )
+            return redirect("employer_jobs")
+        except workflow.WorkflowError as error:
+            messages.error(request, " ".join(error.messages))
+            return redirect("employer_jobs")
         messages.success(request, "Job post deleted.")
         return redirect("employer_jobs")
     return render(request, "skillmatch/job_delete.html", {"job": job, "active": "jobs"})
@@ -423,6 +478,9 @@ def candidates(request, pk=None):
         searched = True
         matches = MatchingAlgorithm().rank_candidates(form.cleaned_data["q"], profiles())
     page = Paginator(matches, 10).get_page(request.GET.get("page"))
+    states = workflow.candidate_states(request.user, job, [match.item for match in page])
+    for match in page:
+        match.item.recruitment_connection = states.get(match.item.pk)
     return render(
         request,
         "skillmatch/candidates.html",

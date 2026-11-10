@@ -1,0 +1,20 @@
+{% if account_role %}
+  <a href="{% url 'recruitment_connections' %}"
+     class="{% if active == 'recruitment_connections' %}active{% endif %}"
+     {% if active == 'recruitment_connections' %}aria-current="page"{% endif %}>
+    {% include "skillmatch/includes/brand_icon.html" with icon="people" %}
+    <div class="rc-nav-copy">
+      Connections
+      {% if connection_counts.pending or connection_counts.messages or connection_counts.updates %}
+        <small class="rc-nav-counts">
+          {% if connection_counts.pending %}<span aria-label="{{ connection_counts.pending }} waiting requests"
+      title="Waiting requests">{{ connection_counts.pending }} req</span>{% endif %}
+          {% if connection_counts.messages %}<span aria-label="{{ connection_counts.messages }} unread messages"
+      title="Unread messages">{{ connection_counts.messages }} msg</span>{% endif %}
+          {% if connection_counts.updates %}<span aria-label="{{ connection_counts.updates }} unread updates"
+      title="Unread updates">{{ connection_counts.updates }} updates</span>{% endif %}
+        </small>
+      {% endif %}
+    </div>
+  </a>
+{% endif %}
