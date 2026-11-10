@@ -38,12 +38,26 @@
         </div>
       </div>
     </div>
-    {% if owner %}
-      <div class="form-actions">
-        <a class="btn btn-outline-secondary" href="{% url 'job_edit' job.pk %}">Edit job</a>
-        <a class="btn btn-primary"
-           href="{% url 'job_candidates' job.pk %}">View candidate matches ↗</a>
-      </div>
-    {% endif %}
+    {% if not owner and account_role == "seeker" %}
+      {% if recruitment_connection %}
+        {% include "skillmatch/connections/state.html" with connection=recruitment_connection %}
+      {% elif not job.is_active or not job.employer.user.is_active %}
+        <p class="rc-unavailable">This opportunity is no longer available.</p>
+      {% elif user.seeker_profile.is_complete %}
+        <section id="apply" class="rc-confirm" aria-labelledby="apply-heading">
+          <h2 id="apply-heading">Apply for this opportunity</h2>
+          <p><strong>{{ job.title }}</strong> at {{ job.employer.company_name }}</p>
+          {% url 'job_apply' job.pk as confirmation_url %}
+          {% include "skillmatch/connections/confirmation_form.html" with form=apply_form confirmation_label="Send application" %}
+        </section>
+    {% else %}<p><a href="{% url 'profile_edit' %}">Complete your profile to apply →</a></p>{% endif %}
+  {% endif %}
+  {% if owner %}
+    <div class="form-actions">
+      <a class="btn btn-outline-secondary" href="{% url 'job_edit' job.pk %}">Edit job</a>
+      <a class="btn btn-primary"
+         href="{% url 'job_candidates' job.pk %}">View candidate matches ↗</a>
+    </div>
+  {% endif %}
   </div>
 {% endblock %}

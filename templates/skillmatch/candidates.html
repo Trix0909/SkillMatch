@@ -65,6 +65,7 @@
               {% if skill.name in match.matched_skills %}✓ {% endif %}{{ skill.name }}</span>
             {% endfor %}
           </div>
+          {% include "skillmatch/connections/candidate_action.html" with candidate=match.item %}
           <div class="card-bottom">
             <span>{{ match.item.get_certification_level_display }} · {{ match.item.get_experience_level_display }}</span>
             <a href="{% url 'profile_detail' match.item.pk %}">View profile ↗</a>

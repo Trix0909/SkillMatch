@@ -16,7 +16,9 @@
   </a>
   <a href="{% url 'employer_jobs' %}?view=all">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}My job posts</a>
   <a href="{% url 'candidates' %}">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}Find candidates</a>
-  <a href="{% url 'profile_edit' %}">{% include "skillmatch/includes/brand_icon.html" with icon="building" %}Company profile</a>
+  <a class="{% if active == 'profile' %}active{% endif %}"
+     href="{% url 'profile_edit' %}"
+     {% if active == 'profile' %}aria-current="page"{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="building" %}Company profile</a>
   <a class="{% if active == 'saved_candidates' %}active{% endif %}"
      href="{% url 'saved_candidates' %}"
      {% if active == 'saved_candidates' %}aria-current="page"{% endif %}>

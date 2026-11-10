@@ -6,6 +6,7 @@ db.sqlite3-*
 .secret-key
 .env
 staticfiles/
+media/
 tmp/
 docs/source-extracts/
 demo-credentials.txt

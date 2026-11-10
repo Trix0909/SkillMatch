@@ -1,15 +1,18 @@
 import hashlib
 import re
 import unicodedata
+from uuid import uuid4
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxLengthValidator, URLValidator
+from django.core.validators import MaxLengthValidator, RegexValidator, URLValidator
 from django.db import models
 from django.db.models.functions import Lower
 from django.utils.crypto import constant_time_compare
 from django.views.decorators.debug import sensitive_variables
 from django_otp.models import Device, ThrottlingMixin, TimestampMixin
+
+from .profile_images import profile_image_path
 
 
 def normalize_skill(value):
@@ -105,8 +108,19 @@ class JobSeekerProfile(models.Model):
     )
     certification_level = models.CharField(max_length=12, choices=CERTIFICATIONS, default="basic")
     experience_level = models.CharField(max_length=8, choices=EXPERIENCES, default="junior")
+    photo = models.ImageField(upload_to=profile_image_path, blank=True, default="")
     bio = models.TextField(blank=True, validators=[MaxLengthValidator(2000)])
     portfolio = models.TextField(blank=True, validators=[MaxLengthValidator(6000)])
+    phone = models.CharField(
+        max_length=20,
+        blank=True,
+        default="",
+        validators=[
+            RegexValidator(
+                r"^(?=.*\d)[\d +\-]+$", "Use digits, spaces, + or -, including at least one digit."
+            )
+        ],
+    )
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -177,12 +191,78 @@ class EvidenceLink(models.Model):
         return self.url
 
 
+def clean_company_focus(values):
+    """A small, ordered list of company values, without a separate tagging model."""
+    if not isinstance(values, list) or len(values) > 3:
+        raise ValidationError({"focus_areas": "Add up to 3 focus areas."})
+    normalized, seen = [], set()
+    for value in values:
+        if not isinstance(value, str) or not 1 <= len(normalize_skill(value)) <= 40:
+            raise ValidationError({"focus_areas": "Each focus area must contain 1–40 characters."})
+        value = normalize_skill(value)
+        if value.casefold() in seen:
+            raise ValidationError(
+                {"focus_areas": "Focus areas must be unique. Remove the duplicate."}
+            )
+        normalized.append(value)
+        seen.add(value.casefold())
+    return normalized
+
+
 class EmployerProfile(models.Model):
+    COMPANY_SIZES = [
+        ("1-10", "1–10 employees"),
+        ("11-20", "11–20 employees"),
+        ("21-50", "21–50 employees"),
+        ("51-100", "51–100 employees"),
+        ("101-250", "101–250 employees"),
+        ("251-500", "251–500 employees"),
+        ("500+", "500+ employees"),
+    ]
+    INDUSTRIES = [
+        ("technology", "Technology & Software"),
+        ("finance", "Financial Services"),
+        ("retail", "Retail"),
+        ("healthcare", "Healthcare"),
+        ("professional_services", "Professional Services"),
+        ("education", "Education"),
+        ("hospitality", "Hospitality"),
+        ("creative_media", "Creative & Media"),
+        ("construction", "Construction"),
+        ("logistics", "Logistics"),
+        ("agriculture", "Agriculture"),
+        ("other", "Other"),
+    ]
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="employer_profile"
     )
     company_name = models.CharField(max_length=150)
+    logo = models.ImageField(upload_to=profile_image_path, blank=True, default="")
+    cover_image = models.ImageField(upload_to=profile_image_path, blank=True, default="")
+    tagline = models.CharField(max_length=160, blank=True, default="")
+    location = models.CharField(max_length=150, blank=True, default="")
+    company_size = models.CharField(max_length=10, choices=COMPANY_SIZES, blank=True, default="")
+    industry = models.CharField(max_length=30, choices=INDUSTRIES, blank=True, default="")
+    summary = models.TextField(blank=True, default="", validators=[MaxLengthValidator(300)])
     description = models.TextField(blank=True, validators=[MaxLengthValidator(2000)])
+    workplace_culture = models.TextField(
+        blank=True, default="", validators=[MaxLengthValidator(500)]
+    )
+    focus_areas = models.JSONField(default=list, blank=True)
+    website = models.URLField(
+        max_length=500, blank=True, default="", validators=[URLValidator(schemes=["http", "https"])]
+    )
+    linkedin = models.URLField(
+        max_length=500, blank=True, default="", validators=[URLValidator(schemes=["http", "https"])]
+    )
+    twitter = models.URLField(
+        max_length=500, blank=True, default="", validators=[URLValidator(schemes=["http", "https"])]
+    )
+
+    def clean(self):
+        super().clean()
+        self.focus_areas = clean_company_focus(self.focus_areas)
 
     def __str__(self):
         return self.company_name
@@ -273,3 +353,129 @@ class SavedCandidate(models.Model):
 
     def __str__(self):
         return f"{self.user} — {self.candidate}"
+
+
+class Connection(models.Model):
+    INITIATORS = [("seeker", "Job seeker"), ("employer", "Employer")]
+    STATUSES = [
+        (value, value.title()) for value in ("pending", "accepted", "declined", "withdrawn")
+    ]
+    STAGES = [
+        ("new", "New"),
+        ("shortlisted", "Shortlisted"),
+        ("interview", "Interview"),
+        ("offered", "Offered"),
+        ("not_selected", "Not selected"),
+    ]
+    job = models.ForeignKey(JobPost, on_delete=models.PROTECT, related_name="connections")
+    seeker = models.ForeignKey(
+        JobSeekerProfile, on_delete=models.CASCADE, related_name="connections"
+    )
+    initiated_by = models.CharField(max_length=8, choices=INITIATORS)
+    status = models.CharField(max_length=10, choices=STATUSES, default="pending")
+    stage = models.CharField(max_length=12, choices=STAGES, default="new")
+    interview_at = models.DateTimeField(null=True, blank=True)
+    note = models.TextField(blank=True, validators=[MaxLengthValidator(500)])
+    created_at = models.DateTimeField(auto_now_add=True)
+    responded_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at", "-pk"]
+        constraints = [
+            models.UniqueConstraint(fields=["job", "seeker"], name="unique_job_seeker_connection"),
+            models.CheckConstraint(
+                condition=models.Q(initiated_by__in=["seeker", "employer"]),
+                name="valid_connection_initiator",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(status__in=["pending", "accepted", "declined", "withdrawn"]),
+                name="valid_connection_status",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(
+                    stage__in=["new", "shortlisted", "interview", "offered", "not_selected"]
+                ),
+                name="valid_connection_stage",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["seeker", "status", "initiated_by"], name="conn_seeker_pending"),
+            models.Index(fields=["job", "status", "initiated_by"], name="conn_job_pending"),
+            models.Index(fields=["initiated_by", "created_at"], name="conn_rate_window"),
+        ]
+
+    @property
+    def is_available(self):
+        return (
+            self.job.is_active and self.job.employer.user.is_active and self.seeker.user.is_active
+        )
+
+    @property
+    def list_state(self):
+        if self.status in {"declined", "withdrawn"} or self.stage == "not_selected":
+            return "Closed"
+        if self.status == "pending":
+            return "Pending"
+        return "Active" if self.is_available else "Paused"
+
+    @property
+    def allows_messages(self):
+        return self.status == "accepted" and self.stage != "not_selected" and self.is_available
+
+    def __str__(self):
+        return f"{self.job} / {self.seeker} ({self.status})"
+
+
+class Message(models.Model):
+    connection = models.ForeignKey(Connection, on_delete=models.CASCADE, related_name="messages")
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    body = models.TextField(validators=[MaxLengthValidator(2000)])
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+    submission_key = models.UUIDField(default=uuid4, unique=True, editable=False)
+
+    class Meta:
+        ordering = ["created_at", "pk"]
+        indexes = [
+            models.Index(fields=["connection", "read_at", "sender"], name="message_received_unread")
+        ]
+
+
+class ConnectionActivity(models.Model):
+    EVENTS = [
+        ("created", "Request sent"),
+        ("accepted", "Request accepted"),
+        ("declined", "Request declined"),
+        ("withdrawn", "Connection withdrawn"),
+        ("stage", "Stage changed"),
+        ("rescheduled", "Interview rescheduled"),
+    ]
+    connection = models.ForeignKey(Connection, on_delete=models.CASCADE, related_name="activities")
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    event = models.CharField(max_length=12, choices=EVENTS)
+    stage = models.CharField(max_length=12, blank=True, choices=Connection.STAGES)
+    interview_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["created_at", "pk"]
+        indexes = [
+            models.Index(fields=["connection", "read_at", "actor"], name="activity_received_unread")
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(
+                    event__in=[
+                        "created",
+                        "accepted",
+                        "declined",
+                        "withdrawn",
+                        "stage",
+                        "rescheduled",
+                    ]
+                ),
+                name="valid_connection_event",
+            )
+        ]

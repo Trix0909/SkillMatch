@@ -25,7 +25,7 @@
   </section>
   <div class="sd-dashboard-grid">
     <div class="sd-main">
-      <section class="sd-summaries" aria-label="Your matching overview">
+      <section class="sd-summaries rc-summaries" aria-label="Your matching overview">
         <a class="sd-summary" href="{% url 'recommendations' %}#recommended">
           <span class="sd-icon-circle">
             {% include "skillmatch/includes/brand_icon.html" with icon="people" %}
@@ -80,6 +80,27 @@
             </svg>
           </a>
         {% endwith %}
+        <a class="sd-summary rc-summary"
+           href="{% url 'recruitment_connections' %}">
+          <span class="sd-icon-circle">
+            {% include "skillmatch/includes/brand_icon.html" with icon="people" %}
+          </span>
+          <div>
+            <h2>Connections</h2>
+            {% include "skillmatch/connections/counts.html" %}
+            <span class="rc-summary-link">Open connections →</span>
+          </div>
+          <svg class="sd-chevron"
+               width="16"
+               height="16"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="1.8"
+               aria-hidden="true">
+            <path d="m9 6 6 6-6 6" />
+          </svg>
+        </a>
       </section>
       <section id="recommended" aria-labelledby="recommended-heading">
         <div class="sd-section-heading">
@@ -144,8 +165,11 @@
                       <strong>{{ match.experience|floatformat:1 }}×</strong>
                     </div>
                   </div>
-                  <a class="sd-button sd-button-small"
-                     href="{% url 'job_detail' match.item.pk %}">View opportunity <span aria-hidden="true">→</span></a>
+                  <div class="rc-job-actions">
+                    {% include "skillmatch/connections/job_action.html" with job=match.item %}
+                    <a class="sd-button sd-button-small"
+                       href="{% url 'job_detail' match.item.pk %}">View opportunity <span aria-hidden="true">→</span></a>
+                  </div>
                   <details class="sd-explanation">
                     <summary>Why this match?</summary>
                     <div>

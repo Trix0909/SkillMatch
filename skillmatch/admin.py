@@ -5,10 +5,13 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from .models import (
     Account,
+    Connection,
+    ConnectionActivity,
     EmployerProfile,
     EvidenceLink,
     JobPost,
     JobSeekerProfile,
+    Message,
     Skill,
     SkillCategory,
 )
@@ -55,3 +58,41 @@ class JobAdmin(admin.ModelAdmin):
 
 
 admin.site.register([Account, EmployerProfile, SkillCategory])
+
+
+class InspectionAdmin(admin.ModelAdmin):
+    actions = None
+
+    def get_readonly_fields(self, request, obj=None):
+        return [field.name for field in self.model._meta.fields]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Connection)
+class ConnectionAdmin(InspectionAdmin):
+    list_display = ["job", "seeker", "initiated_by", "status", "stage", "updated_at"]
+    list_filter = ["status", "stage", "initiated_by", "job"]
+    search_fields = ["job__title", "job__employer__company_name", "seeker__user__username"]
+
+
+@admin.register(Message)
+class MessageAdmin(InspectionAdmin):
+    list_display = ["connection", "sender", "created_at", "read_at"]
+    search_fields = ["body", "sender__username", "connection__job__title"]
+    list_select_related = ["connection__job", "connection__seeker__user", "sender"]
+
+
+@admin.register(ConnectionActivity)
+class ActivityAdmin(InspectionAdmin):
+    list_display = ["connection", "actor", "event", "stage", "created_at"]
+    list_filter = ["event", "stage"]
+    search_fields = ["connection__job__title", "actor__username"]
+    list_select_related = ["connection__job", "connection__seeker__user", "actor"]

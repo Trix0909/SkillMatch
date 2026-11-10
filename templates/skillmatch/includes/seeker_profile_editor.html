@@ -22,7 +22,10 @@
         <span>4</span>Preview
       </a>
     </nav>
-    <form class="sp-form" method="post" id="seeker-profile-form">
+    <form class="sp-form"
+          method="post"
+          id="seeker-profile-form"
+          enctype="multipart/form-data">
       {% csrf_token %}
       {% if form.errors %}
         <div class="sp-form-errors" role="alert">
@@ -41,9 +44,25 @@
           </div>
         </div>
         <div class="sp-section-fields">
+          <div class="profile-photo-preview">
+            <img data-image-preview="photo"
+                 {% if profile.photo %}src="{{ profile.photo.url }}"{% else %}hidden{% endif %}
+                 alt="Your profile photo"
+                 width="88"
+                 height="88">
+            <span data-image-fallback="photo"
+                  {% if profile.photo %}hidden{% endif %}>{{ profile.display_name|first|upper }}</span>
+            {% include "skillmatch/includes/image_edit_button.html" with name="photo" label="Edit profile photo" %}
+          </div>
+          {% include "skillmatch/includes/profile_field.html" with field=form.photo %}
+          <p class="profile-image-notice">Save your profile to apply your photo. If another field has an error, select your new photo again before saving.</p>
           <div class="sp-field-pair">
             {% include "skillmatch/includes/profile_field.html" with field=form.first_name %}
             {% include "skillmatch/includes/profile_field.html" with field=form.last_name %}
+          </div>
+          <div class="sp-field-pair">
+            {% include "skillmatch/includes/profile_field.html" with field=form.email %}
+            {% include "skillmatch/includes/profile_field.html" with field=form.phone %}
           </div>
           {% include "skillmatch/includes/profile_field.html" with field=form.bio %}
         </div>

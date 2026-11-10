@@ -23,7 +23,10 @@
                aria-label="Profile text match">{{ match.similarity_percent }}%</meter>
       </div>
     {% endif %}
-    <a class="ed-profile-link"
-       href="{% url 'profile_detail' candidate.pk %}">View profile</a>
+    <div class="rc-candidate-links">
+      {% include "skillmatch/connections/candidate_action.html" %}
+      <a class="ed-profile-link"
+         href="{% url 'profile_detail' candidate.pk %}">View profile</a>
+    </div>
   </div>
 </article>
