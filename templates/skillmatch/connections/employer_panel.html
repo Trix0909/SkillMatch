@@ -1,0 +1,15 @@
+<section class="ed-panel rc-dashboard-panel"
+         aria-labelledby="connections-heading">
+  <div class="ed-panel-heading">
+    <h2 id="connections-heading">Connections</h2>
+    <a href="{% url 'recruitment_connections' %}">Open connections <span aria-hidden="true">→</span></a>
+  </div>
+  {% include "skillmatch/connections/counts.html" %}
+  {% if connection_recent_activity %}
+    <ul class="rc-recent-list">
+      {% for event in connection_recent_activity|slice:':2' %}
+        <li><a href="{% url 'connection_detail' event.connection_id %}"><strong>{{ event.connection.job.title }}</strong> — {% include "skillmatch/connections/activity.html" %}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>

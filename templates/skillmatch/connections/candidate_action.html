@@ -1,0 +1,13 @@
+{% if candidate.user_id != user.pk and candidate.user.is_active and candidate.is_complete %}
+  {% if candidate.recruitment_connection %}
+    {% include "skillmatch/connections/state.html" with connection=candidate.recruitment_connection %}
+  {% elif job and job.is_active %}
+    <a class="rc-compact-action"
+       href="{% url 'profile_detail' candidate.pk %}?job={{ job.pk }}#invite"
+       aria-label="Invite {{ candidate.display_name }} to {{ job.title }}">Invite</a>
+  {% else %}
+    <a class="rc-compact-action"
+       href="{% url 'profile_detail' candidate.pk %}{% if saved.job.is_active and saved.job.employer.user_id == user.pk %}?job={{ saved.job_id }}{% endif %}#invite"
+       aria-label="Choose a job to invite {{ candidate.display_name }}">Invite</a>
+  {% endif %}
+{% endif %}

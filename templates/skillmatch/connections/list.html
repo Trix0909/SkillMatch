@@ -1,0 +1,18 @@
+{% extends connection_base %}
+{% block title %}Connections · SkillMatch{% endblock %}
+{% block content %}
+  <section class="rc-page">
+    <header class="sd-section-heading"><div><h1>Connections</h1><p>Applications, invitations and your recruitment conversations.</p></div><a href="{% url 'home' %}">Back to workspace →</a></header>
+    {% include "skillmatch/connections/overview.html" %}
+    {% if account_role == "employer" %}<form method="get" class="rc-filter"><label for="connection-job">Filter by your job</label><select name="job" id="connection-job" class="form-select"><option value="">All your jobs</option>{% for job in owned_jobs %}<option value="{{ job.pk }}"
+        {% if selected_job.pk == job.pk %}selected{% endif %}>{{ job.title }}</option>{% endfor %}</select><button class="sd-button">Filter</button></form>{% endif %}
+    <div class="rc-list">
+      {% for connection in page_obj %}
+        <article class="rc-card"><div><h2><a href="{% url 'connection_detail' connection.pk %}">{{ connection.job.title }}</a></h2><p>{% if account_role == "seeker" %}{{ connection.job.employer.company_name }}{% else %}{{ connection.seeker.display_name }} <span class="rc-muted">(@{{ connection.seeker.user.username }})</span>{% endif %}</p><p><span class="rc-status">{% if connection.status == "pending" %}{% if connection.initiated_by == account_role %}Waiting for them{% elif account_role == "seeker" %}Invitation from {{ connection.job.employer.company_name }}{% else %}Waiting for me{% endif %}{% else %}{{ connection.list_state }}{% endif %}</span> · {{ connection.get_status_display }}{% if connection.status == "accepted" %} · {{ connection.get_stage_display }}{% endif %}</p>{% if connection.status == "pending" and not connection.is_available %}<p>Acceptance is unavailable while this job is closed or an account is inactive.</p>{% endif %}</div><div class="rc-card-actions"><span>{{ connection.unread_messages }} unread messages · {{ connection.unread_updates }} updates</span><a class="sd-button sd-button-small"
+   href="{% url 'connection_detail' connection.pk %}">{% if connection.status == "pending" and connection.initiated_by != account_role %}{% if account_role == "seeker" %}Review invitation{% else %}Review application{% endif %}{% else %}Open connection{% endif %} →</a></div></article>
+{% empty %}<div class="sd-empty"><h2>No connections yet</h2><p>{% if account_role == "seeker" %}Apply to a suitable job or respond to an invitation to start a conversation.{% else %}Invite a candidate to one of your active jobs or respond to an application.{% endif %}</p><a href="{% url 'home' %}">Return to your workspace →</a></div>{% endfor %}
+  </div>
+  {% include "partials/pagination.html" %}
+  {% if recent_activity %}<section class="rc-card rc-activity"><h2>Recent updates</h2>{% for event in recent_activity %}<p><a href="{% url 'connection_detail' event.connection_id %}">{{ event.connection.job.title }}</a> — {% include "skillmatch/connections/activity.html" %}</p>{% endfor %}</section>{% endif %}
+  </section>
+{% endblock %}

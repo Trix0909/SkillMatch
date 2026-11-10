@@ -1,0 +1,5 @@
+<section class="rc-overview" aria-label="Connection activity">
+  <a href="{% url 'recruitment_connections' %}"><strong>Connections →</strong></a>
+  <p>{{ connection_counts.pending }} requests waiting for you · {{ connection_counts.messages }} unread messages · {{ connection_counts.updates }} unread updates</p>
+  {% for event in connection_recent_activity %}<div class="rc-recent"><a href="{% url 'connection_detail' event.connection_id %}">{{ event.connection.job.title }} — {% include "skillmatch/connections/activity.html" %}</a></div>{% endfor %}
+</section>

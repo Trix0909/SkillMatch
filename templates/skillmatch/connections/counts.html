@@ -1,0 +1,11 @@
+{% if connection_counts.pending or connection_counts.messages or connection_counts.updates %}
+  <p class="rc-counts">
+    <span aria-label="{{ connection_counts.pending }} requests waiting for you">{{ connection_counts.pending }} request{{ connection_counts.pending|pluralize }}</span>
+    <span aria-hidden="true">·</span>
+    <span aria-label="{{ connection_counts.messages }} unread messages">{{ connection_counts.messages }} message{{ connection_counts.messages|pluralize }}</span>
+    <span aria-hidden="true">·</span>
+    <span aria-label="{{ connection_counts.updates }} unread updates">{{ connection_counts.updates }} update{{ connection_counts.updates|pluralize }}</span>
+  </p>
+{% else %}
+  <p class="rc-counts">No new activity</p>
+{% endif %}

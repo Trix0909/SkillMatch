@@ -1,0 +1,84 @@
+{% if connection.status == "accepted" %}
+  <section class="rc-card rc-progress"
+           id="recruitment-progress"
+           aria-labelledby="recruitment-heading">
+    <h2 id="recruitment-heading">Recruitment progress</h2>
+    <p class="rc-current-stage">Current stage: <strong>{{ stage_label }}</strong></p>
+    {% if connection.interview_at %}
+      <p>Interview: {{ connection.interview_at|date:'j F Y' }} at {{ connection.interview_at|date:'g:i A' }} ({{ display_timezone }})</p>
+    {% endif %}
+    {% if connection.stage == "new" %}
+      <p class="rc-muted">{% if participant_role == "employer" %}This candidate has connected with you and is ready for review.{% else %}You are connected. The employer can now review your profile.{% endif %}</p>
+    {% elif connection.stage == "offered" %}
+      <p class="rc-muted">An offer has been recorded. This does not confirm that the candidate has accepted it.</p>
+    {% elif connection.stage == "not_selected" %}
+      <p class="rc-muted">Consideration for this job has ended. Your connection history remains available.</p>
+    {% endif %}
+    {% if stage_form.non_field_errors or stage_form.stage.errors or stage_form.expected_state.errors or stage_form.confirm_not_selected.errors %}<div class="rc-notice" role="alert">{{ stage_form.non_field_errors }}{{ stage_form.stage.errors }}{{ stage_form.expected_state.errors }}{{ stage_form.confirm_not_selected.errors }}</div>{% endif %}
+    {% if can_set_stage %}
+      <div class="rc-progress-actions">
+        {% if "shortlisted" in progress_actions %}
+          <form method="post" action="{% url 'connection_stage' connection.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="stage" value="shortlisted">
+            <input type="hidden" name="expected_state" value="{{ progress_token }}">
+            <button class="sd-button" type="submit">Move to shortlisted</button>
+          </form>
+        {% endif %}
+        {% if "interview" in progress_actions %}
+          <details class="rc-stage-disclosure"
+                   data-progress-disclosure
+                   {% if scheduler_open %}open{% endif %}>
+            <summary class="{% if connection.stage == 'interview' %}rc-secondary{% else %}sd-button{% endif %}">{% if connection.stage == "interview" %}Reschedule{% else %}Schedule interview{% endif %}</summary>
+            <form method="post"
+                  action="{% url 'connection_stage' connection.pk %}"
+                  class="rc-scheduler">
+              {% csrf_token %}
+              <input type="hidden" name="stage" value="interview">
+              <input type="hidden" name="expected_state" value="{{ progress_token }}">
+              <h3>{% if connection.stage == "interview" %}Reschedule interview{% else %}Schedule an interview{% endif %}</h3>
+              {% include "partials/field.html" with field=stage_form.interview_at %}
+              <p class="rc-muted">Times are shown in {{ display_timezone }}.</p>
+              <div class="rc-actions">
+                <button class="sd-button" type="submit">{% if connection.stage == "interview" %}Save new time{% else %}Confirm interview{% endif %}</button>
+                <a class="rc-secondary"
+                   href="{% url 'connection_detail' connection.pk %}#recruitment-progress"
+                   data-progress-cancel>Cancel</a>
+              </div>
+            </form>
+          </details>
+        {% endif %}
+        {% if "offered" in progress_actions %}
+          <form method="post" action="{% url 'connection_stage' connection.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="stage" value="offered">
+            <input type="hidden" name="expected_state" value="{{ progress_token }}">
+            <button class="sd-button" type="submit">Mark offer made</button>
+          </form>
+        {% endif %}
+      </div>
+      {% if "not_selected" in progress_actions %}
+        <details class="rc-stage-disclosure rc-end-consideration"
+                 data-progress-disclosure
+                 {% if rejection_open %}open{% endif %}>
+          <summary class="rc-secondary">Not selected</summary>
+          <div class="rc-stage-confirm">
+            <p>Mark this candidate as not selected? This ends consideration for this job and disables further messaging in this connection.</p>
+            <form method="post" action="{% url 'connection_stage' connection.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="stage" value="not_selected">
+              <input type="hidden" name="expected_state" value="{{ progress_token }}">
+              <input type="hidden" name="confirm_not_selected" value="true">
+              <div class="rc-actions">
+                <button class="rc-secondary" type="submit">Confirm not selected</button>
+                <a class="rc-secondary"
+                   href="{% url 'connection_detail' connection.pk %}#recruitment-progress"
+                   data-progress-cancel>Cancel</a>
+              </div>
+            </form>
+          </div>
+        </details>
+      {% endif %}
+    {% endif %}
+  </section>
+{% endif %}

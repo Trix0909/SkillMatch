@@ -1,0 +1,13 @@
+<form class="rc-confirm-form" method="post" action="{{ confirmation_url }}">
+  {% csrf_token %}
+  <p class="rc-consent">{{ consent }}</p>
+  {{ form.non_field_errors }}
+  {% for field in form %}
+    {% include "partials/field.html" %}
+  {% endfor %}
+  <div class="rc-actions">
+    <button class="btn btn-primary"
+            type="submit">{{ confirmation_label }} <span aria-hidden="true">→</span></button>
+    <a class="rc-cancel" href="{% url 'home' %}">Back to workspace</a>
+  </div>
+</form>
