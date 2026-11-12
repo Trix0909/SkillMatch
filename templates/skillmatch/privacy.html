@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Privacy policy · SkillMatch</title>
+    <link rel="icon"
+          href="{% static 'images/brand/match-point.svg' %}"
+          type="image/svg+xml">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+    <link rel="stylesheet" href="{% static 'css/privacy.css' %}">
+  </head>
+  <body class="sm-landing sm-privacy">
+    <a class="skip-link" href="#main">Skip to content</a>
+    {% include "partials/public_header.html" %}
+    <main id="main" class="privacy-content">
+      <header>
+        <h1>Privacy policy</h1>
+        <p>Last updated: <time datetime="2026-11-12">12 November 2026</time></p>
+        <p>SkillMatch is a student academic project at Strathmore University, connecting job seekers and employers in Kenya. This policy explains how we use your information.</p>
+      </header>
+      <section aria-labelledby="data-heading">
+        <h2 id="data-heading">Information we collect</h2>
+        <p>We store your username, email address, first and last name, and a hashed password if you set one. We also store information you choose to add: skills, experience and certification levels, professional summaries, project descriptions, evidence links, optional phone numbers, company details and links, job posts, and uploaded profile photos, company logos and cover images.</p>
+        <p>We keep saved jobs and candidates, applications, invitations, recruitment progress, messages and related activity. Essential cookies support sign-in, sessions and security.</p>
+      </section>
+      <section aria-labelledby="sso-heading">
+        <h2 id="sso-heading">Google and GitHub sign-in</h2>
+        <p>Google sign-in requests only basic identity, email and profile access (openid, email and profile). GitHub sign-in requests read:user and user:email. We use a verified email address, available name information and the provider’s account ID to create or recognize your linked account.</p>
+        <p>We do not store Google or GitHub access tokens. We discard other provider profile data, including pictures and bios; the retained provider extra data contains only the email address. A photo you upload to SkillMatch is separate from your provider photo.</p>
+      </section>
+      <section aria-labelledby="use-heading">
+        <h2 id="use-heading">How we use and share information</h2>
+        <p>We use your information to run accounts, display profiles and opportunities, rank matches and support recruitment conversations. Matching compares profile and job text within SkillMatch using TF-IDF and cosine similarity. We do not send this data to outside AI or analytics services.</p>
+        <p>Employers can discover candidate profiles through job matching and candidate search. Job seekers can view job posts and company profiles. Connections and messages are available to their participants, with authorized administrators able to inspect records for administration and moderation.</p>
+        <p>Acceptance shares the seeker’s account email and optional phone number with the employer, and the employer’s account email with the seeker. Accepted contact access can remain after a job closes or consideration ends. Withdrawal revokes access through that connection; another qualifying accepted connection may still allow access. Inactive accounts restrict access.</p>
+        <p>We do not sell your personal information. PythonAnywhere hosts the live application, database and uploaded files. Google and GitHub process sign-in when you choose their services. We use these providers to operate SkillMatch, rather than selling or sharing data for advertising.</p>
+      </section>
+      <section aria-labelledby="security-heading">
+        <h2 id="security-heading">Security and retention</h2>
+        <p>The live site uses HTTPS. Django hashes local passwords. Two-factor authentication and recovery codes help protect accounts; two-factor authentication is required for administrators and optional for other users.</p>
+        <p>Information remains stored while your account and related records are maintained for the project. You can request account and data deletion using the contact below. We will review the request and explain any records that need to be retained and any limits affecting deletion, including hosting backups or logs.</p>
+      </section>
+      <section aria-labelledby="contact-heading">
+        <h2 id="contact-heading">Contact and deletion requests</h2>
+        <p>For privacy questions or to request deletion of your account and data, email <strong><a href="mailto:trina.kinyua@strathmore.edu">trina.kinyua@strathmore.edu</a></strong>.</p>
+      </section>
+    </main>
+  </body>
+</html>

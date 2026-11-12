@@ -139,7 +139,8 @@ class MFAEnforcementMiddleware:
     def __call__(self, request):
         had_device = DEVICE_ID_SESSION_KEY in request.session
         user = request.user
-        if user.is_authenticated and request.path != reverse("logout"):
+        # Public policy access must also work during an unfinished MFA sign-in.
+        if user.is_authenticated and request.path not in {reverse("logout"), reverse("privacy")}:
             required = is_admin(user) or had_device or confirmed_device(user) is not None
             if required and not is_mfa_verified(user):
                 destination = safe_destination(request, request.get_full_path())
