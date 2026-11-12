@@ -1,0 +1,7 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <p class="sm-page-intro">A read-only view of the records you have permission to manage. Users may hold both seeker and employer profiles.</p>
+  {% include "admin/includes/metrics.html" %}
+  {% include "admin/includes/growth.html" %}
+  <section class="sm-panel sm-report-table"><h2>Monthly registrations &amp; job posts</h2><p>Creation dates of current records. The current month is still in progress. Deleted records are not included; — means view permission is required.</p><div class="sm-table-scroll"><table><thead><tr><th scope="col">Month</th><th scope="col">New users</th><th scope="col">New job posts</th></tr></thead><tbody>{% for row in report_rows %}<tr><th scope="row">{{ row.label }}</th><td>{{ row.users|default_if_none:'—' }}</td><td>{{ row.jobs|default_if_none:'—' }}</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

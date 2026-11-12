@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block bodyclass %}{{ block.super }} sm-overview{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block content %}
+  <section class="sm-hero" aria-labelledby="overview-heading">
+    <div class="sm-hero-art sm-botanical-banner" aria-hidden="true"><img src="{% static 'images/landing-nairobi.jpg' %}" alt=""><div class="sm-banner-leaves">{% include "admin/includes/leaves.html" %}</div><span>Real skills.<br>Real opportunities.</span></div>
+    <div class="sm-hero-copy">
+      <h1 id="overview-heading">Platform <em>overview</em></h1>
+      <p>
+        Track growth, manage users and opportunities, and keep
+        <br class="sm-desktop-break">
+        SkillMatch running smoothly.
+      </p>
+    </div>
+  </section>
+  {% include "admin/includes/metrics.html" %}
+  <div class="sm-analytics">
+    {% include "admin/includes/growth.html" %}
+    <section class="sm-panel sm-activity" aria-labelledby="activity-heading">
+      <div class="sm-panel-heading">
+        <div>
+          <h2 id="activity-heading">Recent activity</h2>
+          <p>Your latest admin actions</p>
+        </div>
+      </div>
+      <ul class="sm-activity-list">
+        {% for event in recent_activity %}<li><span class="sm-event-icon">{% include "admin/includes/icon.html" with icon="document" %}</span><span class="sm-event-dot{% if event.deleted %} sm-event-deleted{% endif %}"></span><div>{% if event.url %}<a href="{{ event.url }}">{{ event.action }} · {{ event.object }}</a>{% else %}<span>{{ event.action }} · {{ event.object }}</span>{% endif %}<small>{{ event.model|capfirst }}</small></div><time datetime="{{ event.time|date:'c' }}" title="{{ event.time }}">{{ event.time|timesince }} ago</time></li>
+      {% empty %}<li class="sm-empty">{% include "admin/includes/icon.html" with icon="document" %}<h3>A clear start</h3><p>Your recorded admin actions will appear here as you manage SkillMatch.</p></li>{% endfor %}
+    </ul>
+  </section>
+</div>
+<section class="sm-panel sm-quick-actions"
+         aria-labelledby="quick-actions-heading">
+  <div class="sm-panel-heading">
+    <h2 id="quick-actions-heading">Quick actions</h2>
+    <p>Common tasks to keep the platform running efficiently.</p>
+  </div>
+  <div class="sm-action-grid">{% for action in quick_actions %}<a class="sm-action-card" href="{{ action.url }}"><span class="sm-mint-icon">{% include "admin/includes/icon.html" with icon=action.icon %}</span><span><strong>{{ action.label }}</strong><small>{{ action.description }}</small></span>{% include "admin/includes/icon.html" with icon="arrow" %}</a>{% endfor %}</div>
+</section>
+{% endblock %}

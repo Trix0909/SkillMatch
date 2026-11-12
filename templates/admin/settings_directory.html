@@ -1,0 +1,8 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <p class="sm-page-intro">Manage accounts, groups, permissions and project records using the existing Django administration tools.</p>
+  <div class="sm-directory">
+    {% include "admin/app_list.html" with app_list=available_apps show_changelinks=True %}
+  </div>
+  <section class="sm-panel sm-settings-note"><h2>Account security</h2><p>Staff access continues to require multi-factor authentication.</p>{% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">Change your password →</a>{% endif %}</section>
+{% endblock %}

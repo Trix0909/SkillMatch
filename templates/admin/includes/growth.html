@@ -1,0 +1,26 @@
+<section class="sm-panel sm-growth" aria-labelledby="growth-heading">
+  <div class="sm-panel-heading">
+    <div>
+      <h2 id="growth-heading">User growth</h2>
+      <p>Cumulative registrations · last {{ period }} months</p>
+    </div>
+    <form method="get" class="sm-period-form"><label class="visually-hidden" for="sm-period">Growth period</label><select id="sm-period" name="period"><option value="12"{% if period == 12 %} selected{% endif %}>Last 12 months</option><option value="6"{% if period == 6 %} selected{% endif %}>Last 6 months</option></select><button type="submit" class="sm-period-submit">Apply</button></form>
+  </div>
+  {% if growth_chart %}
+    <svg class="sm-growth-chart"
+         viewBox="0 0 700 230"
+         role="img"
+         aria-labelledby="chart-title chart-description">
+      <title id="chart-title">Cumulative user registrations over the last {{ period }} months</title>
+      <desc id="chart-description">Based on registration dates of current user records. Monthly values are available in the data table below.</desc>
+      <defs><linearGradient id="sm-chart-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7edeb5" stop-opacity=".28" /><stop offset="100%" stop-color="#7edeb5" stop-opacity=".02" /></linearGradient></defs>
+      {% for tick in growth_chart.ticks %}<line x1="52" y1="{{ tick.y }}" x2="676" y2="{{ tick.y }}" class="sm-gridline" /><text x="40" y="{{ tick.y }}" text-anchor="end" dominant-baseline="middle">{{ tick.value }}</text>{% endfor %}
+      {% for point in growth_chart.points %}<line x1="{{ point.x }}" y1="18" x2="{{ point.x }}" y2="194" class="sm-gridline sm-vertical" /><text x="{{ point.x }}" y="220" text-anchor="middle">{{ point.short }}</text>{% endfor %}
+      <polygon points="{{ growth_chart.area }}" fill="url(#sm-chart-fill)" />
+      <polyline points="{{ growth_chart.line }}" fill="none" stroke="#7edeb5" stroke-width="2.5" stroke-linejoin="round" />
+      {% for point in growth_chart.points %}<circle cx="{{ point.x }}" cy="{{ point.y }}" r="4" fill="#7edeb5"><title>{{ point.label }}: {{ point.total }} users</title></circle>{% endfor %}
+    </svg>
+    <div class="sm-chart-footer"><span class="sm-legend"><i></i>Registered users</span><details class="sm-chart-data"><summary>View data</summary><div class="sm-table-scroll"><table><caption>Cumulative registrations of current user records</caption><thead><tr><th scope="col">Month</th><th scope="col">New users</th><th scope="col">Total</th></tr></thead><tbody>{% for point in growth_chart.points %}<tr><th scope="row">{{ point.label }}</th><td>{{ point.new }}</td><td>{{ point.total }}</td></tr>{% endfor %}</tbody></table></div></details></div>
+  {% else %}<div class="sm-empty">{% include "admin/includes/icon.html" with icon="chart" %}<h3>User growth is restricted</h3><p>You need permission to view users to see registration data.</p></div>{% endif %}
+  <p class="sm-chart-note">Profile creation dates are not recorded; seeker and employer growth is unavailable.</p>
+</section>
