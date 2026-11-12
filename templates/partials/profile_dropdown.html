@@ -1,0 +1,40 @@
+{% if profile_dropdown %}
+  <details class="profile-dropdown" data-profile-dropdown>
+    <summary class="profile-trigger"
+             aria-controls="profile-menu-options"
+             aria-expanded="false"
+             aria-label="Account menu for {{ profile_dropdown.name }}, {{ profile_dropdown.role_label }}">
+      <span class="profile-avatar" aria-hidden="true">
+        {% if profile_dropdown.image_url %}<img src="{{ profile_dropdown.image_url }}"
+     alt=""
+     width="42"
+     height="42">{% else %}{{ profile_dropdown.initial }}{% endif %}
+      </span>
+      <span class="sd-account-name"><strong class="profile-display-name">{{ profile_dropdown.name }}</strong><small>{{ profile_dropdown.role_label }}</small></span>
+      <svg class="profile-chevron"
+           width="16"
+           height="16"
+           viewBox="0 0 24 24"
+           fill="none"
+           stroke="currentColor"
+           stroke-width="1.8"
+           aria-hidden="true">
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </summary>
+    <div class="profile-menu"
+         id="profile-menu-options"
+         aria-label="Account options">
+      <div class="profile-menu-identity"><span>Signed in as</span><strong>@{{ user.username }}</strong></div>
+      <div class="profile-menu-links">
+        <a href="{{ profile_dropdown.profile_url }}">{% include "skillmatch/includes/brand_icon.html" with icon=profile_dropdown.profile_icon %}<span>{{ profile_dropdown.profile_label }}</span></a>
+        <a href="{% url 'account_security' %}">{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}<span>Account security</span></a>
+        <a href="{% url 'social_connections' %}">{% include "skillmatch/includes/brand_icon.html" with icon="link" %}<span>Connected accounts</span></a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}<span>Log out</span></button>
+        </form>
+      </div>
+    </div>
+  </details>
+{% endif %}

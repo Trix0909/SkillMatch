@@ -52,12 +52,31 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(JobPost)
 class JobAdmin(admin.ModelAdmin):
-    list_display = ["title", "employer", "is_active", "created_at"]
+    list_display = ["title", "employer", "availability", "close_date", "is_active", "created_at"]
     list_filter = ["is_active"]
     search_fields = ["title", "description"]
 
+    @admin.display(description="Effective status")
+    def availability(self, obj):
+        return obj.effective_status
 
-admin.site.register([Account, EmployerProfile, SkillCategory])
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("employer__user")
+
+
+@admin.register(Account)
+class AccountAdmin(admin.ModelAdmin):
+    search_fields = ["user__username", "user__email"]
+
+
+@admin.register(EmployerProfile)
+class EmployerAdmin(admin.ModelAdmin):
+    search_fields = ["company_name", "user__username"]
+
+
+@admin.register(SkillCategory)
+class SkillCategoryAdmin(admin.ModelAdmin):
+    search_fields = ["name"]
 
 
 class InspectionAdmin(admin.ModelAdmin):

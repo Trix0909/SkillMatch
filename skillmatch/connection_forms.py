@@ -36,15 +36,25 @@ class InvitationForm(IntroductionForm):
         self.style()
 
 
-class MessageForm(StyledForm, forms.Form):
+class MessageBodyForm(StyledForm, forms.Form):
     body = forms.CharField(
-        max_length=2000, strip=True, label="Message", widget=forms.Textarea(attrs={"rows": 3})
+        max_length=2000,
+        strip=True,
+        label="Message",
+        widget=forms.Textarea(attrs={"rows": 2, "placeholder": "Write a message…"}),
     )
-    submission_key = forms.UUIDField(initial=uuid4, widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.style()
+
+
+class MessageForm(MessageBodyForm):
+    submission_key = forms.UUIDField(initial=uuid4, widget=forms.HiddenInput)
+
+
+class UnsendForm(forms.Form):
+    confirm = forms.BooleanField(required=True, widget=forms.HiddenInput)
 
 
 class StageForm(StyledForm, forms.Form):

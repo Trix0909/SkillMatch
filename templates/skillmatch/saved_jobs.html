@@ -16,8 +16,8 @@
             <div class="sd-company-icon"
                  aria-hidden="true">{{ job.employer.company_name|first|upper }}</div>
             <div class="sd-job-main">
-              <p class="sd-company">{{ job.employer.company_name }}</p>
-              <h3>{% if job.is_active and job.employer.user.is_active %}<a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a>{% else %}{{ job.title }}{% endif %}</h3>
+              <p class="sd-company">{% if account_role == "seeker" and job.employer.user.is_active %}<a href="{% url 'company_detail' job.employer.pk %}">{{ job.employer.company_name }}</a>{% else %}{{ job.employer.company_name }}{% endif %}</p>
+              <h3>{% if job.accepts_new_applications %}<a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a>{% else %}{{ job.title }}{% endif %}</h3>
               <div class="sd-job-meta">
                 <span>{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}{{ job.get_certification_level_display }} certification</span>
                 <span>{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}{{ job.get_experience_level_display }} experience</span>
@@ -26,10 +26,11 @@
                 {% for skill in job.required_skills|slice:':6' %}<li>{{ skill }}</li>{% endfor %}
               </ul>
               <p class="sd-saved-date">Saved {{ saved.created_at|date:'d M Y' }}</p>
+              {% include "skillmatch/includes/job_deadline.html" %}
             </div>
             <div class="sd-saved-actions">
               {% include "skillmatch/includes/save_job_button.html" with job=job is_saved=True %}
-              {% if job.is_active and job.employer.user.is_active %}
+              {% if job.accepts_new_applications %}
                 <div class="rc-job-actions">
                   {% include "skillmatch/connections/job_action.html" %}
                   <a class="sd-button"
@@ -38,6 +39,7 @@
               {% else %}
                 {% include "skillmatch/connections/job_action.html" %}
                 <span class="sd-saved-unavailable">No longer available</span>
+                <span class="sd-saved-unavailable">{{ job.effective_status }}</span>
               {% endif %}
             </div>
           </article>

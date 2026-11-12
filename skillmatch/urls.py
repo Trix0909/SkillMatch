@@ -39,6 +39,16 @@ urlpatterns = [
     path(
         "connections/<int:pk>/messages/", connection_views.message_action, name="connection_message"
     ),
+    path(
+        "connections/<int:pk>/messages/<int:message_pk>/edit/",
+        connection_views.message_edit,
+        name="message_edit",
+    ),
+    path(
+        "connections/<int:pk>/messages/<int:message_pk>/unsend/",
+        connection_views.message_unsend,
+        name="message_unsend",
+    ),
     path("accounts/social/onboarding/", social_views.onboarding, name="socialaccount_signup"),
     path("accounts/security/connections/", social_views.connections, name="social_connections"),
     path("accounts/security/confirm/", social_views.reauthenticate, name="social_reauthenticate"),
@@ -51,6 +61,7 @@ urlpatterns = [
     ),
     path("", views.landing, name="landing"),
     path("home/", views.home, name="home"),
+    path("get-started/", views.get_started, name="get_started"),
     path("accounts/register/", views.register, name="register"),
     path("accounts/switch-role/", views.switch_role, name="switch_role"),
     path(
@@ -70,6 +81,7 @@ urlpatterns = [
     path("accounts/2fa/cancel/", mfa_views.cancel, name="mfa_cancel"),
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("profiles/<int:pk>/", views.profile_detail, name="profile_detail"),
+    path("companies/<int:pk>/", views.company_detail, name="company_detail"),
     path("recommendations/", views.recommendations, name="recommendations"),
     path("saved-jobs/", views.saved_jobs, name="saved_jobs"),
     path("jobs/<int:pk>/save/", views.job_save, name="job_save"),

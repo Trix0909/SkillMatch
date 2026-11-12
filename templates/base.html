@@ -18,12 +18,18 @@
     <script src="{% static 'js/app.js' %}" defer></script>
     {% block extra_head %}{% endblock %}
     <link rel="stylesheet"
-          href="{% static 'css/connections.css' %}?v=contacts-progress-1">
+          href="{% static 'css/connections.css' %}?v=connection-notifications-2">
+    <link rel="stylesheet" href="{% static 'css/botanical-composition.css' %}">
+    {% if profile_dropdown %}
+      <link rel="stylesheet" href="{% static 'css/profile-dropdown.css' %}">
+      <script src="{% static 'js/profile-dropdown.js' %}" defer></script>
+    {% endif %}
   </head>
   <body class="{% if user.is_authenticated %}signed-in rc-workspace{% else %}public{% endif %} {% block body_class %}{% endblock %}">
     <a href="#main" class="skip-link">Skip to content</a>
     {% if user.is_authenticated %}
       <aside class="sidebar">
+        {% include "partials/sidebar_art.html" %}
         {% block sidebar_brand %}
           <a class="brand" href="{% url 'home' %}">
             <span class="brand-icon">s<span>m</span>
@@ -108,6 +114,7 @@
                   <path d="M6 3h12v19l-6-5-6 5z" />
                 </svg>Saved candidates</a>
             {% endif %}
+              {% include "skillmatch/connections/navigation.html" %}
               <a class="{% if active == 'methodology' %}active{% endif %}"
                  href="{% url 'methodology' %}">
                 <span aria-hidden="true">◈</span>How matching works</a>
@@ -119,7 +126,6 @@
                 <button>Sign out ↪</button>
               </form>
           {% endblock %}
-          {% include "skillmatch/connections/navigation.html" %}
         </nav>
         {% block sidebar_footer %}
           <div class="sidebar-bottom">
@@ -159,7 +165,7 @@
             <a href="{% url 'methodology' %}">How it works</a>
             <a href="{% url 'login' %}">Sign in</a>
             <a class="btn btn-primary btn-sm"
-               href="{% url 'register' %}">Get started <span aria-hidden="true">↗</span>
+               href="{% url 'get_started' %}">Get started <span aria-hidden="true">↗</span>
             </a>
           </nav>
         </header>
@@ -168,13 +174,14 @@
     <div class="main-shell">
       {% if user.is_authenticated %}
         {% block authenticated_topbar %}
-          <header class="topbar">
+          <header class="topbar{% if profile_dropdown %} profile-topbar{% endif %}">
             <span>
               {% if user.username|slice:":5" == "demo_" %}Demo workspace · Synthetic profiles & jobs{% else %}Connecting skills to opportunity{% endif %}
             </span>
             <span class="kenya-label">
               <i>
               </i> Made for Kenya</span>
+              {% include "partials/profile_dropdown.html" %}
             </header>
         {% endblock %}
       {% endif %}
@@ -188,12 +195,7 @@
         {% endif %}
         {% block content %}{% endblock %}
       </main>
-      {% block footer %}
-        <footer class="site-footer">
-          <span>SkillMatch · A skill-first connection.</span>
-          <span>CS Project II · Trina Kinyua · 168111</span>
-        </footer>
-      {% endblock %}
+
     </div>
   </body>
 </html>

@@ -5,11 +5,21 @@ from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
 from . import recruitment as workflow
-from .connection_forms import CONSENT, IntroductionForm, InvitationForm, MessageForm, StageForm
+from .connection_forms import (
+    CONSENT,
+    IntroductionForm,
+    InvitationForm,
+    MessageBodyForm,
+    MessageForm,
+    StageForm,
+    UnsendForm,
+)
 from .models import ConnectionActivity, JobPost
 
 
@@ -48,7 +58,8 @@ def connections(request):
     queryset = queryset.annotate(
         unread_messages=Count(
             "messages",
-            filter=Q(messages__read_at__isnull=True) & ~Q(messages__sender=request.user),
+            filter=Q(messages__read_at__isnull=True, messages__unsent_at__isnull=True)
+            & ~Q(messages__sender=request.user),
             distinct=True,
         ),
         unread_updates=Count(
@@ -70,17 +81,47 @@ def connections(request):
     return render(request, "skillmatch/connections/list.html", context)
 
 
-def detail_response(request, connection, message_form=None, stage_form=None, status=200):
+def message_page(connection, message):
+    position = connection.messages.filter(
+        Q(created_at__lt=message.created_at) | Q(created_at=message.created_at, pk__lte=message.pk)
+    ).count()
+    return max(1, (position - 1) // 30 + 1)
+
+
+def detail_response(
+    request,
+    connection,
+    message_form=None,
+    stage_form=None,
+    status=200,
+    *,
+    editing_message=None,
+    edit_form=None,
+    unsending_message=None,
+    chat_error="",
+):
     context = shell(request)
     role = workflow.participant_role(request.user, connection)
     paginator = Paginator(connection.messages.select_related("sender").all(), 30)
-    page = paginator.get_page(request.GET.get("page") or paginator.num_pages)
+    selected_message = editing_message or unsending_message
+    page = paginator.get_page(
+        message_page(connection, selected_message)
+        if selected_message
+        else request.GET.get("page") or paginator.num_pages
+    )
     displayed = list(page.object_list)
     page.object_list = displayed
+    now = timezone.now()
+    for message in displayed:
+        message.can_modify = (
+            message.sender_id == request.user.pk
+            and not workflow.message_action_problem(request.user, connection, message, now=now)
+        )
+        message.action_deadline = workflow.message_deadline(message)
     # Freeze the selected IDs before updating receipts: unseen pages/new arrivals stay unread.
-    connection.messages.filter(pk__in=[m.pk for m in displayed], read_at__isnull=True).exclude(
-        sender=request.user
-    ).update(read_at=timezone.now())
+    connection.messages.filter(
+        pk__in=[m.pk for m in displayed], read_at__isnull=True, unsent_at__isnull=True
+    ).exclude(sender=request.user).update(read_at=timezone.now())
     activities = Paginator(connection.activities.select_related("actor"), 20)
     activity_page = activities.get_page(request.GET.get("activity_page") or activities.num_pages)
     events = list(activity_page.object_list)
@@ -102,6 +143,19 @@ def detail_response(request, connection, message_form=None, stage_form=None, sta
         participant_role=role,
         page_obj=page,
         activity_page=activity_page,
+        chat_recipient=connection.seeker.display_name
+        if role == "employer"
+        else connection.job.employer.company_name,
+        chat_now=now,
+        introduction_is_mine=connection.initiated_by == role,
+        editing_message=editing_message,
+        edit_form=edit_form
+        if edit_form is not None
+        else MessageBodyForm(initial={"body": editing_message.body}, auto_id="id_edit_%s")
+        if editing_message
+        else None,
+        unsending_message=unsending_message,
+        chat_error=chat_error,
         intro_author=connection.seeker.display_name
         if connection.initiated_by == "seeker"
         else connection.job.employer.company_name,
@@ -132,7 +186,25 @@ def detail_response(request, connection, message_form=None, stage_form=None, sta
 
 @login_required
 def connection_detail(request, pk):
-    return detail_response(request, workflow.get_connection(request.user, pk))
+    connection = workflow.get_connection(request.user, pk)
+    for action in ("edit", "unsend"):
+        if action not in request.GET:
+            continue
+        raw = request.GET[action]
+        if not raw.isascii() or not raw.isdecimal() or len(raw) > 19:
+            from django.http import Http404
+
+            raise Http404
+        message = workflow.owned_message(request.user, connection, int(raw))
+        problem = workflow.message_action_problem(request.user, connection, message)
+        if problem:
+            return detail_response(request, connection, status=400, chat_error=problem)
+        return detail_response(
+            request,
+            connection,
+            **{"editing_message" if action == "edit" else "unsending_message": message},
+        )
+    return detail_response(request, connection)
 
 
 def failure(request, error, connection=None):
@@ -173,13 +245,21 @@ def apply(request, pk):
 @require_POST
 def invite(request, seeker_pk, job_pk=None):
     workflow.require_role(request.user, "employer")
-    jobs = JobPost.objects.filter(employer__user=request.user, is_active=True)
+    jobs = JobPost.objects.accepting_applications().filter(employer__user=request.user)
     if job_pk is not None:
         job = get_object_or_404(JobPost, pk=job_pk)
         if job.employer.user_id != request.user.pk:
             raise PermissionDenied
         form = IntroductionForm(request.POST)
     else:
+        # A posted selection may accept an existing incoming request after its deadline.
+        # Existing pairs are also valid duplicate submissions; initiate() applies
+        # their response/availability rules without ever creating another pair.
+        jobs = (
+            JobPost.objects.filter(employer__user=request.user)
+            .filter(Q(pk__in=jobs.values("pk")) | Q(connections__seeker_id=seeker_pk))
+            .distinct()
+        )
         form = InvitationForm(request.POST, jobs=jobs)
     if not form.is_valid():
         return render(
@@ -248,12 +328,80 @@ def message_action(request, pk):
     return redirect("connection_detail", pk=pk)
 
 
+def changed_message_redirect(request, connection, message):
+    query = {"page": message_page(connection, message)}
+    if "activity_page" in request.GET:
+        query["activity_page"] = request.GET["activity_page"]
+    return redirect(
+        f"{reverse('connection_detail', args=[connection.pk])}?{urlencode(query)}#message-{message.pk}"
+    )
+
+
+@login_required
+@require_POST
+def message_edit(request, pk, message_pk):
+    connection = workflow.get_connection(request.user, pk)
+    message = workflow.owned_message(request.user, connection, message_pk)
+    problem = workflow.message_action_problem(request.user, connection, message)
+    if problem:
+        return detail_response(request, connection, status=400, chat_error=problem)
+    form = MessageBodyForm(request.POST, auto_id="id_edit_%s")
+    if not form.is_valid():
+        # Re-read before displaying a stale submitted body: unsent content stays removed.
+        message = workflow.owned_message(request.user, connection, message_pk)
+        problem = workflow.message_action_problem(request.user, connection, message)
+        if problem:
+            return detail_response(request, connection, status=400, chat_error=problem)
+        return detail_response(
+            request, connection, status=400, editing_message=message, edit_form=form
+        )
+    try:
+        message = workflow.edit_message(request.user, pk, message_pk, form.cleaned_data["body"])
+    except workflow.WorkflowError as error:
+        return detail_response(
+            request,
+            workflow.get_connection(request.user, pk),
+            status=error.status,
+            chat_error=" ".join(error.messages),
+        )
+    return changed_message_redirect(request, connection, message)
+
+
+@login_required
+@require_POST
+def message_unsend(request, pk, message_pk):
+    connection = workflow.get_connection(request.user, pk)
+    message = workflow.owned_message(request.user, connection, message_pk)
+    problem = workflow.message_action_problem(request.user, connection, message)
+    if problem:
+        return detail_response(request, connection, status=400, chat_error=problem)
+    form = UnsendForm(request.POST)
+    if not form.is_valid():
+        return detail_response(
+            request,
+            connection,
+            status=400,
+            unsending_message=message,
+            chat_error="Confirm Unsend to remove this message for both participants.",
+        )
+    try:
+        message = workflow.unsend_message(request.user, pk, message_pk)
+    except workflow.WorkflowError as error:
+        return detail_response(
+            request,
+            workflow.get_connection(request.user, pk),
+            status=error.status,
+            chat_error=" ".join(error.messages),
+        )
+    return changed_message_redirect(request, connection, message)
+
+
 def candidate_invitation_context(request, profile):
     """Explicit job selection only: never choose a convenient first job."""
     role = getattr(getattr(request.user, "account", None), "active_role", "")
     if role != "employer" or profile.user_id == request.user.pk:
         return {}
-    jobs = JobPost.objects.filter(employer__user=request.user, is_active=True)
+    jobs = JobPost.objects.accepting_applications().filter(employer__user=request.user)
     selected = None
     if "job" in request.GET:
         raw = request.GET["job"]
@@ -269,7 +417,10 @@ def candidate_invitation_context(request, profile):
     new_jobs = jobs.exclude(connections__seeker=profile)
     return {
         "invitation_form": InvitationForm(
-            jobs=new_jobs, initial={"job": selected.pk if selected and selected.is_active else None}
+            jobs=new_jobs,
+            initial={
+                "job": selected.pk if selected and selected.accepts_new_applications else None
+            },
         ),
         "invitation_jobs_available": new_jobs.exists(),
         "candidate_connections": existing,

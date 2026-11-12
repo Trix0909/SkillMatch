@@ -386,8 +386,17 @@ class JobForm(StyledForm, forms.ModelForm):
 
     class Meta:
         model = JobPost
-        fields = ["title", "description", "skills_json", "certification_level", "experience_level"]
+        fields = [
+            "title",
+            "description",
+            "skills_json",
+            "certification_level",
+            "experience_level",
+            "close_date",
+        ]
+        widgets = {"close_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")}
         labels = {
+            "close_date": "Application deadline (optional)",
             "certification_level": "Minimum certification level",
             "experience_level": "Minimum experience level",
         }
@@ -397,8 +406,32 @@ class JobForm(StyledForm, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        from .job_dates import business_date
+
+        self.original_close_date = self.instance.close_date
+        today = business_date()
+        self.fields["close_date"].widget.attrs["min"] = min(
+            self.original_close_date or today, today
+        ).isoformat()
+        self.fields["close_date"].help_text = (
+            "Leave blank for no deadline. Applications remain open throughout this date and "
+            "close at midnight at the start of the next day in Africa/Nairobi. "
+            "Existing recruitment conversations can continue after the deadline. "
+            "Extending or removing a passed deadline makes an otherwise active job available "
+            "again; a job closed by the employer stays closed."
+        )
         self.initial["skills_json"] = json.dumps(self.instance.required_skills or [])
         self.style()
+
+    def clean_close_date(self):
+        from .job_dates import business_date
+
+        value = self.cleaned_data["close_date"]
+        if value and value < business_date() and value != self.original_close_date:
+            raise forms.ValidationError(
+                "Choose today or a later date, or leave the deadline blank."
+            )
+        return value
 
     def clean_skills_json(self):
         skills = parse_skills(self.cleaned_data["skills_json"])
@@ -413,7 +446,57 @@ class JobForm(StyledForm, forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.required_skills = self.cleaned_data["skills_json"]
-        return super().save(commit)
+        instance = super().save(commit=False)
+        if commit:
+            if instance.pk:
+                # Never write a stale manual open/closed state from an ordinary edit.
+                instance.save(
+                    update_fields=[
+                        "title",
+                        "description",
+                        "required_skills",
+                        "certification_level",
+                        "experience_level",
+                        "close_date",
+                        "updated_at",
+                    ]
+                )
+            else:
+                instance.save()
+            self.save_m2m()
+        return instance
+
+
+class ReopenJobForm(StyledForm, forms.Form):
+    deadline = forms.ChoiceField(
+        label="Application deadline",
+        choices=[("date", "Set a new deadline"), ("none", "No deadline")],
+    )
+    close_date = forms.DateField(
+        required=False,
+        label="New closing date",
+        widget=forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+        help_text="Open throughout this date; closes at midnight the next day in Africa/Nairobi.",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .job_dates import business_date
+
+        self.fields["close_date"].widget.attrs["min"] = business_date().isoformat()
+        self.style()
+
+    def clean(self):
+        from .job_dates import business_date
+
+        values = super().clean()
+        if values.get("deadline") == "none":
+            values["close_date"] = None
+        elif values.get("deadline") == "date":
+            value = values.get("close_date")
+            if not value or value < business_date():
+                self.add_error("close_date", "Choose today or a later date.")
+        return values
 
 
 class SearchForm(StyledForm, forms.Form):

@@ -10,7 +10,7 @@ from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_safe
 
 from . import recruitment as workflow
 from .connection_forms import CONSENT, IntroductionForm
@@ -21,10 +21,12 @@ from .forms import (
     JobForm,
     ProfileForm,
     RegistrationForm,
+    ReopenJobForm,
     SearchForm,
 )
+from .match_filters import minimum_match_results
 from .matching import MatchingAlgorithm
-from .models import Account, EmployerProfile, JobPost, JobSeekerProfile, SavedCandidate, SavedJob
+from .models import Account, EmployerProfile, JobPost, JobSeekerProfile, SavedCandidate
 
 
 def role_required(role):
@@ -56,9 +58,7 @@ def profiles():
 
 
 def active_jobs():
-    return JobPost.objects.filter(is_active=True, employer__user__is_active=True).select_related(
-        "employer__user"
-    )
+    return JobPost.objects.accepting_applications().select_related("employer__user")
 
 
 def landing(request):
@@ -67,10 +67,19 @@ def landing(request):
     return render(request, "skillmatch/landing.html")
 
 
+@require_safe
+def get_started(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+    return render(request, "skillmatch/get_started.html")
+
+
 def register(request):
     if request.user.is_authenticated:
         return redirect("home")
-    form = RegistrationForm(request.POST or None)
+    role = request.GET.get("role", "")
+    initial = {"role": role} if role in {"seeker", "employer"} else {}
+    form = RegistrationForm(request.POST or None, initial=initial)
     if request.method == "POST" and form.is_valid():
         user = form.save()
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
@@ -138,7 +147,9 @@ def profile_edit(request):
             "seeker": seeker,
             "profile": profile,
             "active": "profile",
-            "active_job_count": profile.jobs.filter(is_active=True).count() if not seeker else None,
+            "active_job_count": profile.jobs.accepting_applications().count()
+            if not seeker
+            else None,
         },
     )
 
@@ -170,12 +181,32 @@ def profile_detail(request, pk):
 
 
 @role_required("seeker")
+@require_safe
+def company_detail(request, pk):
+    company = get_object_or_404(
+        EmployerProfile.objects.select_related("user"), pk=pk, user__is_active=True
+    )
+    return render(
+        request,
+        "skillmatch/company_detail.html",
+        {
+            "profile": company,
+            "preview": EmployerForm(instance=company).preview,
+            "active_job_count": company.jobs.accepting_applications().count(),
+            "active": "jobs",
+        },
+    )
+
+
+@role_required("seeker")
 def recommendations(request):
     profile = get_object_or_404(profiles(), user=request.user)
     matches = MatchingAlgorithm().rank_jobs(
         profile, active_jobs().exclude(employer__user=request.user)
     )
-    page = Paginator(matches, 10).get_page(request.GET.get("page"))
+    best_match = matches[0] if matches else None
+    filtered, filter_context = minimum_match_results(request, matches)
+    page = Paginator(filtered, 10).get_page(request.GET.get("page"))
     hour = timezone.localtime().hour
     greeting = (
         "Good morning"
@@ -201,6 +232,8 @@ def recommendations(request):
             "active": "recommendations",
             "greeting": greeting,
             "saved_job_ids": saved_job_ids,
+            "best_match": best_match,
+            **filter_context,
         },
     )
 
@@ -235,8 +268,7 @@ def saved_job_return(request):
 @role_required("seeker")
 @require_POST
 def job_save(request, pk):
-    job = get_object_or_404(active_jobs().exclude(employer__user=request.user), pk=pk)
-    SavedJob.objects.get_or_create(user=request.user, job=job)
+    workflow.save_job_bookmark(request.user, pk)
     return saved_job_return(request)
 
 
@@ -283,8 +315,7 @@ def job_detail(request, pk):
             not account
             or account.active_role != "seeker"
             or not hasattr(request.user, "seeker_profile")
-            or not job.is_active
-            or not job.employer.user.is_active
+            or not job.accepts_new_applications
         )
     ):
         raise PermissionDenied
@@ -319,7 +350,7 @@ def employer_jobs(request):
             },
         )
     recent_jobs = list(queryset[:4])
-    match_job = queryset.filter(is_active=True).first()
+    match_job = queryset.accepting_applications().first()
     candidate_pool = list(profiles().exclude(user=request.user))
     engine = MatchingAlgorithm()
     results = {}
@@ -338,7 +369,7 @@ def employer_jobs(request):
         "skillmatch/employer_dashboard.html",
         {
             "active": "employer_home",
-            "active_job_count": queryset.filter(is_active=True).count(),
+            "active_job_count": queryset.accepting_applications().count(),
             "candidate_match_count": len(matches),
             "best_match": matches[0] if matches else None,
             "match_job": match_job,
@@ -421,10 +452,12 @@ def job_form(request, pk=None):
         else JobPost(employer=request.user.employer_profile)
     )
     form = JobForm(request.POST or None, instance=job)
-    if request.method == "POST" and form.is_valid():
-        job = form.save()
-        messages.success(request, "Your job post has been saved.")
-        return redirect("job_candidates", pk=job.pk)
+    if request.method == "POST":
+        form = workflow.save_job_edit(request.user, pk, request.POST)
+        job = form.instance
+        if form.is_valid():
+            messages.success(request, "Your job post has been saved.")
+            return redirect("job_candidates", pk=job.pk)
     return render(request, "skillmatch/job_form.html", {"form": form, "job": job, "active": "jobs"})
 
 
@@ -432,11 +465,30 @@ def job_form(request, pk=None):
 @require_POST
 def job_toggle(request, pk):
     job = get_object_or_404(JobPost, pk=pk, employer=request.user.employer_profile)
+    action = request.POST.get("action")
+    form = None
+    deadline = {}
+    if action == "reopen" and (job.deadline_passed or "save_reopen" in request.POST):
+        form = ReopenJobForm(request.POST if "save_reopen" in request.POST else None)
+        if not form.is_bound or not form.is_valid():
+            return render(
+                request,
+                "skillmatch/job_reopen.html",
+                {"job": job, "form": form, "active": "jobs"},
+                status=400 if form.is_bound else 200,
+            )
+        deadline["close_date"] = form.cleaned_data["close_date"]
     try:
-        job = workflow.toggle_job(request.user, pk)
+        job = workflow.change_job_state(request.user, pk, action, **deadline)
     except workflow.WorkflowError as error:
-        messages.error(request, " ".join(error.messages))
-        return redirect("employer_jobs")
+        form = form or ReopenJobForm(request.POST)
+        form.add_error(None, error)
+        return render(
+            request,
+            "skillmatch/job_reopen.html",
+            {"job": job, "form": form, "active": "jobs"},
+            status=error.status,
+        )
     messages.success(
         request,
         "Job reopened." if job.is_active else "Job closed and removed from recommendations.",
@@ -477,7 +529,8 @@ def candidates(request, pk=None):
     elif form.is_bound and form.is_valid():
         searched = True
         matches = MatchingAlgorithm().rank_candidates(form.cleaned_data["q"], profiles())
-    page = Paginator(matches, 10).get_page(request.GET.get("page"))
+    filtered, filter_context = minimum_match_results(request, matches)
+    page = Paginator(filtered, 10).get_page(request.GET.get("page"))
     states = workflow.candidate_states(request.user, job, [match.item for match in page])
     for match in page:
         match.item.recruitment_connection = states.get(match.item.pk)
@@ -488,6 +541,7 @@ def candidates(request, pk=None):
             "job": job,
             "form": form,
             "searched": searched,
+            **filter_context,
             "page_obj": page,
             "active": "candidates",
             "saved_candidate_ids": set(

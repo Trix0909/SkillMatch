@@ -14,8 +14,12 @@
      {% if active == 'employer_home' %}aria-current="page"{% endif %}>
     {% include "skillmatch/includes/brand_icon.html" with icon="home" %}Home
   </a>
-  <a href="{% url 'employer_jobs' %}?view=all">{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}My job posts</a>
-  <a href="{% url 'candidates' %}">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}Find candidates</a>
+  <a class="{% if active == 'jobs' %}active{% endif %}"
+     href="{% url 'employer_jobs' %}?view=all"
+     {% if active == 'jobs' %}aria-current="page"{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}My job posts</a>
+  <a class="{% if active == 'candidates' %}active{% endif %}"
+     href="{% url 'candidates' %}"
+     {% if active == 'candidates' %}aria-current="page"{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="people" %}Find candidates</a>
   <a class="{% if active == 'profile' %}active{% endif %}"
      href="{% url 'profile_edit' %}"
      {% if active == 'profile' %}aria-current="page"{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="building" %}Company profile</a>
@@ -24,6 +28,9 @@
      {% if active == 'saved_candidates' %}aria-current="page"{% endif %}>
     {% include "skillmatch/includes/brand_icon.html" with icon="bookmark" %}Saved candidates
   </a>
-  <a href="{% url 'methodology' %}">{% include "skillmatch/includes/brand_icon.html" with icon="lightbulb" %}How it works</a>
+  {% include "skillmatch/connections/navigation.html" %}
+  <a class="{% if active == 'methodology' %}active{% endif %}"
+     href="{% url 'methodology' %}"
+     {% if active == 'methodology' %}aria-current="page"{% endif %}>{% include "skillmatch/includes/brand_icon.html" with icon="lightbulb" %}How it works</a>
   {% if user.is_staff %}<a href="{% url 'admin:index' %}">Administration →</a>{% endif %}
 {% endblock %}

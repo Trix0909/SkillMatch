@@ -1,11 +1,15 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% block title %}A little extra protection · SkillMatch{% endblock %}
 {% block content %}
   <div class="row">
     <div class="col-lg-8">
-      <section class="panel form-panel" aria-labelledby="reminder-title">
+      <section class="panel form-panel wp-action-panel"
+               aria-labelledby="reminder-title">
+        <span class="wp-icon wp-section-mark">
+          {% include "skillmatch/includes/brand_icon.html" with icon="shield" %}
+        </span>
         <span class="eyebrow">YOUR ACCOUNT, YOUR CHOICE</span>
-        <h1 id="reminder-title">A little extra protection</h1>
+        <h1 id="reminder-title">A little extra <em>protection</em></h1>
         <p>Add an extra layer of security to your account with Two-Factor Authentication.</p>
         <p>If you choose not to enable it now, you can set it up later from <a href="{% url 'profile_edit' %}">{% if account_role == "employer" %}Company profile{% else %}My profile{% endif %}</a> → <a href="{% url 'account_security' %}">Two-factor authentication settings</a>.</p>
         <form method="post" class="d-flex flex-wrap gap-3 mt-4">

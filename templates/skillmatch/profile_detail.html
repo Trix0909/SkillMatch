@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% load static %}
 {% block extra_head %}
+  {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/profile-images.css' %}">
   {% if account_role == "employer" %}
     <link rel="stylesheet" href="{% static 'css/candidate-bookmarks.css' %}">
@@ -10,7 +11,8 @@
 {% block content %}
   <div class="breadcrumb-line">
     <a href="{% url 'home' %}">Workspace</a> / Professional profile</div>
-  <div class="panel profile-header" id="candidate-{{ profile.pk }}">
+  <div class="panel profile-header wp-profile-header"
+       id="candidate-{{ profile.pk }}">
     <span class="avatar large">{% if profile.photo %}<img src="{{ profile.photo.url }}" alt="" width="72" height="72">{% else %}{{ profile.display_name|first|upper }}{% endif %}</span>
     <div>
       <span class="eyebrow">PROFESSIONAL PROFILE</span>
@@ -21,35 +23,19 @@
         <span class="level-tag">{{ profile.get_experience_level_display }} experience</span>
       </div>
     </div>
-    {% if user.id == profile.user_id %}
+    {% if user.id == profile.user_id and account_role == "seeker" %}
       <a class="btn btn-outline-secondary ms-auto"
          href="{% url 'profile_edit' %}">Edit profile ↗</a>
-    {% elif account_role == "employer" and profile.is_complete %}
+    {% elif account_role == "employer" and profile.is_complete and user.pk != profile.user_id %}
       {% include "skillmatch/includes/save_candidate_button.html" with candidate=profile is_saved=candidate_is_saved %}
     {% endif %}
   </div>
-  {% if not profile.is_complete %}
+  {% if not profile.is_complete and account_role == "seeker" and user.pk == profile.user_id %}
     <div class="alert alert-warning mt-4">Complete your skills, summary and portfolio to appear in matching results.</div>
   {% endif %}
   {% if user.pk == profile.user_id or contact_allowed %}<section class="panel mt-4"><h2>Contact details</h2>{% if profile.user.email %}<p>{{ profile.user.email }}</p>{% endif %}{% if profile.phone %}<p>{{ profile.phone }}</p>{% endif %}</section>{% endif %}
-  {% if account_role == "employer" and user.pk != profile.user_id %}
-    <section id="invite"
-             class="panel mt-4 rc-confirm"
-             aria-labelledby="invite-heading">
-      <h2 id="invite-heading">Invite {{ profile.display_name }}</h2>
-      <p class="rc-muted">Invitation recipient: {{ profile.display_name }} (@{{ profile.user.username }}).</p>
-      {% if selected_connection %}
-        {% include "skillmatch/connections/state.html" with connection=selected_connection %}
-      {% elif invitation_jobs_available %}
-        <p>Confirm the opportunity and add an optional introduction before sending your invitation.</p>
-        {% url 'candidate_invite' profile.pk as confirmation_url %}
-        {% include "skillmatch/connections/confirmation_form.html" with form=invitation_form confirmation_label="Send invitation" %}
-  {% else %}<p>An active job without an existing connection is needed for a new invitation. <a href="{% url 'job_create' %}">Post a job →</a></p>{% endif %}
-  {% for connection in candidate_connections %}<p>{{ connection.job.title }}: {% include "skillmatch/connections/state.html" %}</p>{% endfor %}
-    </section>
-  {% endif %}
-  <div class="row g-4 mt-2">
-    <div class="col-lg-8">
+  <div class="wp-detail-layout wp-profile-content">
+    <div>
       <section class="panel">
         <span class="eyebrow">INTRODUCTION</span>
         <h2>Professional summary</h2>
@@ -61,7 +47,7 @@
         <div class="prose">{{ profile.portfolio|linebreaks }}</div>
       </section>
     </div>
-    <aside class="col-lg-4">
+    <aside>
       <section class="panel">
         <h3>Skills</h3>
         <div class="skill-tags">
@@ -86,4 +72,20 @@
       </section>
     </aside>
   </div>
+  {% if account_role == "employer" and user.pk != profile.user_id %}
+    <section id="invite"
+             class="panel mt-4 rc-confirm"
+             aria-labelledby="invite-heading">
+      <h2 id="invite-heading">Invite {{ profile.display_name }}</h2>
+      <p class="rc-muted">Invitation recipient: {{ profile.display_name }} (@{{ profile.user.username }}).</p>
+      {% if selected_connection %}
+        {% include "skillmatch/connections/state.html" with connection=selected_connection %}
+      {% elif invitation_jobs_available %}
+        <p>Confirm the opportunity and add an optional introduction before sending your invitation.</p>
+        {% url 'candidate_invite' profile.pk as confirmation_url %}
+        {% include "skillmatch/connections/confirmation_form.html" with form=invitation_form confirmation_label="Send invitation" %}
+  {% else %}<p>An active job without an existing connection is needed for a new invitation. <a href="{% url 'job_create' %}">Post a job →</a></p>{% endif %}
+  {% for connection in candidate_connections %}<p>{{ connection.job.title }}: {% include "skillmatch/connections/state.html" %}</p>{% endfor %}
+    </section>
+  {% endif %}
 {% endblock %}

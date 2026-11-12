@@ -1,5 +1,7 @@
 from datetime import timedelta
+from types import SimpleNamespace
 
+from django.template.loader import render_to_string
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
@@ -17,8 +19,9 @@ class ContactCardTests(WorkflowCase):
     def test_employer_gets_labelled_candidate_contact_and_correct_copy_values(self):
         connection = self.accepted()
         response = self.page(self.employer, connection)
-        self.assertContains(response, "Job seeker:")
-        self.assertContains(response, "(@seeker)")
+        self.assertContains(response, 'class="rc-participant-name"')
+        self.assertContains(response, "@seeker")
+        self.assertContains(response, 'class="rc-contact-tile"', count=2)
         self.assertContains(response, reverse("profile_detail", args=[self.profile.pk]))
         self.assertContains(response, "Email:")
         self.assertContains(response, "Contact:")
@@ -33,7 +36,7 @@ class ContactCardTests(WorkflowCase):
         self.assertNotContains(response, self.employer.email)
         self.assertContains(response, "Contact access is granted by acceptance.")
 
-    def test_seeker_gets_employer_email_beneath_company_and_no_phone_row(self):
+    def test_seeker_gets_employer_identity_and_full_width_email_tile_without_phone(self):
         response = self.page(self.seeker, self.accepted())
         self.assertContains(
             response, f"<span data-copy-value>{self.employer.email}</span>", html=True
@@ -42,12 +45,18 @@ class ContactCardTests(WorkflowCase):
         self.assertNotContains(response, self.profile.phone)
         self.assertContains(response, 'aria-label="Copy email address"', count=1)
         self.assertNotContains(response, "Copy phone number")
-        self.assertNotContains(response, "Contact:</dt>")
+        self.assertNotContains(response, 'class="rc-tile-label">Contact:</span>')
+        self.assertContains(response, 'class="rc-contact-tile"', count=1)
         card = (
-            response.content.decode().split('class="rc-card rc-parties"', 1)[1].split("</dl>", 1)[0]
+            response.content.decode()
+            .split('class="rc-card rc-parties"', 1)[1]
+            .split("</section>", 1)[0]
         )
-        self.assertLess(card.index("Employer:"), card.index("Email:"))
-        self.assertLess(card.index("Email:"), card.index("Job seeker:"))
+        header, contacts = card.split('class="rc-contact-tiles"', 1)
+        self.assertIn(self.company.company_name, header)
+        self.assertIn("Job seeker", header)
+        self.assertIn("@seeker", header)
+        self.assertIn(self.employer.email, contacts)
 
     def test_blank_phone_or_email_produces_no_empty_row_or_copy_button(self):
         connection = self.accepted()
@@ -55,13 +64,41 @@ class ContactCardTests(WorkflowCase):
             self.profile.phone = value
             self.profile.save(update_fields=["phone"])
             response = self.page(self.employer, connection)
-            self.assertNotContains(response, "Contact:</dt>")
+            self.assertNotContains(response, 'class="rc-tile-label">Contact:</span>')
             self.assertNotContains(response, "Copy phone number")
+            self.assertContains(response, 'class="rc-contact-tile"', count=1)
         self.seeker.email = ""
         self.seeker.save(update_fields=["email"])
         response = self.page(self.employer, connection)
-        self.assertNotContains(response, "Email:</dt>")
+        self.assertNotContains(response, 'class="rc-tile-label">Email:</span>')
         self.assertNotContains(response, "data-copy-contact")
+        self.assertNotContains(response, 'class="rc-contact-tiles"')
+
+    def test_profile_led_header_images_fallbacks_and_full_privacy_explanation(self):
+        connection = self.accepted()
+        self.seeker.last_name = "Kamau"
+        self.seeker.save(update_fields=["last_name"])
+        connection.seeker = self.profile
+        connection.job.employer = self.company
+        context = {"connection": connection, "participant_role": "employer"}
+        without_image = render_to_string("skillmatch/connections/participant_card.html", context)
+        self.assertIn("AK", without_image)
+        self.assertNotIn("Connected</", without_image)
+        self.assertNotIn('class="rc-contact-tiles"', without_image)
+        self.assertIn("another accepted connection may still grant access.", without_image)
+        self.profile.photo = SimpleNamespace(url="/media/profile-photo.jpg")
+        with_image = render_to_string("skillmatch/connections/participant_card.html", context)
+        self.assertIn('src="/media/profile-photo.jpg"', with_image)
+        self.assertNotIn("data-copy-contact", with_image)
+
+        context["participant_role"] = "seeker"
+        self.company.logo = SimpleNamespace(url="/media/company-logo.png")
+        with_logo = render_to_string("skillmatch/connections/participant_card.html", context)
+        self.assertIn('src="/media/company-logo.png"', with_logo)
+        self.company.logo = None
+        without_logo = render_to_string("skillmatch/connections/participant_card.html", context)
+        self.assertIn('data-image-fallback="logo"', without_logo)
+        self.assertIn(">K</span>", without_logo)
 
     def test_unaccepted_and_withdrawn_contacts_are_not_embedded_anywhere(self):
         connection = self.pending()
@@ -73,11 +110,13 @@ class ContactCardTests(WorkflowCase):
                     for private in [self.seeker.email, self.employer.email, self.profile.phone]:
                         self.assertNotContains(response, private)
                     self.assertNotContains(response, "data-copy-contact")
+                    self.assertNotContains(response, 'class="rc-contact-tiles"')
+                    self.assertContains(response, 'class="rc-contact-privacy"')
 
     def test_existing_contact_access_policy_survives_new_structure(self):
         connection = self.accepted()
         flow.set_stage(self.employer, connection.pk, "not_selected")
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "close")
         self.assertContains(self.page(self.employer, connection), self.seeker.email)
         self.assertContains(self.page(self.seeker, connection), self.employer.email)
         self.seeker.is_active = False
@@ -236,8 +275,8 @@ class RecruitmentProgressTests(WorkflowCase):
         self.assertContains(response, self.seeker.email)
         self.assertNotContains(response, 'name="body"')
         self.assertNotContains(response, "Confirm not selected")
-        flow.toggle_job(self.employer, self.job.pk)
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "close")
+        flow.change_job_state(self.employer, self.job.pk, "reopen")
         self.assertNotContains(self.page(connection), "Mark offer made")
 
     def test_stale_forward_form_cannot_end_consideration_from_newer_stage(self):

@@ -266,7 +266,10 @@ class ProjectCase(TestCase):
                 self.client.post(reverse(name, args=[self.job.pk]), {}).status_code, 404
             )
         self.assertEqual(
-            self.client.post(reverse("job_toggle", args=[self.job.pk])).status_code, 404
+            self.client.post(
+                reverse("job_toggle", args=[self.job.pk]), {"action": "close"}
+            ).status_code,
+            404,
         )
         self.assertTrue(JobPost.objects.filter(pk=self.job.pk, is_active=True).exists())
 
@@ -323,7 +326,7 @@ class ProjectCase(TestCase):
         self.assertEqual(
             self.client.get(reverse("job_toggle", args=[self.job.pk])).status_code, 405
         )
-        self.client.post(reverse("job_toggle", args=[self.job.pk]))
+        self.client.post(reverse("job_toggle", args=[self.job.pk]), {"action": "close"})
         self.job.refresh_from_db()
         self.assertFalse(self.job.is_active)
         self.client.force_login(self.seeker)

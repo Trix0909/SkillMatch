@@ -18,21 +18,7 @@
 {% block body_class %}sm-landing{% endblock %}
 {% block main_class %}sm-main{% endblock %}
 {% block public_header %}
-  <header class="sm-header">
-    <div class="sm-container sm-header-inner">
-      <a class="sm-brand"
-         href="{% url 'landing' %}"
-         aria-label="SkillMatch home"><img src="{% static 'images/brand/match-point.svg' %}"
-     width="32"
-     height="38"
-     alt=""><span>SkillMatch</span></a>
-      <nav class="sm-desktop-nav" aria-label="Main navigation">
-        <a href="#for-job-seekers">For job seekers</a><a href="#for-employers">For employers</a><a href="#how-it-works">How it works</a><a href="#about">About</a>
-      </nav>
-      <div class="sm-header-actions"><a class="sm-button sm-button-white" href="{% url 'login' %}">Sign in</a><a class="sm-button sm-button-primary" href="{% url 'register' %}">Get started {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div>
-      <details class="sm-mobile-nav"><summary aria-label="Navigation menu"><span></span><span></span><span></span></summary><nav aria-label="Mobile navigation"><a href="#for-job-seekers">For job seekers</a><a href="#for-employers">For employers</a><a href="#how-it-works">How it works</a><a href="#about">About SkillMatch</a><a href="{% url 'login' %}">Sign in</a><a href="{% url 'register' %}">Get started →</a></nav></details>
-    </div>
-  </header>
+  {% include "partials/public_header.html" %}
 {% endblock %}
 {% block content %}
   <section class="sm-hero" aria-labelledby="hero-title">
@@ -47,9 +33,9 @@
         <p class="sm-hero-description">SkillMatch connects Kenyan professionals and SMEs through skills, experience and professional profiles — for more meaningful opportunities and stronger businesses.</p>
         <div class="sm-hero-actions"><a id="for-job-seekers"
    class="sm-button sm-button-primary"
-   href="{% url 'register' %}">{% include "skillmatch/includes/brand_icon.html" with icon="person" %} I’m looking for work {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a><a id="for-employers"
+   href="{% url 'register' %}?role=seeker">{% include "skillmatch/includes/brand_icon.html" with icon="person" %} I’m looking for work {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a><a id="for-employers"
    class="sm-button sm-button-sage"
-   href="{% url 'register' %}">{% include "skillmatch/includes/brand_icon.html" with icon="building" %} I’m hiring {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div>
+   href="{% url 'register' %}?role=employer">{% include "skillmatch/includes/brand_icon.html" with icon="building" %} I’m hiring {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div>
         <p class="sm-hero-note">One account for job seeking and hiring. Switch anytime from inside your account.</p>
         <p class="sm-hero-note">Real people. Real skills. A stronger Kenya.</p>
       </div>
@@ -117,6 +103,5 @@
       <a class="sm-text-link" href="{% url 'methodology' %}">Explore how matching works {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a>
     </div>
   </section>
-  <section id="about" class="sm-about" aria-labelledby="about-title"><div class="sm-container sm-about-inner"><div><span class="sm-eyebrow">Rooted in Kenya. Built around skills.</span><h2 id="about-title">Talent deserves the right connection.</h2></div><div><p>For professionals taking their next step and small businesses building their teams, SkillMatch brings structured profiles and explainable matching together.</p><a class="sm-text-link" href="{% url 'register' %}">Find your starting point {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div></div></section>
+  <section id="about" class="sm-about" aria-labelledby="about-title"><div class="sm-container sm-about-inner"><div><span class="sm-eyebrow">Rooted in Kenya. Built around skills.</span><h2 id="about-title">Talent deserves the right connection.</h2></div><div><p>For professionals taking their next step and small businesses building their teams, SkillMatch brings structured profiles and explainable matching together.</p><a class="sm-text-link" href="{% url 'get_started' %}">Find your starting point {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div></div></section>
 {% endblock %}
-{% block footer %}<footer class="sm-footer sm-container"><span>SkillMatch · Real skills. Real opportunities.</span><span>Made for Kenyan talent &amp; SMEs.</span></footer>{% endblock %}

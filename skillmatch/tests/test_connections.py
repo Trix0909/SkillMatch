@@ -258,7 +258,7 @@ class EligibilityTests(WorkflowCase):
 
     def test_closed_job_pending_response_restrictions_and_reopen(self):
         c = self.pending()
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "close")
         for operation in [
             lambda: flow.respond(self.employer, c.pk, "accept"),
             lambda: flow.initiate(
@@ -267,9 +267,9 @@ class EligibilityTests(WorkflowCase):
         ]:
             with self.assertRaises(flow.WorkflowError):
                 operation()
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "reopen")
         flow.respond(self.employer, c.pk, "accept")
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "close")
         for operation in [
             lambda: flow.send_message(self.seeker, c.pk, "hi"),
             lambda: flow.set_stage(self.employer, c.pk, "shortlisted"),
@@ -277,7 +277,7 @@ class EligibilityTests(WorkflowCase):
             with self.assertRaises(flow.WorkflowError):
                 operation()
         flow.respond(self.seeker, c.pk, "withdraw")
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "reopen")
         c.refresh_from_db()
         self.assertEqual(c.status, "withdrawn")
 
@@ -350,7 +350,7 @@ class ContactAndMessageTests(WorkflowCase):
         self.assertContains(response, self.seeker.email)
         self.assertContains(response, self.profile.phone)
         flow.set_stage(self.employer, c.pk, "not_selected")
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "close")
         self.assertTrue(flow.can_view_contact(self.employer, self.profile))
         flow.respond(self.seeker, c.pk, "withdraw")
         self.assertFalse(flow.can_view_contact(self.employer, self.profile))
@@ -490,7 +490,7 @@ class PresentationTests(WorkflowCase):
         self.assertContains(confirmation, "Invitation recipient: Amina (@seeker).")
         self.assertContains(
             self.client.get(reverse("employer_jobs")),
-            '<p class="rc-account-hint">Signed in as <strong>@employer</strong></p>',
+            '<div class="profile-menu-identity"><span>Signed in as</span><strong>@employer</strong></div>',
             html=True,
         )
         response = self.client.post(
@@ -519,10 +519,10 @@ class PresentationTests(WorkflowCase):
         response = self.client.get(reverse("recommendations"))
         self.assertEqual(response.context["connection_counts"]["pending"], 1)
         self.assertEqual(response.context["connection_counts"]["updates"], 1)
-        self.assertContains(response, 'class="sd-notification-dot"')
+        self.assertContains(response, 'class="sd-notification-count"')
         self.assertContains(
             response,
-            '<p class="rc-account-hint">Signed in as <strong>@seeker</strong></p>',
+            '<div class="profile-menu-identity"><span>Signed in as</span><strong>@seeker</strong></div>',
             html=True,
         )
         response = self.client.get(reverse("recruitment_connections"))
@@ -675,7 +675,7 @@ class PresentationTests(WorkflowCase):
         for user, url in [(self.seeker, "recommendations"), (self.employer, "employer_jobs")]:
             self.login(user)
             self.assertContains(self.client.get(reverse(url)), "Open connection")
-        flow.toggle_job(self.employer, self.job.pk)
+        flow.change_job_state(self.employer, self.job.pk, "close")
         self.login(self.employer)
         response = self.client.get(
             reverse("profile_detail", args=[self.profile.pk]) + f"?job={self.job.pk}"

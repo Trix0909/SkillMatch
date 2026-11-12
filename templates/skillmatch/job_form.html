@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% block title %}
   {% if job.pk %}Edit job{% else %}Post a job{% endif %} · SkillMatch{% endblock %}
 {% block content %}
@@ -8,31 +8,69 @@
   <div class="page-heading">
     <div>
       <span class="eyebrow">BUILD YOUR NEXT CONNECTION</span>
-      <h1>{% if job.pk %}Edit your opportunity{% else %}What skills do you need?{% endif %}</h1>
+      <h1>{% if job.pk %}Edit your <em>opportunity</em>{% else %}What skills do <em>you need?</em>{% endif %}</h1>
       <p>A clear job description helps the right candidates rise to the top.</p>
     </div>
   </div>
-  <div class="row g-4">
-    <div class="col-xl-8">
-      <form class="panel form-panel" method="post">
-        {% csrf_token %}{{ form.non_field_errors }}<h2>About the opportunity</h2>
-        {% include "partials/field.html" with field=form.title %}
-        {% include "partials/field.html" with field=form.description %}
-        {% include "partials/skills.html" %}
-        <div class="row">
-          <div class="col-sm-6">{% include "partials/field.html" with field=form.certification_level %}</div>
-          <div class="col-sm-6">{% include "partials/field.html" with field=form.experience_level %}</div>
+  <div class="wp-editor-layout">
+    <form class="panel wp-job-form" method="post">
+      {% csrf_token %}{{ form.non_field_errors }}
+      <section class="wp-form-section" aria-labelledby="opportunity-heading">
+        <div class="wp-section-intro">
+          <span class="wp-icon">
+            {% include "skillmatch/includes/brand_icon.html" with icon="document" %}
+          </span>
+          <div>
+            <h2 id="opportunity-heading">About the opportunity</h2>
+            <p>Describe the role and the work your next team member will do.</p>
+          </div>
         </div>
-        <div class="form-actions">
-          <a class="btn btn-outline-secondary" href="{% url 'employer_jobs' %}">Cancel</a>
-          <button class="btn btn-primary">
-          {% if job.pk %}Save changes{% else %}Post job & find matches{% endif %} →</button>
+        <div class="wp-section-fields">
+          {% include "partials/field.html" with field=form.title %}
+          {% include "partials/field.html" with field=form.description %}
         </div>
-      </form>
-    </div>
-    <aside class="col-xl-4">
+      </section>
+      <section class="wp-form-section" aria-labelledby="requirements-heading">
+        <div class="wp-section-intro">
+          <span class="wp-icon">
+            {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}
+          </span>
+          <div>
+            <h2 id="requirements-heading">Skills & experience</h2>
+            <p>Help candidates understand the skills and levels you’re looking for.</p>
+          </div>
+        </div>
+        <div class="wp-section-fields">
+          {% include "partials/skills.html" %}
+          <div class="wp-field-pair">
+            {% include "partials/field.html" with field=form.certification_level %}
+            {% include "partials/field.html" with field=form.experience_level %}
+          </div>
+        </div>
+      </section>
+      <section class="wp-form-section" aria-labelledby="deadline-heading">
+        <div class="wp-section-intro">
+          <span class="wp-icon">
+            {% include "skillmatch/includes/brand_icon.html" with icon="lightbulb" %}
+          </span>
+          <div>
+            <h2 id="deadline-heading">Application deadline</h2>
+            <p>Choose when to stop accepting new applications, or leave the date open.</p>
+          </div>
+        </div>
+        <div class="wp-section-fields">{% include "partials/field.html" with field=form.close_date %}</div>
+      </section>
+      <div class="form-actions">
+        <a class="btn btn-outline-secondary" href="{% url 'employer_jobs' %}">Cancel</a>
+        <button class="btn btn-primary">
+        {% if job.pk %}Save changes{% else %}Post job & find matches{% endif %} →</button>
+      </div>
+    </form>
+    <aside class="wp-guidance" aria-label="Job posting guidance">
       <div class="tip-panel">
-        <span class="tip-icon">✧</span>
+        <span class="wp-icon">
+          {% include "skillmatch/includes/brand_icon.html" with icon="lightbulb" %}
+        </span>
         <h3>Be specific about the work.</h3>
         <p>Describe the responsibilities and the skills someone will use. Clear, relevant words make for clearer matches.</p>
         <hr>
