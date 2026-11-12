@@ -1,0 +1,24 @@
+{% extends "skillmatch/workspace_page.html" %}
+{% block title %}Reopen job · SkillMatch{% endblock %}
+{% block content %}
+  <section class="panel form-panel wp-action-panel">
+    <span class="eyebrow">WELCOME NEW APPLICATIONS</span>
+    <h1>Reopen {{ job.title }}</h1>
+    <p>{{ job.effective_status }}</p>
+    {% include "skillmatch/includes/job_deadline.html" %}
+    <p>Choose a new closing date or explicitly choose no deadline. Nothing changes until you save.</p>
+    <form method="post" action="{% url 'job_toggle' job.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="reopen">
+      <input type="hidden" name="save_reopen" value="1">
+      {{ form.non_field_errors }}
+      {% include "partials/field.html" with field=form.deadline %}
+      {% include "partials/field.html" with field=form.close_date %}
+      <div class="form-actions">
+        <a class="btn btn-outline-secondary"
+           href="{% url 'job_detail' job.pk %}">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save and reopen</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
