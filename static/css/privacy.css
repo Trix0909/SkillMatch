@@ -1,0 +1,33 @@
+.sm-privacy .privacy-content {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: clamp(24px, 5vw, 64px) 24px;
+  color: #0b2d3b;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.sm-privacy h1 {
+  font-size: clamp(32px, 5vw, 52px);
+  margin: 0 0 12px;
+}
+
+.sm-privacy h2 {
+  font-size: clamp(23px, 3vw, 30px);
+  margin: 0 0 12px;
+}
+
+.sm-privacy section {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid #dce5dc;
+}
+
+.sm-privacy p {
+  margin: 0 0 14px;
+}
+
+.sm-privacy .privacy-contact-note {
+  color: #536b73;
+  font-size: 0.9rem;
+}

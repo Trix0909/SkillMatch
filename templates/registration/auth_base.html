@@ -14,4 +14,6 @@
 {% block body_class %}sm-landing sm-auth{% endblock %}
 {% block main_class %}sm-auth-main{% endblock %}
 {% block public_header %}{% endblock %}
-{% block footer %}{% endblock %}
+{% block footer %}
+  <footer class="sm-auth-switch"><a href="{% url 'privacy' %}">Privacy policy</a></footer>
+{% endblock %}

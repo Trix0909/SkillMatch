@@ -105,3 +105,8 @@
   </section>
   <section id="about" class="sm-about" aria-labelledby="about-title"><div class="sm-container sm-about-inner"><div><span class="sm-eyebrow">Rooted in Kenya. Built around skills.</span><h2 id="about-title">Talent deserves the right connection.</h2></div><div><p>For professionals taking their next step and small businesses building their teams, SkillMatch brings structured profiles and explainable matching together.</p><a class="sm-text-link" href="{% url 'get_started' %}">Find your starting point {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div></div></section>
 {% endblock %}
+
+{% block footer %}
+  <footer class="sm-container"><p><a class="sm-text-link"
+   href="{% url 'privacy' %}">Privacy policy</a></p></footer>
+{% endblock %}

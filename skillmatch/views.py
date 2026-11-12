@@ -74,6 +74,11 @@ def get_started(request):
     return render(request, "skillmatch/get_started.html")
 
 
+@require_safe
+def privacy(request):
+    return render(request, "skillmatch/privacy.html")
+
+
 def register(request):
     if request.user.is_authenticated:
         return redirect("home")

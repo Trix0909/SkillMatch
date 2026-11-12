@@ -62,6 +62,7 @@ urlpatterns = [
     path("", views.landing, name="landing"),
     path("home/", views.home, name="home"),
     path("get-started/", views.get_started, name="get_started"),
+    path("privacy/", views.privacy, name="privacy"),
     path("accounts/register/", views.register, name="register"),
     path("accounts/switch-role/", views.switch_role, name="switch_role"),
     path(
