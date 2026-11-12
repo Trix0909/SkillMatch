@@ -1,0 +1,18 @@
+<div class="match-filter-controls">
+  <div class="match-filter-field">
+    <label for="minimum-match">Minimum match</label>
+    <select id="minimum-match"
+            name="min_match"
+            aria-describedby="minimum-match-help">
+      {% for value, label in min_match_options %}
+        <option value="{{ value }}"
+                {% if value == min_match %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  {% if show_apply %}<button type="submit"
+        class="match-filter-submit">Apply filter</button>{% endif %}
+  {% if min_match %}<a class="match-filter-clear"
+   href="{{ clear_match_url }}">Clear filter</a>{% endif %}
+</div>
+<p id="minimum-match-help" class="match-filter-help">Match percentage measures text similarity.</p>

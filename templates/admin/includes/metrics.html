@@ -1,0 +1,8 @@
+<section class="sm-metrics" aria-label="Platform totals">
+  {% for metric in metrics %}
+    <article class="sm-panel sm-metric">
+      <span class="sm-mint-icon">{% include "admin/includes/icon.html" with icon=metric.icon %}</span>
+      <div><h2>{{ metric.label }}</h2><strong class="sm-metric-value">{% if metric.value != None %}{{ metric.value }}{% else %}—{% endif %}</strong><p>{{ metric.note }}</p></div>
+    </article>
+  {% endfor %}
+</section>

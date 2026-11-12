@@ -1,6 +1,8 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
+{% block title %}Page not found · SkillMatch{% endblock %}
 {% block content %}
-  <div class="empty-state panel">
+  <div class="empty-state panel wp-action-panel">
+    <span class="wp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="search" %}</span>
     <h1>We couldn’t find that page.</h1>
     <p>The profile or job may no longer be available.</p>
     <a class="btn btn-primary" href="{% url 'landing' %}">Back to SkillMatch</a>

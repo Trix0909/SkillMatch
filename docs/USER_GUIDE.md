@@ -4,13 +4,13 @@
 
 Double-click `start.cmd` in the project folder, or run `.\start.cmd` in its terminal. It prepares the environment and starts the app. Open `http://127.0.0.1:8000` once the server is ready. Keep the terminal open while using SkillMatch; press Ctrl+C to stop.
 
-Select **Get started** to register. Enter your name, email, username and password. Choose **I’m looking for work** or **I’m hiring**. Employers also enter a company name. Registration signs you in and opens profile editing. The role you pick is the workspace you start in. You can use both sides with one account: use the **Job seeking | Hiring** toggle in the sidebar. The first time you switch to Hiring you enter a company name; the first time you switch to Job seeking you complete a seeker profile. Each side keeps its own profile, and only the pages of your current workspace are available.
+Select **Get started** to register. Enter your name, email, username and password. Choose **I’m looking for work** or **I’m hiring**. Employers also enter a company name. Registration signs you in and opens profile editing. Your selected role cannot be switched through a web request or form; use separate accounts for the two roles.
 
 If demo data has been seeded, use the usernames and generated password in `demo-credentials.txt`. The demo is fictional and intended for local demonstrations only.
 
 ## Account security
 
-Before or after editing a profile, you can open **Two-factor authentication settings** from **My profile** or **Company profile**. It is optional for ordinary users. Confirm your password, scan the QR with a compatible authenticator app, and enter its current code to enable it. Every later login will require that app's code. When setup succeeds you are shown ten one-time recovery codes; save them somewhere safe. If you lose your authenticator, choose **Use a recovery code** at the code prompt, then generate a new set from account security (your password is required). Staff/superusers, including the demo administrator, must complete setup at their next login. Disabling 2FA or replacing the authenticator is not yet available. See the [complete MFA guide](MFA.md).
+Before or after editing a profile, you can open **Two-factor authentication settings** from **My profile** or **Company profile**. It is optional for ordinary users. Confirm your password, scan the QR with a compatible authenticator app, and enter its current code to enable it. Every later login will require that app's code. Staff/superusers, including the demo administrator, must complete setup at their next login. Recovery and disabling are not available in this stage, so retain access to the app. See the [complete MFA guide](MFA.md).
 
 ## Job seekers
 
@@ -32,7 +32,15 @@ Before or after editing a profile, you can open **Two-factor authentication sett
 6. Use **Find candidates** to search with a job description or keywords without saving a job post.
 7. Manage existing jobs with **Edit**, **Close job**, **Reopen job** and **Delete**. Closing removes a job from seeker recommendations. Deletion has a confirmation page and permanently removes that job.
 
+### Application deadlines
+
+Jobs may have an optional application deadline. They remain open throughout that date in **Africa/Nairobi**, expiring at midnight at the start of the next day. An expired job stops appearing among open jobs and recommendations and cannot receive new applications, invitations or saves. Existing saved jobs remain listed as unavailable. Existing requests can still be accepted, and recruitment conversations can continue after deadline expiry.
+
+**Close job** manually pauses the job and its connections without removing its deadline. **Reopen job** is explicit: for a passed deadline, choose a new date (today or later) or explicitly choose **No deadline**, then **Save and reopen**. Opening or cancelling this form changes nothing. An ordinary edit keeps the manual open/closed state: extending or removing a passed deadline reopens applications only if the job was not manually closed. An unchanged historical deadline may be kept when editing; a newly chosen past deadline is rejected. Job status distinguishes **Open**, **Closed by employer**, and **Closed: deadline passed**.
+
 ## Understanding scores
+
+On **My matches**, a job's candidate matches, or **Find candidates**, use **Minimum match** to choose **Any match**, **30%+**, **50%+**, **70%+**, **80%+**, or **90%+**, then submit the filter/search form. The threshold uses the displayed text-similarity percentage; it does not change weighted ranking. **Any match** is the default and includes zero-percent results. **Clear filter** retains your search keywords or current job and returns to the first page. Counts reflect the filtered results, while the seeker's **Best match** still shows the first result from the full ranking.
 
 Similarity measures keyword overlap, then the candidate’s self-reported levels multiply it. Scores range from 0 to 3.6 and are not probabilities. A zero score means no meaningful token overlap. Higher scores do not guarantee qualification; compare the listed role requirements and inspect the profile.
 

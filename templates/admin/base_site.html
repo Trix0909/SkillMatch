@@ -1,8 +1,90 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/base.html" %}
 {% load static %}
-{% block extrahead %}
+{% block title %}{{ title }} | SkillMatch administration{% endblock %}
+{% block dark-mode-vars %}{% endblock %}
+{% block responsive %}
   {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/admin-skillmatch.css' %}">
+  <link rel="stylesheet" href="{% static 'css/botanical-composition.css' %}">
+{% endblock %}
+{% block extrahead %}{{ block.super }}
   <link rel="icon"
         href="{% static 'images/brand/match-point.svg' %}"
         type="image/svg+xml">
+  <script src="{% static 'js/admin-skillmatch.js' %}" defer></script>
 {% endblock %}
+{% block header %}
+  {% if has_permission %}
+    <aside class="sm-sidebar"
+           id="sm-sidebar"
+           aria-label="Administration navigation">
+      {% include "partials/sidebar_art.html" with dark=True %}
+      <a class="sm-brand" href="{% url 'admin:index' %}"><img src="{% static 'images/brand/match-point.svg' %}"
+     width="36"
+     height="42"
+     alt="">SkillMatch</a>
+      <nav class="sm-navigation" aria-label="Main">
+        {% for item in admin_navigation %}
+          <a href="{{ item.url }}"
+             {% if item.active %} class="active" aria-current="page"{% endif %}>{% include "admin/includes/icon.html" with icon=item.icon %}<span>{{ item.label }}</span></a>
+        {% endfor %}
+      </nav>
+      <div class="sm-sidebar-footer">
+        <p>
+          Kenyan talent.
+          <br>
+          Brighter
+          <br>
+          opportunities.
+        </p>
+      </div>
+    </aside>
+    <header class="sm-header" id="header">
+      <button class="sm-menu-toggle"
+              type="button"
+              aria-label="Toggle administration navigation"
+              aria-controls="sm-sidebar"
+              aria-expanded="false">
+        {% include "admin/includes/icon.html" with icon="menu" %}
+      </button>
+      <form class="sm-global-search"
+            method="get"
+            action="{% url 'admin:search' %}"
+            role="search">
+        <label for="sm-admin-search"
+               class="visually-hidden">Search users, jobs, skills or admin pages</label>
+        {% include "admin/includes/icon.html" with icon="search" %}
+        <input id="sm-admin-search"
+               name="q"
+               type="search"
+               maxlength="200"
+               value="{{ query|default:'' }}"
+               placeholder="Search users, jobs, skills or admin pages…">
+        <kbd title="Control or Command + K">⌘ K</kbd>
+      </form>
+      <div class="sm-header-account">
+        <span class="sm-bell"
+              title="Notifications are not available"
+              role="img"
+              aria-label="Notifications are not available">
+          {% include "admin/includes/icon.html" with icon="bell" %}
+        </span>
+        <details class="sm-account-menu">
+          <summary aria-label="Account menu for {{ admin_display_name }}"><span class="sm-avatar">{{ admin_initials }}{% if admin_photo_url %}<img src="{{ admin_photo_url }}" alt="" width="46" height="46">{% endif %}</span><span class="sm-account-name">{{ admin_display_name }}<small>SkillMatch</small></span>{% include "admin/includes/icon.html" with icon="chevron" %}</summary>
+          <div class="sm-account-dropdown">
+            {% if site_url %}<a href="{{ site_url }}">View site</a>{% endif %}
+            {% if user.has_usable_password %}<a href="{% url 'admin:password_change' %}">Change password</a>{% endif %}
+            <form method="post"
+                  action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit">Log out</button></form>
+          </div>
+        </details>
+      </div>
+    </header>
+  {% else %}
+    <header class="sm-signed-out-header"><a class="sm-brand" href="{% url 'admin:index' %}"><img src="{% static 'images/brand/match-point.svg' %}"
+     width="36"
+     height="42"
+     alt="">SkillMatch</a></header>
+  {% endif %}
+{% endblock %}
+{% block bodyclass %}{{ block.super }} sm-admin{% if has_permission %} sm-authenticated{% endif %}{% endblock %}

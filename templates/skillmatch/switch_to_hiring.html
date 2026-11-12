@@ -1,26 +1,39 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% block title %}Switch to hiring · SkillMatch{% endblock %}
 {% block content %}
   <div class="page-heading">
     <div>
-      <h1>Switch to hiring</h1>
+      <span class="eyebrow">ONE ACCOUNT, BOTH WORKSPACES</span>
+      <h1>Switch to <em>hiring</em></h1>
       <p>Add your company name to start hiring with this account.</p>
     </div>
   </div>
-  <div class="row">
-    <div class="col-lg-6">
-      <form class="panel form-panel"
-            method="post"
-            action="{% url 'switch_role' %}">
-        {% csrf_token %}
-        <input type="hidden" name="active_role" value="employer">
-        {{ form.non_field_errors }}
-        {% include "partials/field.html" with field=form.company_name %}
-        <div class="form-actions">
-          <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
-          <button type="submit" class="btn btn-primary">Switch to hiring</button>
+  <div class="wp-switch-layout">
+    <form class="panel form-panel"
+          method="post"
+          action="{% url 'switch_role' %}">
+      {% csrf_token %}
+      <input type="hidden" name="active_role" value="employer">
+      {{ form.non_field_errors }}
+      <div class="wp-card-intro">
+        <span class="wp-icon">
+          {% include "skillmatch/includes/brand_icon.html" with icon="building" %}
+        </span>
+        <div>
+          <h2>Your company</h2>
+          <p>This is the name candidates will see alongside your opportunities.</p>
         </div>
-      </form>
-    </div>
+      </div>
+      {% include "partials/field.html" with field=form.company_name %}
+      <div class="form-actions">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Switch to hiring</button>
+      </div>
+    </form>
+    <aside class="tip-panel" aria-labelledby="switch-guidance">
+      <span class="wp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}</span>
+      <h3 id="switch-guidance">Room for both sides of your career.</h3>
+      <p>Your job seeker profile stays with this account. Switch back to job seeking whenever you need to.</p>
+    </aside>
   </div>
 {% endblock %}

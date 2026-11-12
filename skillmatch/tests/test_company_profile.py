@@ -73,11 +73,12 @@ class CompanyProfileTests(TestCase):
         self.assertIn(self.company.company_name, identity)
         self.assertIn("Employer account", identity)
         self.assertNotIn("Sam", identity)
-        self.assertIn('class="avatar small" aria-hidden="true">N</span>', html)
+        self.assertContains(response, 'class="profile-avatar"')
+        self.assertEqual(response.context["profile_dropdown"]["initial"], "N")
         self.assertContains(response, 'title="Switch to job seeking"')
         self.assertContains(response, 'class="sd-notifications"')
         self.assertContains(response, f'href="{reverse("recruitment_connections")}"')
-        self.assertNotContains(response, 'class="sd-notification-dot"')
+        self.assertNotContains(response, 'class="sd-notification-count"')
 
     def test_security_moves_to_account_menu_without_being_removed(self):
         response = self.client.get(reverse("profile_edit"))

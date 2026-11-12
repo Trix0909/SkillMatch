@@ -1,6 +1,6 @@
 {% if job.recruitment_connection %}
   {% include "skillmatch/connections/state.html" with connection=job.recruitment_connection %}
-{% elif job.employer.user_id != user.pk and job.is_active and job.employer.user.is_active %}
+{% elif job.employer.user_id != user.pk and job.accepts_new_applications %}
   {% if user.seeker_profile.is_complete %}<a class="rc-compact-action"
    href="{% url 'job_detail' job.pk %}#apply"
    aria-label="Apply for {{ job.title }} at {{ job.employer.company_name }}">Apply</a>{% else %}<a class="rc-state-link" href="{% url 'profile_edit' %}">Complete profile to apply →</a>{% endif %}

@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="{% static 'css/profile-images.css' %}">
   <link rel="stylesheet"
         href="{% static 'css/seeker-dashboard.css' %}?v=shared-dashboard-2">
-  <script src="{% static 'js/seeker-dashboard.js' %}" defer></script>
 {% endblock %}
 {% block sidebar_brand %}
   <a class="sd-brand" href="{% url 'home' %}" aria-label="SkillMatch home">
@@ -38,7 +37,9 @@
   <a href="{% url 'recommendations' %}#recommended">
     {% include "skillmatch/includes/brand_icon.html" with icon="people" %}My matches
   </a>
-  <a href="{% url 'jobs' %}">
+  <a class="{% if active == 'jobs' %}active{% endif %}"
+     href="{% url 'jobs' %}"
+     {% if active == 'jobs' %}aria-current="page"{% endif %}>
     {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}Browse jobs
   </a>
   <a class="{% if active == 'profile' %}active{% endif %}"
@@ -62,7 +63,10 @@
       <path d="M6 3h12v19l-6-5-6 5z" />
     </svg>Saved jobs
   </a>
-  <a href="{% url 'methodology' %}">
+  {% include "skillmatch/connections/navigation.html" %}
+  <a class="{% if active == 'methodology' %}active{% endif %}"
+     href="{% url 'methodology' %}"
+     {% if active == 'methodology' %}aria-current="page"{% endif %}>
     <svg class="sm-icon"
          width="24"
          height="24"
@@ -80,7 +84,6 @@
 {% endblock %}
 {% block sidebar_footer %}
   <div class="sd-sidebar-footer">
-    {% include "skillmatch/includes/dashboard_botanical.html" %}
     <p>
       Real people.
       <br>
@@ -123,46 +126,11 @@
            aria-hidden="true">
         <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4M12 2V1" />
       </svg>
-      {% if connection_counts.messages or connection_counts.updates %}
-        <span class="sd-notification-dot" aria-hidden="true"></span>
+      {% if connection_notification_count %}
+        <span class="sd-notification-count"
+              aria-hidden="true">{{ connection_notification_count }}</span>
       {% endif %}
     </a>
-    {% firstof form.initial.company_name user.employer_profile.company_name as company_name %}
-    <details class="sd-account" data-account-menu>
-      <summary class="sd-user" aria-expanded="false" aria-controls="account-options">
-        <span class="avatar small" aria-hidden="true">{% if account_role == "employer" %}{% if user.employer_profile.logo %}<img src="{{ user.employer_profile.logo.url }}"
-     alt=""
-     width="40"
-     height="40">{% else %}{{ company_name|first|upper }}{% endif %}{% else %}{% if user.seeker_profile.photo %}<img src="{{ user.seeker_profile.photo.url }}"
-     alt=""
-     width="40"
-     height="40">{% else %}{{ user.first_name|first|default:user.username|first|upper }}{% endif %}{% endif %}</span>
-        <span class="sd-account-name">{% if account_role == "employer" %}{{ company_name }}<small>Employer account</small>{% else %}{{ user.get_full_name|default:user.username }}{% endif %}</span>
-        <svg class="sd-account-chevron"
-             width="16"
-             height="16"
-             viewBox="0 0 24 24"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="1.8"
-             aria-hidden="true">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </summary>
-      <div class="sd-account-options" id="account-options">
-        <p class="rc-account-hint">Signed in as <strong>@{{ user.username }}</strong></p>
-        {% if account_role == "employer" %}
-          <a href="{% url 'profile_edit' %}">{% include "skillmatch/includes/brand_icon.html" with icon="building" %}View company profile</a>
-          <a href="{% url 'account_security' %}">{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}Account security</a>
-          <a href="{% url 'social_connections' %}">{% include "skillmatch/includes/brand_icon.html" with icon="link" %}Connected accounts</a>
-        {% else %}
-          <a href="{% url 'profile_detail' profile.pk %}">{% include "skillmatch/includes/brand_icon.html" with icon="person" %}View profile</a>
-        {% endif %}
-        <form method="post" action="{% url 'logout' %}">
-          {% csrf_token %}
-          <button type="submit">{% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}Log out</button>
-        </form>
-      </div>
-    </details>
+    {% include "partials/profile_dropdown.html" %}
   </header>
 {% endblock %}

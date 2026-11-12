@@ -1,13 +1,14 @@
 {% load static %}
 <div class="cp-candidate-preview{% if expanded %} cp-expanded-preview{% endif %}">
-  <div class="cp-skyline">
+  <div class="cp-skyline sm-botanical-banner">
     <img src="{% if profile.cover_image %}{{ profile.cover_image.url }}{% else %}{% static 'images/landing-nairobi.jpg' %}{% endif %}"
          data-image-preview="cover_image"
          data-default-src="{% static 'images/landing-nairobi.jpg' %}"
          alt=""
          width="1024"
          height="410">
-    <span data-image-fallback="cover_image"
+    <span class="sm-banner-leaves"
+          data-image-fallback="cover_image"
           {% if profile.cover_image %}hidden{% endif %}>
       {% include "skillmatch/includes/dashboard_botanical.html" %}
     </span>
@@ -69,7 +70,7 @@
     {% if expanded %}
       <section class="cp-narrative"
                data-cp-section="description"
-               {% if not preview.description %}hidden{% endif %}><h4>What your company does</h4><p data-cp-text="description">{{ preview.description }}</p></section>
+               {% if not preview.description %}hidden{% endif %}><h4>{% if account_role == "seeker" %}What the company does{% else %}What your company does{% endif %}</h4><p data-cp-text="description">{{ preview.description }}</p></section>
       <section class="cp-narrative"
                data-cp-section="workplace_culture"
                {% if not preview.workplace_culture %}hidden{% endif %}><h4>Workplace culture</h4><p data-cp-text="workplace_culture">{{ preview.workplace_culture }}</p></section>

@@ -268,6 +268,17 @@ class EmployerProfile(models.Model):
         return self.company_name
 
 
+class JobPostQuerySet(models.QuerySet):
+    def accepting_applications(self):
+        from .job_dates import business_date
+
+        return self.filter(
+            models.Q(close_date__isnull=True) | models.Q(close_date__gte=business_date()),
+            is_active=True,
+            employer__user__is_active=True,
+        )
+
+
 class JobPost(models.Model):
     employer = models.ForeignKey(EmployerProfile, on_delete=models.CASCADE, related_name="jobs")
     title = models.CharField(max_length=150)
@@ -276,8 +287,11 @@ class JobPost(models.Model):
     certification_level = models.CharField(max_length=12, choices=CERTIFICATIONS, default="basic")
     experience_level = models.CharField(max_length=8, choices=EXPERIENCES, default="junior")
     is_active = models.BooleanField(default=True)
+    close_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = JobPostQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at", "-id"]
@@ -290,6 +304,26 @@ class JobPost(models.Model):
                 condition=models.Q(experience_level__in=dict(EXPERIENCES)), name="valid_job_exp"
             ),
         ]
+
+    @property
+    def deadline_passed(self):
+        from .job_dates import business_date
+
+        return self.close_date is not None and self.close_date < business_date()
+
+    @property
+    def accepts_new_applications(self):
+        return self.is_active and not self.deadline_passed and self.employer.user.is_active
+
+    @property
+    def effective_status(self):
+        if not self.is_active:
+            return "Closed by employer"
+        if self.deadline_passed:
+            return "Closed: deadline passed"
+        if not self.employer.user.is_active:
+            return "Unavailable: employer account inactive"
+        return "Open"
 
     @property
     def matching_text(self):
@@ -433,6 +467,8 @@ class Message(models.Model):
     body = models.TextField(validators=[MaxLengthValidator(2000)])
     created_at = models.DateTimeField(auto_now_add=True)
     read_at = models.DateTimeField(null=True, blank=True)
+    edited_at = models.DateTimeField(null=True, blank=True)
+    unsent_at = models.DateTimeField(null=True, blank=True)
     submission_key = models.UUIDField(default=uuid4, unique=True, editable=False)
 
     class Meta:

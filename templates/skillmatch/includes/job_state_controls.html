@@ -1,0 +1,11 @@
+<form method="post" action="{% url 'job_toggle' job.pk %}">
+  {% csrf_token %}
+  {% if job.is_active %}<button class="link-button"
+        type="submit"
+        name="action"
+        value="close">Close job</button>{% endif %}
+  {% if not job.is_active or job.deadline_passed %}<button class="link-button"
+        type="submit"
+        name="action"
+        value="reopen">Reopen job</button>{% endif %}
+</form>

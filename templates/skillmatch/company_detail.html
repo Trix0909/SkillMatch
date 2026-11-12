@@ -1,0 +1,15 @@
+{% extends "skillmatch/workspace_page.html" %}
+{% load static %}
+{% block title %}{{ profile.company_name }} · SkillMatch{% endblock %}
+{% block extra_head %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'css/company-profile.css' %}">
+  <link rel="stylesheet" href="{% static 'css/profile-images.css' %}">
+{% endblock %}
+{% block content %}
+  <div class="breadcrumb-line"><a href="{% url 'jobs' %}">Browse jobs</a> / Company profile</div>
+  <article class="wp-company-detail"
+           aria-label="{{ profile.company_name }} company profile">
+    {% include "skillmatch/includes/company_preview_card.html" with expanded=True %}
+  </article>
+{% endblock %}

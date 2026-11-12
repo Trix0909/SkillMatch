@@ -1,16 +1,19 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% block title %}Account security · SkillMatch{% endblock %}
 {% block content %}
   <div class="page-heading">
     <div>
       <span class="eyebrow">YOUR ACCOUNT</span>
-      <h1>Account security<span class="blue">.</span></h1>
+      <h1>Account <em>security</em></h1>
       <p>Manage how you protect your SkillMatch account.</p>
     </div>
   </div>
   <div class="row">
     <div class="col-lg-8">
       <section class="panel form-panel" aria-labelledby="security-title">
+        <span class="wp-icon wp-section-mark">
+          {% include "skillmatch/includes/brand_icon.html" with icon="shield" %}
+        </span>
         <h2 id="security-title">Two-Factor Authentication</h2>
         <p><strong>Status: {% if enabled %}Enabled{% else %}Not enabled{% endif %}</strong></p>
         {% if enabled %}

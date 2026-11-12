@@ -1,26 +1,29 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% block title %}{{ job.title }} · SkillMatch{% endblock %}
 {% block content %}
   <div class="breadcrumb-line">
     <a href="{% url 'home' %}">Workspace</a> / Opportunity</div>
-  <div class="panel">
-    <div class="result-meta">
-      <span class="company-monogram">{{ job.employer.company_name|first|upper }}</span>
-      <span>{{ job.employer.company_name }}</span>
-      <span class="status-tag ms-auto {% if not job.is_active %}closed{% endif %}">
-        {% if job.is_active %}Open{% else %}Closed{% endif %}
-      </span>
-    </div>
-    <h1 class="mt-4">{{ job.title }}</h1>
-    <p class="muted">Posted {{ job.created_at|date:'d F Y' }}</p>
-    <div class="skill-tags">
-      {% for skill in job.required_skills %}
-        <span class="skill-tag">{{ skill }}</span>
-      {% endfor %}
-    </div>
+  <article class="panel wp-opportunity">
+    <header class="wp-opportunity-heading">
+      <div class="result-meta">
+        <span class="company-monogram">{% if job.employer.logo %}<img src="{{ job.employer.logo.url }}" alt="" width="44" height="44">{% else %}{{ job.employer.company_name|first|upper }}{% endif %}</span>
+        <span>{% if account_role == "seeker" and job.employer.user.is_active %}<a href="{% url 'company_detail' job.employer.pk %}">{{ job.employer.company_name }}</a>{% else %}{{ job.employer.company_name }}{% endif %}</span>
+        <span class="status-tag ms-auto {% if not job.accepts_new_applications %}closed{% endif %}">
+          {{ job.effective_status }}
+        </span>
+      </div>
+      <h1 class="mt-4">{{ job.title }}</h1>
+      <p class="muted">Posted {{ job.created_at|date:'d F Y' }}</p>
+      {% include "skillmatch/includes/job_deadline.html" %}
+      <div class="skill-tags">
+        {% for skill in job.required_skills %}
+          <span class="skill-tag">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    </header>
     <hr class="my-4">
-    <div class="row g-4">
-      <div class="col-lg-8">
+    <div class="wp-detail-layout">
+      <div class="wp-detail-copy">
         <h2>About the role</h2>
         <div class="prose">{{ job.description|linebreaks }}</div>
         {% if job.employer.description %}
@@ -28,20 +31,23 @@
           <div class="prose">{{ job.employer.description|linebreaks }}</div>
         {% endif %}
       </div>
-      <div class="col-lg-4">
+      <aside>
         <div class="tip-panel">
+          <span class="wp-icon">
+            {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}
+          </span>
           <h3>Role requirements</h3>
           <p class="mb-1 muted">Minimum certification</p>
           <strong>{{ job.get_certification_level_display }}</strong>
           <p class="mb-1 mt-3 muted">Minimum experience</p>
           <strong>{{ job.get_experience_level_display }}</strong>
         </div>
-      </div>
+      </aside>
     </div>
     {% if not owner and account_role == "seeker" %}
       {% if recruitment_connection %}
         {% include "skillmatch/connections/state.html" with connection=recruitment_connection %}
-      {% elif not job.is_active or not job.employer.user.is_active %}
+      {% elif not job.accepts_new_applications %}
         <p class="rc-unavailable">This opportunity is no longer available.</p>
       {% elif user.seeker_profile.is_complete %}
         <section id="apply" class="rc-confirm" aria-labelledby="apply-heading">
@@ -52,12 +58,13 @@
         </section>
     {% else %}<p><a href="{% url 'profile_edit' %}">Complete your profile to apply →</a></p>{% endif %}
   {% endif %}
-  {% if owner %}
+  {% if owner and account_role == "employer" %}
     <div class="form-actions">
       <a class="btn btn-outline-secondary" href="{% url 'job_edit' job.pk %}">Edit job</a>
+      {% include "skillmatch/includes/job_state_controls.html" %}
       <a class="btn btn-primary"
          href="{% url 'job_candidates' job.pk %}">View candidate matches ↗</a>
     </div>
   {% endif %}
-  </div>
+  </article>
 {% endblock %}

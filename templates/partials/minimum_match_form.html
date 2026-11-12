@@ -1,0 +1,4 @@
+<form method="get" action="{{ request.path }}" class="match-filter">
+  {% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+  {% include "partials/minimum_match_controls.html" with show_apply=True %}
+</form>

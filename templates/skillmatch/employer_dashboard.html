@@ -12,12 +12,12 @@
         grow your team, and create real opportunities.
       </p>
     </div>
-    <div class="sd-skyline ed-skyline" aria-hidden="true">
+    <div class="sd-skyline ed-skyline sm-botanical-banner" aria-hidden="true">
       <img src="{% static 'images/landing-nairobi.jpg' %}"
            width="1024"
            height="410"
            alt="">
-      <div class="sd-skyline-leaves">{% include "skillmatch/includes/dashboard_botanical.html" %}</div>
+      <div class="sm-banner-leaves">{% include "skillmatch/includes/dashboard_botanical.html" %}</div>
       <span>Great people
         <br>
         build greater
@@ -77,13 +77,13 @@
                   <a class="ed-job-count"
                      href="{% url 'job_candidates' job.pk %}"
                      aria-label="View {{ row.match_count }} candidate matches for {{ job.title }}">{{ row.match_count }}<span class="ed-mobile-label"> matches</span></a>
-                  <span class="ed-status{% if not job.is_active %} is-closed{% endif %}">{% if job.is_active %}Active{% else %}Closed{% endif %}</span>
+                  <span class="ed-status{% if not job.accepts_new_applications %} is-closed{% endif %}">{{ job.effective_status }}</span>
                   <time datetime="{{ job.created_at|date:'c' }}">{{ job.created_at|date:'d M Y' }}</time>
                   <details class="ed-job-menu">
                     <summary aria-label="Actions for {{ job.title }}">•••</summary>
                     <div>
                       <a href="{% url 'job_candidates' job.pk %}">View matches</a><a href="{% url 'job_edit' job.pk %}">Edit job</a><a href="{% url 'job_detail' job.pk %}">View job</a>
-                      <form method="post" action="{% url 'job_toggle' job.pk %}">{% csrf_token %}<button type="submit">{% if job.is_active %}Close job{% else %}Reopen job{% endif %}</button></form>
+                      {% include "skillmatch/includes/job_state_controls.html" %}
                       <a href="{% url 'job_delete' job.pk %}">Delete job</a>
                     </div>
                   </details>

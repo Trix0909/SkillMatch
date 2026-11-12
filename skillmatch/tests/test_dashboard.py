@@ -109,9 +109,13 @@ class DashboardPresentationTests(TestCase):
         )
         self.assertNotIn("_auth_user_id", client.session)
 
-    def test_other_pages_keep_their_existing_sidebar(self):
+    def test_browse_jobs_reuses_the_approved_seeker_shell(self):
         self.client.force_login(self.user)
         response = self.client.get(reverse("jobs"))
-        self.assertContains(response, 'class="account-card"')
-        self.assertContains(response, "A BETTER WAY TO CONNECT")
-        self.assertNotContains(response, "seeker-dashboard.css")
+        self.assertTemplateUsed(response, "skillmatch/dashboard_base.html")
+        self.assertContains(response, "seeker-dashboard.css")
+        self.assertContains(response, "workspace-pages.css")
+        self.assertContains(response, "images/brand/match-point.svg")
+        self.assertNotContains(response, 'class="account-card"')
+        self.assertNotContains(response, "A BETTER WAY TO CONNECT")
+        self.assertContains(response, 'aria-current="page"')

@@ -1,22 +1,28 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% block title %}How matching works · SkillMatch{% endblock %}
 {% block content %}
   <div class="page-heading">
     <div>
       <span class="eyebrow">A CONNECTION YOU CAN UNDERSTAND</span>
       <h1>
-        What’s behind your match<span class="blue">?</span>
+        What’s behind <em>your match?</em>
       </h1>
       <p>A transparent score built from your skills, experience and the work you describe.</p>
     </div>
   </div>
   <div class="formula-panel">
     <span class="eyebrow">THE SKILLMATCH FORMULA</span>
-    <div>Text similarity <span>×</span> Certification <span>×</span> Experience</div>
+    <div class="wp-formula">
+      <div>{% include "skillmatch/includes/brand_icon.html" with icon="search" %}<strong>Text similarity</strong></div>
+      <span aria-hidden="true">×</span>
+      <div>{% include "skillmatch/includes/brand_icon.html" with icon="shield" %}<strong>Certification</strong></div>
+      <span aria-hidden="true">×</span>
+      <div>{% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}<strong>Experience</strong></div>
+    </div>
     <p>A weighted relevance score between 0 and 3.6 — not a hiring probability.</p>
   </div>
-  <div class="row g-4 mt-1">
-    <div class="col-lg-7">
+  <div class="wp-information-layout">
+    <div>
       <section class="panel">
         <h2>One engine. Both directions.</h2>
         <ol class="method-steps">
@@ -36,7 +42,7 @@
         <p class="muted">The same steps recommend jobs to a job seeker. Because one person’s multipliers are constant across their recommendations, they change the score but not the order of those jobs.</p>
       </section>
     </div>
-    <div class="col-lg-5">
+    <div>
       <section class="panel">
         <h3>Certification multiplier</h3>
         <div class="factor-row">

@@ -1,0 +1,1048 @@
+/* Remaining workspace screens reuse the approved dashboard shell and profile surfaces. */
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/inter-normal-400.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/inter-normal-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/playfair-display-normal-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/playfair-display-italic-600.ttf') format('truetype');
+}
+
+.workspace-pages {
+  --ink: #0b2d3b;
+  --muted: #586d78;
+  --line: #e5e8e1;
+  --blue: #0f6b5b;
+  --blue-dark: #0b5045;
+  --paper: #faf9f6;
+  --soft: #edf3ed;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Inter, 'Segoe UI', sans-serif;
+  font-size: 13px;
+}
+
+.workspace-pages .wp-content {
+  padding-top: 30px;
+  padding-bottom: 40px;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.wp-content .page-heading {
+  margin-bottom: 28px;
+  gap: 24px;
+  align-items: center;
+}
+
+.wp-content .page-heading>div {
+  min-width: 0;
+}
+
+.wp-content h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(30px, 2.8vw, 44px);
+  line-height: 1.22;
+  letter-spacing: -1.1px;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+
+.wp-content h1 em {
+  color: #0f6b5b;
+}
+
+.wp-content .page-heading p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.wp-content .eyebrow {
+  color: #5a756e;
+  font-size: 9px;
+  letter-spacing: 1.8px;
+  margin-bottom: 12px;
+}
+
+.wp-content .breadcrumb-line {
+  margin-bottom: 24px;
+  font-size: 12px;
+}
+
+.wp-content h2,
+.wp-content .tip-panel h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -.5px;
+  color: var(--ink);
+}
+
+.wp-content h2 {
+  font-size: 25px;
+}
+
+.wp-content .panel {
+  background: #fffefc;
+  border: 1px solid #e9eae3;
+  border-radius: 22px;
+  box-shadow: 0 4px 20px #0b2d3b03;
+  padding: 24px;
+}
+
+.wp-content .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 11px;
+  padding: 11px 17px;
+  min-height: 44px;
+  font: 600 12px/1.4 Inter, 'Segoe UI', sans-serif;
+  white-space: normal;
+}
+
+.wp-content .btn .sm-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.wp-content .btn-primary {
+  background: #0b3d42;
+  border-color: #0b3d42;
+  color: #fffefa;
+}
+
+.wp-content .btn-primary:hover,
+.wp-content .btn-primary:focus-visible {
+  background: #0f6b5b;
+  border-color: #0f6b5b;
+}
+
+.wp-content .btn-secondary,
+.wp-content .btn-outline-primary,
+.wp-content .btn-outline-secondary {
+  background: #fffefc;
+  border-color: #d4ded5;
+  color: #0f6b5b;
+}
+
+.wp-content .btn-secondary:hover,
+.wp-content .btn-outline-primary:hover,
+.wp-content .btn-outline-secondary:hover {
+  background: #edf3ed;
+  border-color: #a7c1b3;
+}
+
+.wp-content :focus-visible {
+  outline: 2px solid #0f6b5b;
+  outline-offset: 3px;
+}
+
+.wp-content .form-control,
+.wp-content .form-select {
+  background-color: #fffefa;
+  border: 1px solid #d7dfd6;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 13px;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--ink);
+}
+
+.wp-content .form-select {
+  padding-right: 32px;
+}
+
+.wp-content .form-control:focus,
+.wp-content .form-select:focus {
+  border-color: #649b87;
+  box-shadow: 0 0 0 3px #0f6b5b0d;
+}
+
+.wp-content .form-label {
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.wp-content .form-text {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.wp-content .required-mark,
+.wp-content .field-error,
+.wp-content .errorlist {
+  color: #a5453f;
+}
+
+.wp-content [aria-invalid="true"] {
+  border-color: #b96b62;
+}
+
+.wp-content .skill-tag {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: #f0f3ed;
+  color: #425e61;
+  font-size: 11px;
+  padding: 5px 10px;
+}
+
+.wp-content .skill-tag.matched,
+.wp-content .skill-tag.editable {
+  background: #e8f2eb;
+  color: #0f6b5b;
+}
+
+.wp-content .skill-tag button {
+  color: #0f6b5b;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.wp-content .results-heading {
+  flex-wrap: wrap;
+  margin: 26px 0 16px;
+}
+
+.wp-content .results-heading h2 {
+  font-size: 25px;
+}
+
+.wp-content .results-heading h2 small {
+  font: 400 12px/1.5 Inter, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+}
+
+.wp-content .count {
+  background: #eaf1e9;
+  color: #356358;
+  border-radius: 7px;
+}
+
+.wp-content .results-heading>span,
+.wp-content .results-note {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.wp-content .match-banner {
+  padding: 24px 28px;
+  border-radius: 20px;
+  background: #edf3ed;
+  border-color: #dfe8dc;
+  gap: 24px;
+}
+
+.wp-content .match-banner h2 {
+  font-size: 26px;
+}
+
+.wp-content .match-banner p,
+.wp-content .match-banner .eyebrow {
+  color: #587568;
+}
+
+.wp-banner-icon {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #e0ebdf;
+  color: #568374;
+  flex-shrink: 0;
+}
+
+.wp-banner-icon .sm-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.wp-content .job-card {
+  margin-bottom: 16px;
+}
+
+.wp-content .job-card h3,
+.wp-content .result-card h3 {
+  font: 600 19px/1.4 Inter, 'Segoe UI', sans-serif;
+  letter-spacing: -.4px;
+  overflow-wrap: anywhere;
+}
+
+.wp-content .result-description {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.wp-content .result-meta {
+  color: var(--muted);
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+
+.wp-content .result-meta>span:not(.avatar):not(.company-monogram) {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.wp-content .company-monogram,
+.wp-content .avatar.small {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  background: #edf3ed;
+  color: #0f6b5b;
+  border: 1px solid #dce6dc;
+  overflow: hidden;
+}
+
+.wp-content .company-monogram {
+  font: 600 23px 'Playfair Display', Georgia, serif;
+  border-radius: 11px;
+}
+
+.wp-content .company-monogram img,
+.wp-content .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.wp-content .card-bottom {
+  border-color: var(--line);
+  color: var(--muted);
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+  font-size: 12px;
+}
+
+.wp-job-actions,
+.wp-candidate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 18px;
+}
+
+.wp-job-actions>a,
+.wp-job-actions .link-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.wp-job-actions form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+}
+
+.wp-content .status-tag {
+  background: #e8f3ec;
+  color: #0f6b5b;
+  border-radius: 999px;
+  padding: 6px 11px;
+}
+
+.wp-content .status-tag.closed {
+  background: #f4eee4;
+  color: #775b37;
+}
+
+.wp-content .wp-job-search {
+  background: #fffefc;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wp-search-input {
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+  min-width: 0;
+  gap: 12px;
+  color: #60786e;
+}
+
+.wp-search-input>.sm-icon {
+  flex-shrink: 0;
+}
+
+.wp-content .search-panel {
+  margin-bottom: 24px;
+}
+
+.wp-content .search-panel textarea {
+  min-height: 100px;
+}
+
+.wp-content .job-context {
+  background: #edf3ed;
+  border: 1px solid #dfe8dc;
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.wp-content .result-card {
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  overflow: visible;
+}
+
+.wp-content .result-main {
+  padding: 24px;
+}
+
+.wp-content .result-score {
+  width: auto;
+  padding: 24px 18px;
+  border-left: 1px solid var(--line);
+  background: transparent;
+  text-align: left;
+  min-width: 0;
+}
+
+.wp-match-label {
+  display: inline-block;
+  padding: 7px 12px;
+  background: #e9f3ec;
+  color: #0f6b5b;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wp-match-help {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  margin: 7px 0 18px;
+}
+
+.wp-content .score-box {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wp-content .score-value {
+  font-size: 17px;
+  margin: 0;
+  color: var(--ink);
+}
+
+.wp-content .score-label {
+  font-size: 8px;
+  color: var(--muted);
+}
+
+.wp-content .score-details {
+  margin-top: 16px;
+}
+
+.wp-content .score-explanation {
+  position: static;
+  width: auto;
+  min-width: 0;
+  background: #f3f6ef;
+  color: var(--ink);
+  border-color: var(--line);
+  padding: 12px;
+  box-shadow: none;
+  overflow-wrap: anywhere;
+}
+
+.wp-content .score-explanation>div {
+  flex-wrap: wrap;
+}
+
+.wp-editor-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 27%);
+  align-items: start;
+  gap: 24px;
+}
+
+.wp-content .wp-job-form {
+  padding: 0 24px 24px;
+  min-width: 0;
+}
+
+.wp-form-section {
+  display: grid;
+  grid-template-columns: minmax(140px, 31%) minmax(0, 1fr);
+  gap: 24px;
+  padding: 26px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.wp-section-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.wp-content .wp-section-intro h2 {
+  font: 600 13px/1.45 Inter, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+  margin: 4px 0 6px;
+}
+
+.wp-section-intro p {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.wp-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  background: #eaf2e9;
+  color: #0f6b5b;
+}
+
+.wp-icon .sm-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.wp-section-fields {
+  min-width: 0;
+}
+
+.wp-section-fields>.field-group:last-child,
+.wp-field-pair>.field-group {
+  margin-bottom: 0;
+}
+
+.wp-field-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.wp-content .wp-job-form textarea {
+  min-height: 180px;
+  height: 180px;
+  resize: vertical;
+}
+
+.wp-content .form-actions {
+  flex-wrap: wrap;
+}
+
+.wp-content .tip-panel {
+  background: #edf3ed;
+  border: 1px solid #e1e8dc;
+  border-radius: 22px;
+  padding: 24px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.wp-content .tip-panel h3 {
+  font-size: 24px;
+  line-height: 1.3;
+  margin-top: 18px;
+}
+
+.wp-content .tip-panel strong {
+  color: var(--ink);
+}
+
+.wp-content .tip-panel a {
+  color: #0f6b5b;
+}
+
+.wp-content .empty-state,
+.wp-content .search-placeholder {
+  padding: 36px 24px;
+  text-align: center;
+}
+
+.wp-content .empty-state .wp-icon,
+.wp-content .search-placeholder .wp-icon {
+  margin-bottom: 14px;
+  color: #0f6b5b;
+}
+
+.wp-content .search-placeholder h2 {
+  font-size: 24px;
+}
+
+.wp-content .search-placeholder p {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.wp-content .formula-panel {
+  background: #edf3ed;
+  color: var(--ink);
+  border: 1px solid #dfe8dc;
+  border-radius: 22px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.wp-content .formula-panel>.eyebrow,
+.wp-content .formula-panel>p {
+  color: #587568;
+}
+
+.wp-content .formula-panel>p {
+  font-size: 12px;
+  margin: 18px 0 0;
+}
+
+.wp-content .wp-formula {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  color: var(--ink);
+}
+
+.wp-formula>div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 12px;
+  border-radius: 14px;
+  background: #fffefa;
+  font: 600 clamp(16px, 1.7vw, 23px)/1.35 'Playfair Display', Georgia, serif;
+}
+
+.wp-formula .sm-icon {
+  flex-shrink: 0;
+  color: #0f6b5b;
+}
+
+.wp-content .wp-formula>span {
+  margin: 0;
+  color: #638a76;
+  font-size: 24px;
+}
+
+.wp-information-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.wp-content .method-steps li:before {
+  color: #0f6b5b;
+}
+
+.wp-content .method-steps p,
+.wp-information-layout p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.wp-information-layout h3 {
+  font: 600 18px/1.4 'Playfair Display', Georgia, serif;
+}
+
+.wp-content .factor-row {
+  border-color: var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.wp-content .factor-row strong {
+  color: #0f6b5b;
+  background: #edf3ed;
+  border-radius: 7px;
+  padding: 3px 8px;
+}
+
+.wp-switch-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(230px, 1fr);
+  align-items: start;
+  gap: 24px;
+  max-width: 1000px;
+}
+
+.wp-card-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.wp-content .wp-card-intro h2 {
+  margin: 0 0 6px;
+}
+
+.wp-card-intro p {
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.7;
+}
+
+.wp-content .wp-action-panel {
+  max-width: 760px;
+}
+
+.wp-action-panel>p,
+.wp-content .form-panel>p {
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.wp-section-mark {
+  margin-bottom: 16px;
+}
+
+.wp-content .btn-danger {
+  color: #fffefa;
+  background: #943e36;
+  border-color: #943e36;
+}
+
+.wp-content .btn-danger:hover {
+  background: #79352e;
+  border-color: #79352e;
+}
+
+.wp-content .sm-connection-row {
+  border-color: var(--line);
+}
+
+.wp-content .sm-connection-row h2 {
+  font: 600 18px/1.5 Inter, 'Segoe UI', sans-serif;
+  letter-spacing: 0;
+  margin-bottom: 12px;
+}
+
+.wp-content .wp-opportunity {
+  padding: clamp(22px, 3vw, 36px);
+}
+
+.wp-opportunity-heading .result-meta {
+  flex-wrap: wrap;
+  color: var(--ink);
+}
+
+.wp-opportunity-heading .result-meta>span:not(.company-monogram) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.wp-opportunity-heading .company-monogram {
+  flex-shrink: 0;
+}
+
+.wp-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 28%);
+  gap: 28px;
+  align-items: start;
+}
+
+.wp-detail-layout>* {
+  min-width: 0;
+}
+
+.wp-detail-layout h2,
+.wp-detail-layout h3 {
+  overflow-wrap: anywhere;
+}
+
+.wp-content .wp-opportunity>.form-actions {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+}
+
+.wp-content .wp-profile-header {
+  flex-wrap: wrap;
+  background: #f3f6ef;
+}
+
+.wp-profile-header>div {
+  flex: 1 1 220px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.wp-content .wp-profile-header .avatar {
+  background: #e2eee3;
+  color: #0f6b5b;
+  flex-shrink: 0;
+}
+
+.wp-content .level-tag {
+  background: #e6efe5;
+  color: #366355;
+  border-radius: 999px;
+  padding: 6px 11px;
+}
+
+.wp-profile-content {
+  margin-top: 24px;
+}
+
+.wp-company-detail {
+  max-width: 1000px;
+  margin-inline: auto;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.wp-content .evidence-link {
+  color: #0f6b5b;
+}
+
+.wp-content .form-panel,
+.wp-content .rc-confirm {
+  min-width: 0;
+}
+
+.wp-content .rc-confirm textarea {
+  min-height: 100px;
+}
+
+.wp-public-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 20px clamp(20px, 4vw, 50px);
+  border-bottom: 1px solid var(--line);
+  background: #fffefa;
+}
+
+.wp-public-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 26px/1.3 'Playfair Display', Georgia, serif;
+  color: var(--ink);
+  letter-spacing: -1px;
+}
+
+.wp-public-header nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.wp-public-header nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+}
+
+.wp-public-header nav .wp-public-cta {
+  border-radius: 10px;
+  background: #0b3d42;
+  color: #fffefa;
+  padding: 10px 16px;
+  gap: 8px;
+}
+
+.wp-public-header a:focus-visible {
+  outline: 2px solid #0f6b5b;
+  outline-offset: 4px;
+}
+
+.workspace-pages.public .wp-content {
+  margin-inline: auto;
+}
+
+@media (max-width: 1280px) {
+  .wp-editor-layout {
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+
+  .wp-form-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .wp-content .result-card {
+    grid-template-columns: minmax(0, 1fr) 180px;
+  }
+}
+
+@media (max-width: 1050px) {
+
+  .wp-detail-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(190px, 30%);
+    gap: 20px;
+  }
+
+  .wp-editor-layout,
+  .wp-information-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .wp-form-section {
+    grid-template-columns: minmax(140px, 30%) minmax(0, 1fr);
+  }
+
+  .wp-content .wp-formula {
+    gap: 10px;
+  }
+
+  .wp-formula>div {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 700px) {
+  .workspace-pages .wp-content {
+    padding-top: 24px;
+  }
+
+  .wp-content .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wp-content h1 {
+    font-size: 32px;
+  }
+
+  .wp-content .panel {
+    padding: 20px;
+  }
+
+  .wp-content .wp-job-form {
+    padding: 0 20px 20px;
+  }
+
+  .wp-form-section,
+  .wp-field-pair {
+    grid-template-columns: 1fr;
+  }
+
+  .wp-content .result-card {
+    grid-template-columns: 1fr;
+    padding: 0;
+  }
+
+  .wp-content .result-main {
+    padding: 20px;
+  }
+
+  .wp-content .result-score {
+    display: block;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 20px;
+    text-align: left;
+  }
+
+  .wp-content .card-bottom {
+    align-items: flex-start;
+  }
+
+  .wp-content .skill-entry {
+    flex-wrap: wrap;
+  }
+
+  .wp-content .skill-entry>input {
+    flex: 1 1 180px;
+  }
+
+  .wp-content .match-banner {
+    padding: 22px;
+  }
+
+  .wp-banner-icon {
+    display: none;
+  }
+
+  .wp-content .wp-job-search>.btn-primary {
+    flex: 1;
+  }
+
+  .wp-content .formula-panel {
+    padding: 22px;
+  }
+
+  .wp-content .wp-formula {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .wp-formula>div {
+    flex-direction: row;
+    padding: 14px;
+  }
+
+  .wp-content .wp-formula>span {
+    text-align: center;
+  }
+
+  .wp-switch-layout,
+  .wp-detail-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .wp-content .wp-profile-header {
+    align-items: flex-start;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .wp-profile-header>div {
+    flex-basis: auto;
+  }
+
+  .wp-content .wp-profile-header .btn {
+    margin: 0 !important;
+  }
+}

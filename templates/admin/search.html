@@ -1,0 +1,5 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <p class="sm-page-intro">{% if query %}Choose where to search for <strong>“{{ query }}”</strong>.{% else %}Search by entering a term above, or open an administration page below.{% endif %} Each search uses the model’s existing admin search and permissions.</p>
+  <div class="sm-search-results">{% for destination in destinations %}<a class="sm-panel sm-search-result" href="{{ destination.url }}">{% include "admin/includes/icon.html" with icon="search" %}<span><strong>{{ destination.label }}</strong><small>{{ destination.description }}</small></span>{% include "admin/includes/icon.html" with icon="arrow" %}</a>{% empty %}<div class="sm-panel sm-empty"><h2>No available destinations</h2><p>No accessible administration page matches that term.</p></div>{% endfor %}</div>
+{% endblock %}

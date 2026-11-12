@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Get started · SkillMatch{% endblock %}
+{% block body_class %}sm-landing sm-get-started{% endblock %}
+{% block main_class %}sm-main{% endblock %}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+  <link rel="stylesheet" href="{% static 'css/get-started.css' %}?v=2">
+  <script src="{% static 'js/landing.js' %}" defer></script>
+{% endblock %}
+{% block public_header %}
+  {% include "partials/public_header.html" %}
+{% endblock %}
+{% block content %}
+  <section class="gs-page" aria-labelledby="get-started-title">
+    <div class="gs-leaves gs-leaves-left">
+      {% include "skillmatch/includes/dashboard_botanical.html" %}
+    </div>
+    <div class="gs-leaves gs-leaves-right">
+      {% include "skillmatch/includes/dashboard_botanical.html" %}
+    </div>
+    <header class="gs-intro">
+      <span class="sm-eyebrow">Kenyan talent. Brighter opportunities.</span>
+      <h1 id="get-started-title">Get started with <em>SkillMatch</em></h1>
+      <p>
+        Choose how you want to use the platform and take the next step
+        <br class="gs-desktop-break">
+        towards brighter opportunities.
+      </p>
+    </header>
+    <div class="gs-choices">
+      <article class="gs-card">
+        <img class="gs-photo gs-professional"
+             src="{% static 'images/get-started-seeker.png' %}"
+             alt=""
+             width="1774"
+             height="887">
+        <div class="gs-card-content">
+          <span class="gs-icon">{% include "skillmatch/includes/brand_icon.html" with icon="person" %}</span>
+          <div class="gs-card-copy">
+            <h2>I’m looking for work</h2>
+            <p>Create a professional profile, showcase your skills and experience, and get matched with meaningful opportunities in Kenya.</p>
+            <ul>
+              <li>Showcase your skills and experience</li>
+              <li>Get matched with relevant opportunities</li>
+              <li>Connect with employers looking for your skills</li>
+            </ul>
+            <a class="sm-button sm-button-primary"
+               href="{% url 'register' %}?role=seeker">I’m looking for work {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a>
+          </div>
+        </div>
+      </article>
+      <article class="gs-card">
+        <img class="gs-photo"
+             src="{% static 'images/get-started-hiring.png' %}"
+             alt=""
+             width="1774"
+             height="887">
+        <div class="gs-card-content">
+          <span class="gs-icon">
+            {% include "skillmatch/includes/brand_icon.html" with icon="building" %}
+          </span>
+          <div class="gs-card-copy">
+            <h2>I’m hiring</h2>
+            <p>Post jobs, discover ranked candidates, and hire skilled Kenyan talent with confidence.</p>
+            <ul>
+              <li>Post jobs in minutes</li>
+              <li>Discover and compare ranked candidates</li>
+              <li>Find the right talent to grow your business</li>
+            </ul>
+            <a class="sm-button gs-hiring"
+               href="{% url 'register' %}?role=employer">I’m hiring {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a>
+          </div>
+        </div>
+      </article>
+    </div>
+    <p class="gs-sign-in">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+  </section>
+{% endblock %}

@@ -83,7 +83,7 @@ class MatchingAlgorithm:
     def rank_jobs(self, profile, jobs):
         if not profile.is_complete:
             return []
-        jobs = [j for j in jobs if j.is_active and j.employer.user.is_active]
+        jobs = [j for j in jobs if j.accepts_new_applications]
         bases = self.compute_similarity(profile.matching_text, [j.matching_text for j in jobs])
         matches = []
         for job, base in zip(jobs, bases):

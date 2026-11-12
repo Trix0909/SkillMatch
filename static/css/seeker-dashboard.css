@@ -128,10 +128,8 @@
 .sd-sidebar-footer {
   position: relative;
   margin-top: auto;
-  flex: 1 0 180px;
-  max-height: 360px;
-  min-height: 0;
-  overflow: hidden;
+  flex: 0 0 auto;
+  padding: 24px 12px 25px 103px;
   margin-left: -16px;
   margin-right: -16px;
 }
@@ -147,9 +145,6 @@
 }
 
 .sd-sidebar-footer p {
-  position: absolute;
-  left: 103px;
-  bottom: 25px;
   margin: 0;
   color: var(--ink);
   font-family: 'Playfair Display', Georgia, serif;
@@ -369,7 +364,6 @@
   inset: 0 0 0 39%;
   overflow: hidden;
   z-index: -1;
-  border-radius: 130px 0 0 0;
 }
 
 .sd-skyline img {
@@ -377,13 +371,6 @@
   height: 100%;
   object-fit: cover;
   object-position: 55% 52%;
-}
-
-.sd-skyline::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, #faf9f6, #faf9f6de 8%, #faf9f699 20%, transparent 46%);
 }
 
 .sd-skyline span {
@@ -398,26 +385,6 @@
   line-height: 1.35;
   transform: rotate(-9deg);
   text-shadow: 0 1px 8px #fffefa;
-}
-
-.sd-skyline-leaves {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: clamp(180px, 22vw, 340px);
-  height: 100%;
-  z-index: 1;
-  opacity: .55;
-  pointer-events: none;
-}
-
-.sd-skyline-leaves .sd-botanical {
-  width: 100%;
-  height: 180%;
-  max-height: none;
-  bottom: -75%;
-  left: -20%;
-  transform: rotate(12deg);
 }
 
 .sd-dashboard-grid {
@@ -1109,7 +1076,8 @@
   }
 
   .sd-sidebar-footer {
-    flex-basis: 125px;
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
 
   .sd-botanical {
@@ -1118,7 +1086,6 @@
   }
 
   .sd-sidebar-footer p {
-    bottom: 18px;
     font-size: 16px;
   }
 }
@@ -1255,10 +1222,6 @@
     left: 45%;
   }
 
-  .sd-skyline::after {
-    background: linear-gradient(90deg, #faf9f6, #faf9f6b3 50%, #faf9f633);
-  }
-
   .sd-skyline span {
     display: none;
   }
@@ -1316,8 +1279,11 @@
     font-size: 30px;
   }
 
+  .sd-sidebar-footer {
+    padding-left: 65px;
+  }
+
   .sd-sidebar-footer p {
-    left: 65px;
     font-size: 16px;
   }
 
@@ -1488,10 +1454,6 @@
   .sd-skyline {
     left: 20%;
     opacity: .22;
-  }
-
-  .sd-skyline::after {
-    background: linear-gradient(90deg, #faf9f6, #faf9f688);
   }
 
   .sd-summaries {

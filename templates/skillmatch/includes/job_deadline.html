@@ -1,0 +1,6 @@
+{% if job.close_date %}
+  <p class="small muted">
+    {% if job.deadline_passed %}Application deadline passed: {{ job.close_date|date:'d F Y' }}{% else %}Applications close {{ job.close_date|date:'d F Y' }}{% endif %}
+    {% if job.deadline_passed %}Existing recruitment conversations can continue after deadline expiry.{% endif %}
+  </p>
+{% endif %}

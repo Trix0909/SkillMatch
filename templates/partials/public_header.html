@@ -1,0 +1,16 @@
+{% load static %}
+<header class="sm-header">
+  <div class="sm-container sm-header-inner">
+    <a class="sm-brand"
+       href="{% url 'landing' %}"
+       aria-label="SkillMatch home"><img src="{% static 'images/brand/match-point.svg' %}"
+     width="32"
+     height="38"
+     alt=""><span>SkillMatch</span></a>
+    <nav class="sm-desktop-nav" aria-label="Main navigation">
+      <a href="{% url 'landing' %}#for-job-seekers">For job seekers</a><a href="{% url 'landing' %}#for-employers">For employers</a><a href="{% url 'landing' %}#how-it-works">How it works</a><a href="{% url 'landing' %}#about">About</a>
+    </nav>
+    <div class="sm-header-actions"><a class="sm-button sm-button-white" href="{% url 'login' %}">Sign in</a><a class="sm-button sm-button-primary" href="{% url 'get_started' %}">Get started {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a></div>
+    <details class="sm-mobile-nav"><summary aria-label="Navigation menu"><span></span><span></span><span></span></summary><nav aria-label="Mobile navigation"><a href="{% url 'landing' %}#for-job-seekers">For job seekers</a><a href="{% url 'landing' %}#for-employers">For employers</a><a href="{% url 'landing' %}#how-it-works">How it works</a><a href="{% url 'landing' %}#about">About SkillMatch</a><a href="{% url 'login' %}">Sign in</a><a href="{% url 'get_started' %}">Get started →</a></nav></details>
+  </div>
+</header>

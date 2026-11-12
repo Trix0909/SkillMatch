@@ -1,7 +1,9 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% load static %}
 {% block extra_head %}
+  {{ block.super }}
   <link rel="stylesheet" href="{% static 'css/candidate-bookmarks.css' %}">
+  <link rel="stylesheet" href="{% static 'css/match-filters.css' %}">
 {% endblock %}
 {% block title %}Candidate matches · SkillMatch{% endblock %}
 {% block content %}
@@ -9,12 +11,15 @@
     <div>
       <span class="eyebrow">SKILLS THAT CONNECT</span>
       <h1>
-        {% if job %}Your candidate matches{% else %}Find the skills you need{% endif %}
-        <span class="blue">.</span>
+        {% if job %}Your <em>candidate matches</em>{% else %}Find the skills <em>you need.</em>{% endif %}
       </h1>
       <p>
         {% if job %}Ranked profiles for <strong>{{ job.title }}</strong>.{% else %}Start with a job description or skill keywords to find relevant profiles.{% endif %}
       </p>
+      {% if job %}
+        <p class="small muted">{{ job.effective_status }}</p>
+        {% include "skillmatch/includes/job_deadline.html" %}
+      {% endif %}
     </div>
     {% if job %}
       <a class="btn btn-outline-secondary"
@@ -22,9 +27,12 @@
     {% endif %}
   </div>
   {% if not job %}
-    <form method="get" class="panel search-panel">
+    <form method="get"
+          action="{{ request.path }}"
+          class="panel search-panel match-filter-search">
       {% include "partials/field.html" with field=form.q %}
-      <button class="btn btn-primary">
+      {% include "partials/minimum_match_controls.html" %}
+      <button type="submit" class="btn btn-primary">
         Find candidates <span aria-hidden="true">→</span>
       </button>
     </form>
@@ -38,11 +46,12 @@
       </div>
       <p class="small muted mb-0 mt-2">Minimum levels: {{ job.get_certification_level_display }} certification · {{ job.get_experience_level_display }} experience. Rankings show relevance rather than filtering these requirements.</p>
     </div>
+    {% include "partials/minimum_match_form.html" %}
   {% endif %}
   {% if searched %}
     <div class="results-heading">
       <h2>
-        Candidate matches <span class="count">{{ page_obj.paginator.count }}</span>
+        Candidate matches <span class="count">{{ page_obj.paginator.count }}</span>{% if min_match %} <small>at {{ min_match }}%+</small>{% endif %}
       </h2>
       <span>Sorted by weighted relevance</span>
     </div>
@@ -50,7 +59,7 @@
       <article class="panel result-card" id="candidate-{{ match.item.pk }}">
         <div class="result-main">
           <div class="result-meta">
-            <span class="avatar small">{{ match.item.display_name|first|upper }}</span>
+            <span class="avatar small" aria-hidden="true">{% if match.item.photo %}<img src="{{ match.item.photo.url }}" alt="" width="40" height="40">{% else %}{{ match.item.display_name|first|upper }}{% endif %}</span>
             <span>PROFESSIONAL PROFILE</span>
             <span class="result-rank">#{{ forloop.counter|add:page_obj.start_index|add:'-1' }}</span>
             {% include "skillmatch/includes/save_candidate_button.html" with candidate=match.item %}
@@ -65,26 +74,41 @@
               {% if skill.name in match.matched_skills %}✓ {% endif %}{{ skill.name }}</span>
             {% endfor %}
           </div>
-          {% include "skillmatch/connections/candidate_action.html" with candidate=match.item %}
           <div class="card-bottom">
             <span>{{ match.item.get_certification_level_display }} · {{ match.item.get_experience_level_display }}</span>
-            <a href="{% url 'profile_detail' match.item.pk %}">View profile ↗</a>
+            <div class="wp-candidate-actions">
+              {% include "skillmatch/connections/candidate_action.html" with candidate=match.item %}
+              <a class="btn btn-primary btn-sm"
+                 href="{% url 'profile_detail' match.item.pk %}">View profile {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</a>
+            </div>
           </div>
         </div>
-        <div class="result-score">{% include "partials/score.html" %}</div>
+        <div class="result-score">
+          <span class="wp-match-label">{{ match.similarity_percent }}% Match</span>
+          <span class="wp-match-help">Text similarity</span>
+          {% include "partials/score.html" %}
+        </div>
       </article>
     {% empty %}
-      <div class="panel empty-state">
-        <span class="empty-icon">◎</span>
-        <h2>No complete candidate profiles yet.</h2>
-        <p>Profiles appear here after job seekers add their skills, summary and project portfolio.</p>
-      </div>
+      {% if filter_excludes_all %}
+        <div class="panel empty-state">
+          <h2>No candidates meet your minimum match of {{ min_match }}% right now.</h2>
+          <p>Try a lower match level.</p>
+          <a class="btn btn-outline-secondary" href="{{ clear_match_url }}">Clear filter</a>
+        </div>
+      {% else %}
+        <div class="panel empty-state">
+          <span class="wp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="people" %}</span>
+          <h2>No complete candidate profiles yet.</h2>
+          <p>Profiles appear here after job seekers add their skills, summary and project portfolio.</p>
+        </div>
+      {% endif %}
     {% endfor %}
     {% include "partials/pagination.html" %}
     <p class="results-note">Levels are self-reported. Review the profile and supporting evidence when assessing a candidate.</p>
   {% else %}
     <div class="search-placeholder">
-      <span>⌕</span>
+      <span class="wp-icon">{% include "skillmatch/includes/brand_icon.html" with icon="search" %}</span>
       <h2>A clear description makes a better starting point.</h2>
       <p>Try the skills and responsibilities you would include in a job post.</p>
     </div>

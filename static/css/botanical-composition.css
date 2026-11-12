@@ -1,0 +1,139 @@
+/* Shared decorative layers. Only the sidebar/banner boundary clips the artwork;
+   navigation and image-edit controls always sit above it. */
+.sidebar:has(>.sm-sidebar-art),
+.sm-sidebar {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.sm-sidebar-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sm-sidebar-art>svg {
+  position: absolute;
+  left: -15%;
+  bottom: -24px;
+  width: 180%;
+  height: max(580px, 75%);
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  opacity: .32;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 28%);
+  mask-image: linear-gradient(to bottom, transparent, #000 28%);
+}
+
+.sm-sidebar .sm-sidebar-art>svg {
+  height: max(500px, 70%);
+  opacity: .85;
+}
+
+:is(.sidebar, .sm-sidebar)>:is(.brand, .sd-brand, .sm-brand, .workspace-label, .workspace-switch, .side-nav, .sm-navigation, .sidebar-bottom, .sd-sidebar-footer, .sm-sidebar-footer) {
+  position: relative;
+  z-index: 1;
+}
+
+.sm-sidebar>.sm-brand,
+.sidebar>.workspace-switch {
+  flex-shrink: 0;
+}
+
+.sm-sidebar .sm-navigation {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sm-sidebar .sm-navigation>a {
+  flex-shrink: 0;
+}
+
+.sidebar .side-nav>a:focus-visible,
+.sm-sidebar .sm-navigation>a:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Mask each image and the leaf layer itself, rather than painting an opaque
+   panel over their join. The photograph continues beneath the fading leaves. */
+.sm-botanical-banner {
+  --sm-city-mask: linear-gradient(90deg, transparent, #000 46%);
+  isolation: isolate;
+}
+
+.sm-botanical-banner>img {
+  -webkit-mask-image: var(--sm-city-mask);
+  mask-image: var(--sm-city-mask);
+}
+
+.sm-banner-leaves {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 58%;
+  min-width: 240px;
+  height: 100%;
+  z-index: 1;
+  opacity: .75;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24%, #000 40%, transparent 95%);
+  mask-image: linear-gradient(90deg, transparent, #000 24%, #000 40%, transparent 95%);
+}
+
+.sm-banner-leaves>svg {
+  position: absolute;
+  width: 100%;
+  height: 230%;
+  max-width: none;
+  max-height: none;
+  left: -10%;
+  bottom: -66%;
+  transform: rotate(20deg);
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Company covers remain full photographs, including uploaded covers. */
+.cp-skyline.sm-botanical-banner {
+  --sm-city-mask: none;
+}
+
+.cp-skyline .sm-banner-leaves {
+  width: 45%;
+  min-width: 120px;
+}
+
+.cp-skyline .sm-banner-leaves>svg {
+  height: 140%;
+  bottom: -30%;
+}
+
+@media (min-width: 768px) {
+  .sidebar:has(>.sm-sidebar-art) .side-nav {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 1199px) {
+  .sd-skyline.sm-botanical-banner {
+    --sm-city-mask: linear-gradient(90deg, transparent, #000 80%);
+  }
+}
+
+@media (max-width: 767px) {
+
+  /* The existing mobile navigation remains a horizontally scrolling row. */
+  .sidebar>.sm-sidebar-art>svg {
+    width: 350px;
+    height: auto;
+    left: -35px;
+    bottom: -155px;
+    opacity: .25;
+  }
+}

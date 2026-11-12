@@ -34,4 +34,33 @@
       disclosure.querySelector('summary').focus();
     });
   });
+
+  const thread = page.querySelector('[data-chat-server-time]');
+  if (thread) {
+    // This clock only hides expired controls. Every POST is checked again by Django.
+    const serverTime = Date.parse(thread.dataset.chatServerTime);
+    const started = performance.now();
+    const check = () => {
+      const now = serverTime + performance.now() - started;
+      thread.querySelectorAll('[data-message-until]').forEach(message => {
+        if (now < Date.parse(message.dataset.messageUntil)) return;
+        const menu = message.querySelector('.rc-message-menu');
+        if (menu) {
+          menu.open = false;
+          menu.hidden = true;
+        }
+        message.querySelectorAll('form button[type="submit"]').forEach(button => {
+          button.disabled = true;
+        });
+        const feedback = message.querySelector('.rc-message-expiry');
+        if (feedback) feedback.hidden = false;
+        message.removeAttribute('data-message-until');
+      });
+    };
+    check();
+    const timer = setInterval(check, 1000);
+    window.addEventListener('pagehide', () => clearInterval(timer), {
+      once: true
+    });
+  }
 })();

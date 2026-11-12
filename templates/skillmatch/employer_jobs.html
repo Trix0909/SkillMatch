@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "skillmatch/workspace_page.html" %}
 {% block title %}My job posts · SkillMatch{% endblock %}
 {% block content %}
   <div class="page-heading">
     <div>
       <span class="eyebrow">{{ user.employer_profile.company_name|upper }}</span>
       <h1>
-        Find your next great fit<span class="blue">.</span>
+        Find your next <em>great fit.</em>
       </h1>
       <p>Turn your job requirements into a ranked list of relevant people.</p>
     </div>
@@ -18,7 +18,9 @@
       <p>Describe the work. Discover candidates. Understand every match.</p>
       <a href="{% url 'candidates' %}">Search candidates directly →</a>
     </div>
-    <span class="banner-art" aria-hidden="true">⌕</span>
+    <span class="wp-banner-icon" aria-hidden="true">
+      {% include "skillmatch/includes/brand_icon.html" with icon="search" %}
+    </span>
   </div>
   <div class="results-heading">
     <h2>
@@ -29,8 +31,8 @@
   {% for job in page_obj %}
     <article class="panel job-card">
       <div class="d-flex justify-content-between align-items-center gap-2">
-        <span class="status-tag {% if not job.is_active %}closed{% endif %}">
-          {% if job.is_active %}● Open{% else %}Closed{% endif %}
+        <span class="status-tag {% if not job.accepts_new_applications %}closed{% endif %}">
+          {{ job.effective_status }}
         </span>
         <span class="small muted">Posted {{ job.created_at|date:'d M Y' }}</span>
       </div>
@@ -38,18 +40,16 @@
         <a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a>
       </h3>
       <p class="result-description">{{ job.description|truncatechars:160 }}</p>
+      {% include "skillmatch/includes/job_deadline.html" %}
       <div class="skill-tags">
         {% for skill in job.required_skills %}
           <span class="skill-tag">{{ skill }}</span>
         {% endfor %}
       </div>
       <div class="card-bottom">
-        <div class="d-flex gap-3 align-items-center">
+        <div class="wp-job-actions">
           <a href="{% url 'job_edit' job.pk %}">Edit</a>
-          <form method="post" action="{% url 'job_toggle' job.pk %}">
-            {% csrf_token %}
-            <button class="link-button">{% if job.is_active %}Close job{% else %}Reopen job{% endif %}</button>
-          </form>
+          {% include "skillmatch/includes/job_state_controls.html" %}
           <a class="muted" href="{% url 'job_delete' job.pk %}">Delete</a>
         </div>
         <a class="btn btn-primary btn-sm"
@@ -58,7 +58,9 @@
     </article>
   {% empty %}
     <div class="panel empty-state">
-      <span class="empty-icon">▤</span>
+      <span class="wp-icon">
+        {% include "skillmatch/includes/brand_icon.html" with icon="briefcase" %}
+      </span>
       <h2>Your first great match starts with a job.</h2>
       <p>Tell candidates what you’re looking for. We’ll help you find the relevant profiles.</p>
       <a href="{% url 'job_create' %}" class="btn btn-primary">Post your first job →</a>
