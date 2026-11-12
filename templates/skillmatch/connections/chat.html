@@ -1,0 +1,109 @@
+<section class="rc-card rc-thread"
+         id="chat"
+         aria-labelledby="chat-heading"
+         data-chat-server-time="{{ chat_now|date:'c' }}">
+  <header class="rc-chat-heading">
+    <h2 id="chat-heading">Chat with {{ chat_recipient }}</h2>
+    <p>{{ connection.job.title }}</p>
+  </header>
+  {% if chat_error %}<p class="rc-notice" role="alert">{{ chat_error }}</p>{% endif %}
+  <div class="rc-chat-messages">
+    {% if connection.note %}
+      <article class="rc-message rc-introduction{% if introduction_is_mine %} rc-mine{% endif %}">
+        <strong class="rc-message-sender">{{ intro_author }}</strong>
+        <div class="rc-bubble">
+          <span class="rc-intro-label">Introduction</span>
+          <div class="rc-message-body">{{ connection.note|linebreaksbr }}</div>
+          <time datetime="{{ connection.created_at|date:'c' }}">{{ connection.created_at|date:'d M Y, H:i T' }}</time>
+        </div>
+      </article>
+    {% endif %}
+    {% for message in page_obj %}
+      <article class="rc-message{% if message.sender_id == user.pk %} rc-mine{% endif %}{% if message.unsent_at %} rc-unsent{% endif %}"
+               id="message-{{ message.pk }}"
+               {% if message.can_modify %}data-message-until="{{ message.action_deadline|date:'c' }}"{% endif %}>
+        <div class="rc-message-meta">
+          <strong class="rc-message-sender">{% if message.sender_id == connection.job.employer.user_id %}{{ connection.job.employer.company_name }}{% else %}{{ connection.seeker.display_name }}{% endif %}</strong>
+          {% if message.can_modify %}
+            <details class="rc-message-menu">
+              <summary aria-label="Actions for your message sent {{ message.created_at|date:'d M Y, H:i:s T' }}">
+                <svg width="20"
+                     height="20"
+                     viewBox="0 0 24 24"
+                     fill="currentColor"
+                     aria-hidden="true">
+                  <circle cx="5" cy="12" r="1.7" /><circle cx="12" cy="12" r="1.7" /><circle cx="19" cy="12" r="1.7" />
+                </svg>
+              </summary>
+              <div class="rc-message-options">
+                <a href="{% url 'connection_detail' connection.pk %}?edit={{ message.pk }}&amp;page={{ page_obj.number }}&amp;activity_page={{ activity_page.number }}#message-{{ message.pk }}">Edit message</a>
+                <a href="{% url 'connection_detail' connection.pk %}?unsend={{ message.pk }}&amp;page={{ page_obj.number }}&amp;activity_page={{ activity_page.number }}#message-{{ message.pk }}">Unsend</a>
+                <p>Available for 15 minutes after sending.</p>
+              </div>
+            </details>
+          {% endif %}
+        </div>
+        <div class="rc-bubble">
+          {% if message.unsent_at %}
+            <p class="rc-unsent-label">Message was unsent</p>
+          {% elif editing_message.pk == message.pk and message.can_modify %}
+            <form class="rc-message-edit"
+                  method="post"
+                  action="{% url 'message_edit' connection.pk message.pk %}?activity_page={{ activity_page.number }}">
+              {% csrf_token %}
+              {{ edit_form.non_field_errors }}
+              {% include "partials/field.html" with field=edit_form.body %}
+              <div class="rc-chat-actions">
+                <button type="submit" class="rc-secondary">Save changes</button>
+                <a href="{% url 'connection_detail' connection.pk %}?page={{ page_obj.number }}&amp;activity_page={{ activity_page.number }}#message-{{ message.pk }}">Cancel</a>
+              </div>
+            </form>
+          {% else %}
+            <div class="rc-message-body">{{ message.body|linebreaksbr }}</div>
+          {% endif %}
+          <div class="rc-message-stamp">
+            <time datetime="{{ message.created_at|date:'c' }}">{{ message.created_at|date:'d M Y, H:i T' }}</time>
+            {% if message.edited_at and not message.unsent_at %}<span class="rc-edited">edited</span>{% endif %}
+          </div>
+          {% if unsending_message.pk == message.pk and message.can_modify %}
+            <form class="rc-message-unsend"
+                  method="post"
+                  action="{% url 'message_unsend' connection.pk message.pk %}?activity_page={{ activity_page.number }}">
+              {% csrf_token %}
+              <p>Unsend this message? This permanently removes its content for both participants. Content already viewed or copied cannot be recalled.</p>
+              <div class="rc-chat-actions">
+                <button type="submit"
+                        class="rc-secondary"
+                        name="confirm"
+                        value="true">Confirm unsend</button>
+                <a href="{% url 'connection_detail' connection.pk %}?page={{ page_obj.number }}&amp;activity_page={{ activity_page.number }}#message-{{ message.pk }}">Cancel</a>
+              </div>
+            </form>
+          {% endif %}
+          {% if message.can_modify %}<p class="rc-message-expiry" role="status" hidden>The 15-minute window has expired. This message can no longer be edited or unsent.</p>{% endif %}
+        </div>
+      </article>
+    {% empty %}
+      {% if not connection.note %}<p class="rc-muted">No messages yet.</p>{% endif %}
+    {% endfor %}
+  </div>
+  {% if page_obj.has_other_pages %}
+    <nav class="rc-pagination rc-chat-pagination" aria-label="Message pages">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&amp;activity_page={{ activity_page.number }}#chat">← Older messages</a>{% endif %}
+      <span>Messages page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&amp;activity_page={{ activity_page.number }}#chat">Newer messages →</a>{% endif %}
+    </nav>
+  {% endif %}
+  {% if connection.allows_messages %}
+    <form class="rc-chat-composer"
+          method="post"
+          action="{% url 'connection_message' connection.pk %}">
+      {% csrf_token %}{{ message_form.submission_key }}
+      <div>{{ message_form.non_field_errors }}{{ message_form.submission_key.errors }}{% include "partials/field.html" with field=message_form.body %}</div>
+      <button class="sd-button"
+              type="submit">Send {% include "skillmatch/includes/brand_icon.html" with icon="arrow" %}</button>
+    </form>
+  {% else %}
+    <p class="rc-muted rc-chat-readonly">This conversation is read-only. Messaging requires an accepted connection, a manually open job and active accounts, and ends when consideration ends.</p>
+  {% endif %}
+</section>

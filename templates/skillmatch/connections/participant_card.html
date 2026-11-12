@@ -1,0 +1,72 @@
+<section class="rc-card rc-parties"
+         aria-label="Participants and contact details">
+  <div class="rc-parties-header">
+    <div class="rc-participant-main">
+      {% if participant_role == "employer" %}
+        <span class="avatar rc-contact-avatar" aria-hidden="true">
+          {% if connection.seeker.photo %}
+            <img src="{{ connection.seeker.photo.url }}" alt="" width="58" height="58">
+          {% elif connection.seeker.user.first_name %}
+            {{ connection.seeker.user.first_name|first|upper }}{% if connection.seeker.user.last_name %}{{ connection.seeker.user.last_name|first|upper }}{% endif %}
+          {% elif connection.seeker.user.last_name %}
+            {{ connection.seeker.user.last_name|first|upper }}
+          {% else %}
+            {{ connection.seeker.user.username|first|upper }}
+          {% endif %}
+        </span>
+        <div class="rc-participant-copy">
+          <h2 class="rc-participant-name"><a href="{% url 'profile_detail' connection.seeker_id %}">{{ connection.seeker.display_name }}</a></h2>
+          <p class="rc-participant-username">@{{ connection.seeker.user.username }}</p>
+        </div>
+      {% else %}
+        {% include "skillmatch/includes/company_logo.html" with profile=connection.job.employer preview=connection.job.employer only %}
+        <div class="rc-participant-copy">
+          <span class="rc-context-label">Employer</span>
+          <h2 class="rc-participant-name">{{ connection.job.employer.company_name }}</h2>
+        </div>
+      {% endif %}
+    </div>
+    <div class="rc-participant-context">
+      {% if participant_role == "employer" %}
+        <span class="rc-context-label">Employer</span>
+        <strong>{{ connection.job.employer.company_name }}</strong>
+      {% else %}
+        <span class="rc-context-label">Job seeker</span>
+        <a href="{% url 'profile_detail' connection.seeker_id %}">{{ connection.seeker.display_name }}</a>
+        <span class="rc-participant-username">@{{ connection.seeker.user.username }}</span>
+      {% endif %}
+    </div>
+  </div>
+  {% if show_seeker_contact %}
+    {% if connection.seeker.user.email.strip or connection.seeker.phone.strip %}
+      <div class="rc-contact-tiles">
+        {% if connection.seeker.user.email.strip %}
+          <div class="rc-contact-tile">
+            {% include "skillmatch/includes/brand_icon.html" with icon="mail" %}
+            <span class="rc-tile-label">Email:</span>
+            {% include "skillmatch/connections/contact_value.html" with contact_value=connection.seeker.user.email.strip copy_label="Copy email address" %}
+          </div>
+        {% endif %}
+        {% if connection.seeker.phone.strip %}
+          <div class="rc-contact-tile">
+            {% include "skillmatch/includes/brand_icon.html" with icon="phone" %}
+            <span class="rc-tile-label">Contact:</span>
+            {% include "skillmatch/connections/contact_value.html" with contact_value=connection.seeker.phone.strip copy_label="Copy phone number" %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% elif show_employer_contact and connection.job.employer.user.email.strip %}
+    <div class="rc-contact-tiles">
+      <div class="rc-contact-tile">
+        {% include "skillmatch/includes/brand_icon.html" with icon="mail" %}
+        <span class="rc-tile-label">Email:</span>
+        {% include "skillmatch/connections/contact_value.html" with contact_value=connection.job.employer.user.email.strip copy_label="Copy email address" %}
+      </div>
+    </div>
+  {% endif %}
+  <footer class="rc-contact-privacy">
+    {% include "skillmatch/includes/brand_icon.html" with icon="shield" %}
+    <p>Contact access is granted by acceptance. Closing the job or ending consideration does not revoke it. Withdrawal removes this connection's consent; another accepted connection may still grant access.</p>
+  </footer>
+</section>
