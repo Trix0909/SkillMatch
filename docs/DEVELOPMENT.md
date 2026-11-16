@@ -88,7 +88,7 @@ The `origin` remote is `https://github.com/Trix0909/SkillMatch.git`. Local `mast
 
 ## Prepared resources
 
-Database schema is fully represented by committed migrations. The existing local SQLite database and credentials are preserved. The deterministic synthetic-data command supplies 30 profiles and 10 jobs with randomly generated demo credentials. It refuses to overwrite existing demo accounts.
+Database schema is fully represented by committed migrations. The existing local SQLite database and credentials are preserved. The deterministic synthetic-data command supplies 31 candidate profiles and 10 jobs with randomly generated demo credentials. It refuses to overwrite existing demo accounts.
 
 ```powershell
 # Optional, only for a database without existing demo accounts.

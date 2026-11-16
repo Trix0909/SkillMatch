@@ -1,10 +1,28 @@
 # Implementation verification
 
-The automated suite was last run on 29 October 2026 against the merged master branch using Python 3.12, Django 5.2 and SQLite: **255 tests passed**. Earlier sections record the state of the earlier stages; the first-stage list and the browser evidence below date from 18 September 2026 and were not rerun for this update.
+The automated suite was last run on 15 November 2026 against the merged master branch (commit `2dd71d9`) using Python 3.12, Django 5.2 and SQLite: **459 tests passed**. Earlier sections record the state of the earlier stages; the first-stage list and the browser evidence below date from 18 September 2026 and were not rerun for this update.
 
 ## Automated results
 
-**255 tests pass** with a freshly migrated temporary database: 49 application and algorithm tests, 37 core MFA tests, 14 MFA login reminder tests, 29 recovery code tests, 5 startup tests, 65 provider sign-in tests, 45 dashboard, profile editor and saved item tests and 11 environment tests. The 49 application tests include account role switching. The behaviors below were the first 40:
+**459 tests pass** with a freshly migrated temporary database (about 40 seconds). By test module:
+
+| Area | Tests |
+| --- | --- |
+| Application, algorithm and role switching (`test_project`) | 49 |
+| Core MFA (`test_mfa`) | 37 |
+| MFA login reminder (`test_mfa_reminder`) | 14 |
+| MFA recovery codes (`test_mfa_recovery`) | 29 |
+| Google and GitHub sign-in (`test_sso`) | 65 |
+| Dashboards (`test_dashboard`), profile editor (`test_profile_editor`), saved jobs (`test_saved_jobs`) and saved candidates (`test_saved_candidates`) | 6 + 7 + 13 + 19 = 45 |
+| Connections: requests and responses (`test_connections`), detail page (`test_connection_detail`), history (`test_connection_history`) and concurrency (`test_connection_concurrency`) | 45 + 15 + 7 + 12 = 79 |
+| Messaging (`test_chat_messages`) and notification bell (`test_notification_bell`) | 19 + 4 = 23 |
+| Job deadlines (`test_job_deadlines`) and minimum match filter (`test_match_filters`) | 21 + 13 = 34 |
+| Company profiles (`test_company_profile`), company pages (`test_company_detail`) and profile images (`test_profile_images`) | 19 + 4 + 8 = 31 |
+| Administration dashboard (`test_admin_dashboard`) | 16 |
+| Profile dropdown, get-started, privacy and workspace controls (`test_profile_dropdown`, `test_get_started`, `test_privacy`, `test_workspace_controls`) | 9 + 4 + 4 + 4 = 21 |
+| Startup (`test_startup`) and environment (`test_environment`) | 5 + 11 = 16 |
+
+The 49 application tests include account role switching. The behaviors below were the first 40:
 
 - Exact certification and experience constants, weighted formula and ranking for equal-text profiles.
 - Term-frequency saturation at 2 before TF-IDF; repeated text cannot keep increasing its term count.
@@ -22,7 +40,7 @@ The automated suite was last run on 29 October 2026 against the merged master br
 - Manual-label requirements, changed-corpus fingerprint rejection, empty/duplicate SUS response rejection.
 - Startup dependency reuse, setup when dependencies or the interpreter are missing, included lock-file checks, and preventing server startup after migration failure.
 
-`manage.py check` and the production-setting `check --deploy` reported no issues. Migrations match the models (`makemigrations --check --dry-run`). `pip check` reported no broken requirements. Static-file collection completed successfully. This checks configuration and dependencies; it does not mean external hosting has been configured.
+`manage.py check` and the production-setting `check --deploy` reported no issues. Migrations match the models (`makemigrations --check --dry-run`). `pip check` reported no broken requirements. Static-file collection completed successfully. This checks configuration and dependencies. The deployment on PythonAnywhere is described under the 15 November 2026 status below.
 
 ## Browser checks
 
@@ -39,9 +57,9 @@ No JavaScript page errors or HTTP 5xx responses occurred, and inspected pages ha
 
 ## Research status
 
-The demonstration database contains 30 synthetic profiles and 10 synthetic job posts. The exported label sheet has 300 candidate/job pairs with suggested rule values and blank reviewer/relevance fields. These are not participant findings.
+The demonstration database contains 31 synthetic candidate profiles and 10 synthetic job posts. The exported label sheet has 310 candidate/job pairs with suggested rule values and blank reviewer/relevance fields. These are not participant findings.
 
-Formal Precision@k results need a frozen study corpus and completed manual relevance labels. SUS and user acceptance testing need actual participants and their responses. No accuracy improvement, usability score, recruitment outcome or completed Scrum schedule is claimed by this implementation report.
+An automated run that used the rule-suggested labels, which no person reviewed, gave Precision@5 of 0.40 and Precision@10 of 0.20. This is a check that the tooling works, not a finding about relevance. Formal Precision@k results need a frozen study corpus and completed manual relevance labels. SUS and user acceptance testing need actual participants and their responses. No accuracy improvement, usability score, recruitment outcome or completed Scrum schedule is claimed by this implementation report.
 
 ## Reproduce
 
@@ -70,3 +88,11 @@ All 134 tests pass on master after merging 2FA, recovery codes and dual-role sup
 ## Current status (29 October 2026)
 
 The suite has grown to 255 tests after provider sign-in (65 tests), dashboards, the profile editor, saved jobs and saved candidates (45 tests) and environment checks (11 tests) were merged. All 255 pass on Python 3.12 and migrations match the models. The browser checks listed above predate these screens and have not been rerun against them.
+
+## Current status (15 November 2026)
+
+All 459 tests pass on master at `2dd71d9` (Python 3.12, Django 5.2, about 40 seconds). The growth from 255 comes from connections and messaging, company profiles, profile images, job deadlines, the minimum match filter, the administration dashboard and the privacy page (PRs #30, #31 and #32). Migrations 0001 to 0010 match the models.
+
+SkillMatch has been deployed since 12 November 2026 on the free plan of PythonAnywhere at https://skillmatcher.pythonanywhere.com. Google and GitHub sign-in and authenticator-app setup were tried by hand on the live site and worked; these manual checks were not recorded as automated tests. The live database is the development laptop's database, so it includes the demonstration accounts. The site was not load-tested, and the free plan has one web worker.
+
+Still outstanding: human review of the relevance labels, the SUS study with participants, a browser and device matrix, and a rerun of the browser checks above against the newer screens.

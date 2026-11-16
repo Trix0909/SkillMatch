@@ -2,6 +2,8 @@
 
 A Django web application for structured professional profiles and keyword-weighted job matching.
 
+**Live demonstration:** https://skillmatcher.pythonanywhere.com (free PythonAnywhere hosting since 12 November 2026; it uses a demonstration database and has not been load-tested).
+
 This build uses **Django templates, Bootstrap 5, SQLite and scikit-learn**, as specified in the proposal and defense presentation. The React frontend is superseded by detailed specifications in the documentation. See [requirements and source decisions](docs/REQUIREMENTS.md).
 
 ## Run on Windows
@@ -37,7 +39,7 @@ See [development environment and workflow](docs/DEVELOPMENT.md) for editor confi
 .\.venv\Scripts\python.exe manage.py seed_demo
 ```
 
-This explicitly creates **30 fictional candidate profiles, 10 job posts**, a seeker, an employer and an administrator. It generates a random password and writes it to `demo-credentials.txt` (excluded from version control). Sign in with `demo_seeker`, `demo_employer` or `demo_admin` and that password. These users and records are demonstration data, not project participants or research findings. The command refuses to overwrite existing demo users.
+This explicitly creates **31 fictional candidate profiles, 10 job posts**, a seeker (`demo_seeker`), an employer (`demo_employer`), a dual-role account (`demo_dual`) and an administrator (`demo_admin`). It generates a random password and writes it to `demo-credentials.txt` (excluded from version control). Sign in with `demo_seeker`, `demo_employer`, `demo_dual` or `demo_admin` and that password. These users and records are demonstration data, not project participants or research findings. The command refuses to overwrite existing demo users.
 
 For a clean installation, skip demo seeding, register your own accounts, and create an administrator with:
 
@@ -49,16 +51,20 @@ For a clean installation, skip demo seeding, register your own accounts, and cre
 
 The landing, login and signup pages use the Match Point visual design, local Inter/Playfair fonts and responsive Kenyan editorial imagery. See [landing design and asset notes](docs/LANDING-DESIGN.md) and [authentication design notes](docs/AUTH-DESIGN.md). Other pages retain their current UI pending design approval.
 
-- Separate job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks.
-- Authenticator-app 2FA: optional for job seekers/employers and mandatory for staff/superusers, including direct Django admin access. Enable it through the profile page's **Account security** link. See the [MFA setup, testing and implementation guide](docs/MFA.md). Recovery and disabling are deferred; keep access to your authenticator.
-- Structured profiles: names, unique skill tags, certification and experience dropdowns, professional summary, project descriptions and optional HTTP(S) evidence links.
-- Employer company profile, job creation/editing, closing/reopening, deletion confirmation and candidate search.
-- Ranked candidates for an employer’s job or free-text search, ranked job recommendations for seekers, and employer access to candidate profiles.
+- Job seeker and employer registration and workspaces, password hashing, session authentication, CSRF protection and server-side role/ownership checks. One account can hold both roles and switch workspace from the sidebar toggle.
+- Google and GitHub sign-in (django-allauth) that keeps the same two-factor rules. Microsoft sign-in is not built.
+- Authenticator-app 2FA: optional for job seekers/employers and mandatory for staff/superusers, including direct Django admin access, with one-time recovery codes. Enable it through **Account security** in the profile menu. See the [MFA setup, testing and implementation guide](docs/MFA.md). There is no disable or reset screen; keep access to your authenticator or your recovery codes.
+- Structured profiles: names, optional phone and photo, unique skill tags, certification and experience dropdowns, professional summary, project descriptions and optional HTTP(S) evidence links.
+- Employer company profile and company page (tagline, summary, location, size, industry, culture, focus areas, links, logo and cover image), job creation/editing, optional closing dates, closing/reopening, deletion confirmation and candidate search.
+- Ranked candidates for an employer’s job or free-text search, ranked job recommendations for seekers, a minimum match filter (30, 50, 70, 80 or 90 percent) and employer access to complete candidate profiles.
 - Exact matching-skill indicators and an expandable explanation showing base similarity, both multipliers and final score.
-- Django administration for users, profiles, jobs and skill categories.
-- Offline Precision@5/Precision@10 comparison and SUS scoring tools. No analytics dashboard.
+- Seeker and employer dashboards, saved jobs and saved candidates, a profile dropdown and a notification bell.
+- Applications and invitations (connections) that the other side accepts or declines, hiring stages with interview scheduling, a connection history and text messages with a 15-minute edit/unsend window. Each person may start 20 new requests in a rolling 24 hours. Contact details are shown only after acceptance.
+- Administration dashboard (overview, monthly reports, settings directory and search) plus Django administration for users, profiles, jobs and skill categories, always behind two-factor verification.
+- Public landing, get-started, "How matching works" and privacy pages.
+- Offline Precision@5/Precision@10 comparison and SUS scoring tools. No analytics dashboard for end users.
 
-There are no uploads, CV parsing, external job-board integrations, credential verification, messaging, payments, application submission, salary negotiation or geolocation matching.
+There are no portfolio or CV uploads (the only uploads are profile photos, logos and cover images, re-encoded after validation), no CV parsing, external job-board integrations, credential verification, push or real-time messaging, payments, salary negotiation or geolocation matching.
 
 ## Matching
 
@@ -89,7 +95,7 @@ The same algorithm works in reverse. A single seeker’s multipliers are constan
 
 The command runs Python linting, formatting checks, dependency and Django checks, migration drift detection, all tests, production-setting checks, static collection and a Git-index privacy check. `tools/dev.py format` formats first-party code, and `tools/dev.py doctor` inspects the environment and prepared database. GitHub Actions is configured to run validation on Windows and Linux when the repository is pushed to GitHub.
 
-Tests cover the real ranking pipeline, repetition capping, qualification multipliers, bidirectional matching, duplicate prevention, evidence safety, registration, role permissions, ownership, CSRF, escaped content, job lifecycle and research metric calculations. MFA tests cover optional enrollment, mandatory admin setup, second-factor login, direct admin protection, replay/throttling, expiry, session isolation and safe redirects.
+The suite has **459 tests** (all passing on Python 3.12 at the time of writing; see [verification report](docs/VERIFICATION.md) for the per-module counts). They cover the real ranking pipeline, repetition capping, qualification multipliers, bidirectional matching, duplicate prevention, evidence safety, registration, role permissions, ownership, CSRF, escaped content, job lifecycle, deadlines, the minimum match filter, connections and messaging (including concurrent requests), company pages, image uploads, the administration dashboard and research metric calculations. MFA tests cover optional enrollment, mandatory admin setup, second-factor login, recovery codes, direct admin protection, replay/throttling, expiry, session isolation and safe redirects. Provider sign-in tests use mocked provider responses.
 
 ## Evaluate
 
@@ -119,7 +125,7 @@ From the project folder, with the Python 3.12 environment:
 .\.venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
 ```
 
-The dependency brings its own `account` and `socialaccount` migrations. There are no new SkillMatch models or migrations. Back up an existing database before applying migrations. The normal setup/start scripts also install dependencies and apply migrations.
+The dependency brings its own `account` and `socialaccount` migrations. Back up an existing database before applying migrations. The normal setup/start scripts also install dependencies and apply migrations.
 
 For local development, create `.env` beside `manage.py` (use `.env.example` as a reference) and put your Google/GitHub credentials there once. Start normally with `.\start.cmd`; `python-dotenv` loads that exact file before Django reads its settings. The file is optional, Git-ignored, and must never be committed. Existing shell variables take precedence (`override=False`). Restart after editing `.env`.
 
@@ -193,4 +199,6 @@ The SSO tests exercise the actual allauth state/callback routes with mocked prov
 
 ## Deployment
 
-This is an academic prototype with source maintained at [Trix0909/SkillMatch](https://github.com/Trix0909/SkillMatch). For deployment, use an empty database without demo accounts, a strong environment-provided `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=0`, explicit `DJANGO_ALLOWED_HOSTS`, HTTPS, a WSGI server and a web server serving collected static files. See [deployment procedure](docs/TECHNICAL.md#deployment). The application itself has not been deployed to an external hosting service.
+This is an academic prototype with source maintained at [Trix0909/SkillMatch](https://github.com/Trix0909/SkillMatch).
+
+SkillMatch is deployed on the free plan of PythonAnywhere at https://skillmatcher.pythonanywhere.com (since 12 November 2026). It runs with `DJANGO_DEBUG=0`, an environment-provided secret key, HTTPS enforced, `/static/` and `/media/` mapped in the Web tab, and Google and GitHub sign-in registered for that address. The live database is the development laptop's database, so it contains the fictional demo accounts; a real deployment should start from an empty database. Updating the live site after a change to `master` takes `git pull`, `pip install -r requirements-lock.txt`, `python manage.py migrate`, `python manage.py collectstatic --noinput` and a **Reload** in the Web tab; the full steps, and the procedure for any other host, are in [deployment procedure](docs/TECHNICAL.md#deployment).
