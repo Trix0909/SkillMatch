@@ -14,7 +14,7 @@ No other nearby project documents were used. Text extracts are private local wor
 | --- | --- | --- |
 | Name | Concept uses KAZIFORCE; proposal and presentation use SkillMatch | Use SkillMatch. |
 | Frontend | Concept uses React; proposal scope and §3.8.4 explicitly specify HTML/CSS/Bootstrap and no separate JavaScript framework; presentation slide 8 agrees | Server-rendered Django templates, Bootstrap 5 and a small vanilla JavaScript skill-tag interaction. |
-| Portfolios | Concept broadly describes samples; proposal explicitly excludes files, PDFs and images | Plain-text portfolio and optional HTTP(S) links only. |
+| Portfolios | Concept broadly describes samples; proposal explicitly excludes files, PDFs and images | Plain-text portfolio and optional HTTP(S) links only. Portfolio files, CVs and PDFs are still not accepted. The only uploads are the later profile and company images (below). |
 | Weighting | Some high-level prose says “portfolio boost”; exact formula and slide 8 specify certification × experience | Portfolio contributes through TF-IDF text. No extra numerical multiplier. |
 | Dropdown typo | A conceptual-framework paragraph calls Junior/Mid/Senior/Lead “certification”; scope, tables and delivery specification distinguish the levels | Certification Basic/Intermediate/Advanced/Expert; experience Junior/Mid/Senior/Lead. |
 | Verified claims | Slides mention verified skills; limitations explicitly state self-reported levels and no credential verification | No verified badges or claims. Explain self-reporting on profile and score screens. |
@@ -24,13 +24,21 @@ No other nearby project documents were used. Text extracts are private local wor
 
 **Authorized extension (1 October 2026):** The project owner requested standard authenticator-app TOTP, optional for ordinary users and mandatory for staff/superusers, while preserving existing registration, roles and designs. MFA, including one-time recovery codes added on 22 October 2026, is documented in [MFA.md](MFA.md); disabling remains deferred. On the same date the project owner also requested that one account be able to act as both job seeker and employer (`Account.active_role` with a workspace switch). This is a later explicit requirement, not a claim that MFA appeared in the original proposal.
 
+**Later additions (October to November 2026):** Google and GitHub sign-in (29 October 2026); dashboards with saved jobs and saved candidates; applications and invitations (connections) with hiring stages and messaging, company profiles and company pages, profile photos, logos and cover images (10 November 2026); job closing dates, the minimum match filter, the administration dashboard and the get-started page (12 November 2026); and a public privacy page (12 November 2026). These go beyond the proposal's scope. None of them changes the matching formula except that the minimum match filter hides low displayed percentages after ranking. SkillMatch is deployed on PythonAnywhere (12 November 2026).
+
 | Requirement | Source | Implementation |
 | --- | --- | --- |
 | Role-based registration/login | Proposal §1.6; slides 4, 11 | `Account`, Django auth, registration/login views, role decorator |
 | One account, both roles (owner request, 22 October 2026) | Later explicit requirement | `Account.active_role`, `switch_role` view, sidebar toggle |
 | Profiles, bio, portfolio, level dropdowns | Proposal §§1.6, 3.6.2 | `JobSeekerProfile`, `ProfileForm`, profile templates |
 | Unique case-insensitive skill tags | Proposal §§1.6, 3.6.1–2 | `Skill`, canonical names and DB constraints, `parse_skills`, skill editor |
-| Optional evidence links, no uploads | Proposal §§1.6–1.7, 2.5 | `EvidenceLink`, HTTP(S) validation, linked profile evidence |
+| Optional evidence links, no portfolio uploads | Proposal §§1.6–1.7, 2.5 | `EvidenceLink`, HTTP(S) validation, linked profile evidence |
+| Google and GitHub sign-in (later requirement) | Added during implementation | django-allauth, `social.py`, `social_views.py`; Microsoft not built |
+| Applications, invitations, hiring stages and messaging (later requirement) | Added during implementation | `Connection`, `Message`, `ConnectionActivity`, `recruitment.py`, `connection_views.py` |
+| Company profiles, company pages and profile images (later requirement) | Added during implementation | Employer company fields, `profile_images.py`, `company_detail` view |
+| Job closing dates and minimum match filter (later requirement) | Added during implementation | `job_dates.py`, `match_filters.py` |
+| Administration dashboard (later requirement) | Added during implementation | `admin_site.py`, `admin_dashboard.py` |
+| Public privacy page, get-started page (later requirement) | Added during implementation; Google consent screen needs a privacy URL | `privacy` and `get_started` views |
 | Employer profiles, job posting | Proposal §§3.5–3.7 | `EmployerProfile`, `JobPost`, owner-scoped management |
 | Employer-driven query/ranking | Proposal §2.5; slide 8 | Free-text search and per-job candidate ranking |
 | Seeker-driven job recommendations | Proposal §2.5; slide 8 | `MatchingAlgorithm.rank_jobs` |
@@ -55,4 +63,4 @@ No other nearby project documents were used. Text extracts are private local wor
 - Fit the vocabulary per query with that candidate/job corpus. This prevents stale vectors after edits; the sources do not specify a persisted vector cache or training dataset.
 - Pagination displays ten results per page. Deterministic ID tie-breaking makes results reproducible within a corpus.
 
-Excluded: native apps, external job boards or third-party APIs, file uploads, image handling, CV/PDF processing, automated credential verification, chat, in-platform messaging, payments, applications/shortlists, analytics dashboards, geolocation matching and salary negotiation.
+Excluded: native apps, external job boards or third-party APIs (other than the Google and GitHub sign-in handshake), portfolio, CV and PDF uploads or processing, automated credential verification, real-time or push messaging, payments, salary negotiation, geolocation matching, email verification and Microsoft sign-in. Profile photos, company logos and cover images, applications and invitations, hiring stages, text messaging between connected users and an administration dashboard were added later and are no longer excluded.
