@@ -42,7 +42,7 @@ This file is the full record of the 39 test cases summarised in Table 5.5 of the
 - **Traceability:** FR-05, FR-06, DR-03
 - **Scenario, data and conditions:** Enter skills with extra spaces, different letter case and full-width characters; insert a duplicate skill directly into the database.
 - **Expected result:** Names normalised; duplicates rejected by the form and by the database constraint.
-- **Actual result, evidence and verdict:** “  Data   Analysis  ” became “Data Analysis”; a duplicate insert raised IntegrityError (report Figure 5.3). 2 tests in test_project.py passed.
+- **Actual result, evidence and verdict:** “  Data   Analysis  ” became “Data Analysis”; a duplicate insert raised IntegrityError (report Figure 5.1). 2 tests in test_project.py passed.
 
 ## TC-007
 
@@ -126,14 +126,14 @@ This file is the full record of the 39 test cases summarised in Table 5.5 of the
 - **Traceability:** FR-22, FR-24
 - **Scenario, data and conditions:** Ordinary seeker and employer log in without 2FA; choose Not now; start setup without a fresh password; submit a wrong and then a valid code.
 - **Expected result:** Reminder shown once and never blocks access; setup needs a fresh password; device enabled only after a valid code.
-- **Actual result, evidence and verdict:** The reminder appeared once and never blocked access; setup was refused without a fresh password; the device was enabled only after a valid code (report Figure 5.2). Tests in test_mfa.py and test_mfa_reminder.py passed.
+- **Actual result, evidence and verdict:** The reminder appeared once and never blocked access; setup was refused without a fresh password; the device was enabled only after a valid code. Tests in test_mfa.py and test_mfa_reminder.py passed.
 
 ## TC-019
 
 - **Traceability:** FR-02, FR-16, FR-23
 - **Scenario, data and conditions:** Administrator without a device signs in; administrator with a device signs in; password POST to /admin/login/; old password-only and promoted-user sessions.
 - **Expected result:** Mandatory setup or code entry; no admin access until verified; old sessions signed out.
-- **Actual result, evidence and verdict:** Administrators without a device were sent to setup and had no admin access before verification; the password POST to /admin/login/ and old sessions did not give access (report Figure 5.6). Tests in test_mfa.py and test_mfa_reminder.py passed.
+- **Actual result, evidence and verdict:** Administrators without a device were sent to setup and had no admin access before verification; the password POST to /admin/login/ and old sessions did not give access (report Figure 5.4). Tests in test_mfa.py and test_mfa_reminder.py passed.
 
 ## TC-020
 
